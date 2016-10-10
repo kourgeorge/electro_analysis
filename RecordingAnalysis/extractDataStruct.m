@@ -1,10 +1,12 @@
-function extractDataStruct( rawDataPath, channels )
+function dataStruct = extractDataStruct( rawDataPath, channels, targetFilePath )
 %CREATEDATASTRUCT Summary of this function goes here
-%   extractDataStruct( 'D:\data_jan\004_26012016', 15 )
+%   extractDataStruct( 'D:\data_jan\004_26012016', 1:17, 'D:\data_jan\004_26012016\a.mat' )
 
-%lfpStruct = extractLFP( rawDataPath, channels);
-%trackingStruct = extractTracking(rawDataPath);
-eventsStruct = extractEvents2(rawDataPath);
+dataStruct.lfpStruct = extractLFP( rawDataPath, channels);
+dataStruct.trackingStruct = extractTracking(rawDataPath);
+dataStruct.eventsStruct = extractEvents(rawDataPath);
+
+save(targetFilePath,'dataStruct');
 
 end
 
