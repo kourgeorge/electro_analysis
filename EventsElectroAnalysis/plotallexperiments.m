@@ -1,6 +1,7 @@
 
 %set environment parameters
 datafolder = '../data';
+datafolder = 'D:\data_jan\004_26012016';
 outputfolder = '../output';
 
 listing = dir('../data');
@@ -14,7 +15,7 @@ for i=1:length(listing)
     end
 end
 
-experiments ={'rat1_1404'};
+experiments ={'004_26012016'};
 %Craete spectrograms for 3 events: aBbeam, bBeam, Nope poke
 for i=1:length(experiments)
     generatespectrograms(datafolder, experiments{i}, outputfolder);
