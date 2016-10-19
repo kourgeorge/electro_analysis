@@ -4,12 +4,16 @@ function batch_convert()
 % send results to extractDataStruct
 
 pmazeTable = readtable('pmaze_exp_info.dat', 'Delimiter','\t');
+load('files.mat');
+
 channels_table = getTableLFPChannels(pmazeTable);
+data_folder = 'E:\experiment\RecordingData';
 
-data_folder = 'D:\data_jan';
-
-for i=1:height(channels_table)
-    extractDataStruct(fullfile('D:\data_jan',channels_table.Var2(i)), channels_table.Var3(i), fullfile('D:\data_jan',channels_table.Var2(i)))
+for i=1:length(files)
+    file_name = files{i};
+    row = channels_table(strcmp(channels_table.Var2, file_name),:);
+    disp(['Extracting data for ',row.Var2{:}])
+    extractDataStruct(fullfile(data_folder,row.Var2{:}), row.channels_cell_arr{:}', fullfile(data_folder,row.Var2{:}))
 end
 
 end
