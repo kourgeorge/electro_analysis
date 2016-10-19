@@ -5,22 +5,25 @@ function generatespectrograms(datafolder, experiment_name, outputfolder)
 disp (['ploting events graph grids for experiment: ',experiment_name]);
 
 %Initialize and load data
-electro_data_file = fullfile(datafolder,[experiment_name,'dat.mat']);
-event_dat_file = fullfile(datafolder,[experiment_name,'Events.nevevents.mat']);
-eval(['load ',electro_data_file]);
-eval(['load ',event_dat_file]);
+dataStructFile = fullfile(datafolder,[experiment_name,'.mat']);
+dataStruct = importdata(dataStructFile);
+
 if ~exist(fullfile(outputfolder), 'dir')
     mkdir(fullfile(outputfolder));
 end
 
-timeVector = timeVectorFull;
-lfp = lfpFull;
+timeVector = dataStruct.lfpStruct.timeVector;
+lfp = dataStruct.lfpStruct.lfp(1,:);
 
 if(timeVector(end)-timeVector(1)<60*5)
     disp(['experiment time is too short: ',num2str((timeVector(end)-timeVector(1))/60,2) ,' only minutes!']);
     return;
 end
 
+Abeam_entrance = dataStruct.eventsStruct.aBeamEnter;
+Bbeam_entrance = dataStruct.eventsStruct.bBeamEnter;
+Abeam_exit = dataStruct.eventsStruct.aBeamExit;
+NP = dataStruct.eventsStruct.NP;
 % generate a plot grid for each event
 disp('Generating Abeam grid...')
 ploteventspectrogramgrid(Abeam_entrance, timeVector, lfp, experiment_name, outputfolder)
