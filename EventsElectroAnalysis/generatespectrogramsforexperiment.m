@@ -46,6 +46,8 @@ subplot(3,3,8)
 ploteventspectrogram (Abeam_exit, timeVector, lfp, [1,0.1], 5000);
 subplot(3,3,9)
 ploteventspectrogram (Abeam_exit, timeVector, lfp, [5,0.5], 5000);
+
+savefig(fig,fullfile(outputfolder, experiment_name));
 end
 
 
