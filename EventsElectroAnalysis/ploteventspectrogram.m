@@ -8,7 +8,9 @@ params.fpass=[0,60];
 for ch=1:1%size(lfp,1)
     %if length(sublfp)>60*params.Fs
         [S,t,f]=mtspecgramc(lfp(ch,:),movingwin,params);
-
+        
+        %[tfr,dgr,gam]=tfrgabor(lfp(ch,:),N,q,h,trace);
+        
         %allign t to timeVector because t start from 0
         t = t+timeVector(1);
         event_times = event(:,2);
