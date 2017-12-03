@@ -1,10 +1,10 @@
 function eventsStruct = extractEvents(eventsDataPath)
-%EXTRACTEVENTS2 Summary of this function goes here
+%EXTRACTEVENTS Summary of this function goes here
 %   Detailed explanation goes here
 
 eventsFilePath = fullfile(eventsDataPath,'Events.nev');
 
-[timeStamps, eventIDs, TTLs, Extras, EventStrings, Header] = Nlx2MatEV(eventsFilePath, [1 1 1 1 1], 1, 1, [] );
+[timeStamps, ~, TTLs, ~, EventStrings, ~] = Nlx2MatEV(eventsFilePath, [1 1 1 1 1], 1, 1, [] );
 
 binaryTTLs=[];
 for i=1:length(TTLs)
@@ -28,9 +28,9 @@ ITI = getITI(ports, binaryTTLs, timeStamps);
 
 %after each ITI, search for stimuli presented, and NPs+IR movements.
 rewards = getRewards(ports, binaryTTLs, timeStamps, ITI);
-[correctArm,incorrectArm] = getArmsInfo(ports, binaryTTLs, timeStamps, ITI);
+[correctArm,incorrectArm] = getArmsInfo(ports, binaryTTLs, ITI, timeStamps);
 NP = getNPInfo(ports, binaryTTLs, timeStamps);
-devideNPsToTrials(NP, correctArm, incorrectArm);
+NP = devideNPsToTrials(NP, [correctArm(:,2), incorrectArm(:,2)], ITI);
 [Abeam_entrance, Abeam_exit, Bbeam_entrance, Bbeam_exit] = getABBeams(ports, binaryTTLs, timeStamps, ITI, rewards);
 
 
@@ -43,7 +43,6 @@ eventsStruct.aBeamEnter = Abeam_entrance;
 eventsStruct.aBeamExit = Abeam_exit;
 eventsStruct.bBeamEnter = Bbeam_entrance;
 eventsStruct.bBeamExit = Bbeam_exit;
-
 
 end
 
@@ -72,47 +71,51 @@ rewards=[];
 %collect all reward events
 for i=1:length(binaryTTLs)
     if ports(i)==1 && binaryTTLs{i,1}(1,6)=='0'
-        allRewards(end+1,1)=i; %index
-        allRewards(end,2)=timeStamps(i);  %timestamp
+        allRewards = [allRewards; i, timeStamps(i)];
     end
 end
 %choose only the first event in each trial (there can be only 1 reward event in a trial)
 if ~isempty(allRewards)
     for j=1:length(ITI)-1
+        % find the rewards in timestamps between ITI_i and iTI_{i+1}
         minIndex= min( find(allRewards(:,2) > ITI(j,2) & allRewards(:,2) < ITI(j+1,2)));
-        rewards = [rewards; allRewards(minIndex,:)];
+        if (~isempty(minIndex))
+            rewards = [rewards; [allRewards(minIndex,:), j]];
+        end
     end
     j=length(ITI); %for the last trial: there's no ITI after it
     minIndex= min( find(allRewards(:,2) > ITI(j,2)));
-    rewards = [rewards; allRewards(minIndex,:)];
+    if (~isempty(minIndex))
+        rewards = [rewards; [allRewards(minIndex,:), j]];
+    end
 end
 end
 
-function [correctArm, incorrectArm] = getArmsInfo(ports, binaryTTLs, timeStamps, ITI)
+function [correctArm, incorrectArm] = getArmsInfo(ports, binaryTTLs, ITI, timeStamps)
 All_CorrectArm=[];
 All_IncorrectArm=[];
 for i=1:length(binaryTTLs)
     if ports(i)==0
         switch(binaryTTLs{i,1}(1,6:8))
             case '110' %this is arm 001 = arm 1
-                All_CorrectArm = [All_CorrectArm; i,timeStamps(i), 1];
+                All_CorrectArm = [All_CorrectArm; i, 1, timeStamps(i)];
             case '101' %this is arm 010 = arm 2
-                All_CorrectArm = [All_CorrectArm; i,timeStamps(i), 2];
+                All_CorrectArm = [All_CorrectArm; i, 2, timeStamps(i)];
             case'100' %this is arm 011 = arm 3
-                All_CorrectArm = [All_CorrectArm; i,timeStamps(i), 3];
+                All_CorrectArm = [All_CorrectArm; i, 3, timeStamps(i)];
             case '011' %this is arm 100 = arm 4
-                All_CorrectArm = [All_CorrectArm; i,timeStamps(i), 4];
+                All_CorrectArm = [All_CorrectArm; i, 4, timeStamps(i)];
         end
         
         switch binaryTTLs{i,1}(1,3:5)
             case '110' %this is arm 001 = arm 1
-                All_IncorrectArm = [All_IncorrectArm; i, timeStamps(i), 1];
+                All_IncorrectArm = [All_IncorrectArm; i, 1, timeStamps(i)];
             case '101' %this is arm 010 = arm 2
-                All_IncorrectArm = [All_IncorrectArm; i, timeStamps(i), 1];
+                All_IncorrectArm = [All_IncorrectArm; i, 2, timeStamps(i)];
             case '100' %this is arm 011 = arm 3
-                All_IncorrectArm = [All_IncorrectArm; i, timeStamps(i), 1];
+                All_IncorrectArm = [All_IncorrectArm; i, 3, timeStamps(i)];
             case '011' %this is arm 100 = arm 4
-                All_IncorrectArm = [All_IncorrectArm; i, timeStamps(i), 1];
+                All_IncorrectArm = [All_IncorrectArm; i, 4, timeStamps(i)];
         end
     end
 end
@@ -122,22 +125,22 @@ correctArm=[];
 incorrectArm=[];
 if ~isempty(All_CorrectArm)
     for j=1:length(ITI)-1
-        min_index= min( find(All_CorrectArm(:,2) > ITI(j,2) & All_CorrectArm(:,2) < ITI(j+1,2)));
-        correctArm = [correctArm; All_CorrectArm(min_index,:)];
+        min_index= min( find(All_CorrectArm(:,end) > ITI(j,2) & All_CorrectArm(:,2) < ITI(j+1,2)));
+        correctArm = [correctArm; All_CorrectArm(min_index,1:end-1)]; %Do not add the timestamp field
     end
     j=length(ITI); %for the last trial: there's no ITI after it
-    min_index= min( find(All_CorrectArm(:,2) > ITI(j,2)));
-    correctArm = [correctArm; All_CorrectArm(min_index,:)];
+    min_index= min( find(All_CorrectArm(:,end) > ITI(j,2)));
+    correctArm = [correctArm; All_CorrectArm(min_index,1:end-1)];
 end
 
 if ~isempty(All_IncorrectArm)
     for j=1:length(ITI)-1
-        min_index= min( find(All_IncorrectArm(:,2) > ITI(j,2) & All_IncorrectArm(:,2) < ITI(j+1,2)));
-        incorrectArm = [incorrectArm; All_IncorrectArm(min_index,:)];
+        min_index= min( find(All_IncorrectArm(:,end) > ITI(j,2) & All_IncorrectArm(:,2) < ITI(j+1,2)));
+        incorrectArm = [incorrectArm; All_IncorrectArm(min_index,1:end-1)];
     end
     j=length(ITI); %for the last trial: there's no ITI after it
-    min_index= min( find(All_IncorrectArm(:,2) > ITI(j,2)));
-    incorrectArm = [incorrectArm; All_IncorrectArm(min_index,:)];
+    min_index= min( find(All_IncorrectArm(:,end) > ITI(j,2)));
+    incorrectArm = [incorrectArm; All_IncorrectArm(min_index,1:end-1)];
 end
 end
 
@@ -149,89 +152,72 @@ NP=[];
 for i=1:length(binaryTTLs)
     if i==1
         if ports(i)==0
-            if(binaryTTLs{i,1}(1,2)=='0')
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=1; %arm
-            elseif  binaryTTLs{i,1}(1,1)=='0'
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=2; %arm
+            if(binaryTTLs{i}(2)=='0')
+                NP = [NP; [i, timeStamps(i), 1]];
+            elseif  binaryTTLs{i}(1)=='0'
+                NP = [NP; [i, timeStamps(i), 2]];
             end
         elseif ports(i)==1
-            if(binaryTTLs{i,1}(1,8)=='0')
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=3; %arm
-            elseif  binaryTTLs{i,1}(1,7)=='0'
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=4; %arm
+            if(binaryTTLs{i}(8)=='0')
+                NP = [NP; [i, timeStamps(i), 3]];
+            elseif  binaryTTLs{i}(7)=='0'
+                NP = [NP; [i, timeStamps(i), 4]];
             end
         end
     else
         if ports(i)==0
-            if(binaryTTLs{i,1}(1,2)=='0') && ((binaryTTLs{i-1,1}(1,2)=='1' && ports(i-1)==0) || ports(i-1)==1 )
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=1; %arm
-            elseif  binaryTTLs{i,1}(1,1)=='0' && ((binaryTTLs{i-1,1}(1,1)=='1' && ports(i-1)==0) || ports(i-1)==1 )
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=2; %arm
+            if(binaryTTLs{i}(2)=='0') && ((binaryTTLs{i-1}(2)=='1' && ports(i-1)==0) || ports(i-1)==1 )
+                NP = [NP; [i, timeStamps(i), 1]];
+            elseif binaryTTLs{i}(1)=='0' && ((binaryTTLs{i-1}(1)=='1' && ports(i-1)==0) || ports(i-1)==1 )
+                NP = [NP; [i, timeStamps(i), 2]];
             end
         elseif ports(i)==1
-            if(binaryTTLs{i,1}(1,8)=='0')&& ((binaryTTLs{i-1,1}(1,8)=='1' && ports(i-1)==1) || ports(i-1)==0 )
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=3; %arm
-            elseif  binaryTTLs{i,1}(1,7)=='0'&& ((binaryTTLs{i-1,1}(1,7)=='1' && ports(i-1)==1) || ports(i-1)==0 )
-                NP(end+1,1)=i;  %index
-                NP(end,2)=timeStamps(i); %timestamp
-                NP(end,3)=4; %arm
+            if(binaryTTLs{i}(8)=='0')&& ((binaryTTLs{i-1}(8)=='1' && ports(i-1)==1) || ports(i-1)==0 )
+                NP = [NP; [i, timeStamps(i), 3]];
+            elseif  binaryTTLs{i}(7)=='0'&& ((binaryTTLs{i-1}(7)=='1' && ports(i-1)==1) || ports(i-1)==0 )
+                NP = [NP; [i, timeStamps(i), 4]];
             end
         end
     end
 end
 end
 
-function NPsDevidedToTrials = devideNPsToTrials(NP, correctArm, incorrectArm)
+function NPDevidedToTrials = devideNPsToTrials(NP, Arms, ITI)
 %now filter consecutive appearances of the same NP events:
 %when such cosecutive sequence is found, its first element is defined as
 %NPstart and its last element as NPend. when there's no sequence, only
 %single element, it's defined as both NPstart and NPend:
-NPstart=[];
-NPend=[];
 NPintervals=NP(2:end,2)-NP(1:end-1,2);
 
 NPintervals(:,2)=(NPintervals(:,1)<0.5); %mark all intervals that are smaller than 500msec
 x=find( NPintervals(:,2)==0); %x contains intervals bigger than500msec
-NPstart=[NP(1,:)];
-for i=1:length(x)
-    NPstart=[NPstart; NP(x(i)+1,:)];  %the end point of an interval>0.5 is actually the NPstart we're looking for
+NPstart=NP(1,:);
+for i=x'
+    NPstart=[NPstart; NP(i+1,:)];  %the end point of an interval>0.5 is actually the NPstart we're looking for
 end
 
 
 % ascribe NP to trials:
 NPDevidedToTrials=[];
-for i=1:length(correctArm(:,2))
-    if i==length(correctArm(:,2));    %for the last trial:
-        indices=find(NPstart(:,2)>=correctArm(i,2));
+numTrials = size(ITI, 1);
+for i=1:numTrials
+    if i==numTrials   %for the last trial:
+        IndicesofNPsInTrial=find(NPstart(:,2)>=ITI(i,2));
     else
-        indices=find(NPstart(:,2)>=correctArm(i,2) & NPstart(:,2)<correctArm(i+1,2));
+        IndicesofNPsInTrial=find(NPstart(:,2)>=ITI(i,2) & NPstart(:,2)<ITI(i+1,2));
     end
     % fields in NP_trial:  Np time | Arm | was this correct arm(=1) or
     % incorrect(=0) or other(=2) | trial number
-    for j=1:length(indices)
-        arm=NPstart(indices(j),3);
-        if arm == correctArm(i,3)
+    for j=IndicesofNPsInTrial'
+        arm=NPstart(j,3);
+        if arm == Arms(i,1)
             arm_type=1;
-        elseif arm == incorrectArm(i,3)
+        elseif arm == Arms(i,2)
             arm_type=0;
         else
             arm_type=2;
         end
-        NPDevidedToTrials=[NPDevidedToTrials; [NPstart(indices(j),2) NPstart(indices(j),3) arm_type i]];
+        NPDevidedToTrials=[NPDevidedToTrials; [NPstart(j,2) NPstart(j,3) arm_type i]];
     end
 end
 end
@@ -279,7 +265,7 @@ for i=1:length(binaryTTLs)
                 AandB=[AandB; Bbeam(end,:) ,2];
                 AandBwithITI=[AandBwithITI; Bbeam(end,:) ,2];
         end
-    end  
+    end
 end
 Bbeam_entrance = [];
 Abeam_entrance = [];
@@ -293,7 +279,7 @@ Bbeam_exit = [];
 % % rep=diff(find(diff([-Inf A Inf])));  %how many times the val appears in its sequence
 % % val=A(cumsum(rep));  %the value in each sequence
 
-
+% AandB structure: eventID | timestamp | arm | A/B(1/2)
 for k=1:length(ITI)
     if k==length(ITI)
         intervalBetweenITIs= find(AandB(:,2)>ITI(k,2));
@@ -303,6 +289,7 @@ for k=1:length(ITI)
     if ~isempty(intervalBetweenITIs)
         interval=AandB(intervalBetweenITIs(1):intervalBetweenITIs(end),:);
         %turn the pair into one number so we can run bruno's code:
+        % The equation is 10*arm+Sensor(A/B)
         interval(:,5)=10.*interval(:,3)+interval(:,4);
         A=interval(:,5)';
         rep=diff(find(diff([-Inf A Inf])));  %how many times the val appears in its sequence
@@ -319,49 +306,30 @@ for k=1:length(ITI)
             end_index=sum(count_appearances(1:i,3));
             %if it's Abeam, and flag=0
             if count_appearances(i,2)==1 && was_in_B==0
-                Abeam_entrance = [Abeam_entrance; interval(start_index,1:3)];
+                Abeam_entrance = [Abeam_entrance; interval(start_index,1:3), k];
                 %only if the next step was into Abeam of another arm, mark the end
                 %of this Abeam as an exit. otherwise, the exit would be *after*
                 %visiting the Bbeam:
                 if i~=length(count_appearances(:,1)) && count_appearances(i+1,2)==1 %Abeam
-                    Abeam_exit = [Abeam_exit; interval(end_index,1:3)];
+                    Abeam_exit = [Abeam_exit; interval(end_index,1:3), k];
                 end
                 %if it's B beam
             elseif count_appearances(i,2)==2
                 was_in_B = 1;
-                Bbeam_entrance = [Bbeam_entrance; interval(start_index,1:3)];
-                Bbeam_exit = [Bbeam_exit; interval(end_index,1:3)];
+                Bbeam_entrance = [Bbeam_entrance; interval(start_index,1:3), k];
+                Bbeam_exit = [Bbeam_exit; interval(end_index,1:3), k];
                 if last_Bbeam_arm == interval(end_index,3)%if the previous visit in B was in this same arm,
                     %then the interval of Abeam between these two Bbeams contains the exit from previous B and entrance to current B
-                    Abeam_entrance = [Abeam_entrance; interval(start_index-1,1:3)];
+                    Abeam_entrance = [Abeam_entrance; interval(start_index-1,1:3), k];
                 end
                 last_Bbeam_arm = interval(end_index,3);
                 % if it's an A beam that come after relevant B beam (flag=1)
             elseif count_appearances(i,2)==1 && was_in_B==1
                 was_in_B = 0;
                 % Insert Abeam exit to Abeam_exit array:
-                Abeam_exit = [Abeam_exit; interval(start_index,1:3)];
+                Abeam_exit = [Abeam_exit; interval(start_index,1:3), k];
             end
         end
-    end
-end
-
-% for Bbeam_entrance, add also a field whether there was a reward at the
-% end of this trial (0=no Reward, 1=Reward):
-Bbeam_entrance(:,4)=0;
-for i=1:length(rewards)
-    index=find(abs((rewards(i,2)-Bbeam_entrance(:,2)))<0.01);
-    Bbeam_entrance(index,4)=1;
-end
-
-% for Abeam_exit, add also a field whether there was a reward at the
-% end of this trial (0=no Reward, 1=Reward):
-Abeam_exit(:,4)=0;
-for i=1:length(rewards)
-    indices=find(rewards(i,2)<Abeam_exit(:,2));
-    if ~isempty(indices)
-        index=find(Abeam_exit(:,2)==min(Abeam_exit(indices,2)));
-        Abeam_exit(index,4)=1;
     end
 end
 end
