@@ -217,7 +217,7 @@ for i=1:numTrials
         else
             arm_type=2;
         end
-        NPDevidedToTrials=[NPDevidedToTrials; [NPstart(j,2) NPstart(j,3) arm_type i]];
+        NPDevidedToTrials=[NPDevidedToTrials; [NPstart(j,1) NPstart(j,2) NPstart(j,3) arm_type i]];
     end
 end
 end
