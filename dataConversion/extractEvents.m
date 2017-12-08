@@ -280,6 +280,25 @@ Bbeam_exit = [];
 % % val=A(cumsum(rep));  %the value in each sequence
 
 % AandB structure: eventID | timestamp | arm | A/B(1/2)
+%The algorithm:
+%==============%
+%1. Use the ITI to partition A and B beam recordings to the different trials.
+%2. For each trial, classify consequent sensor recordings to clusters, namely, sequence of same sensor recording with respect to the sensor type A/B and the door - not according to times.
+%3. Remove clusters which represent flickering in the sensors using the following steps
+%   1.If all recordings are from the same door - return
+%   2. for each door, if recordings were obtained from a single sensor - filter out all the recordings from this door.
+%4. Remove uncompleted trials using the following steps:
+%   1.find the patter A(B*)B in the sensor recordings.
+%   2.If not found - mark the trial as in-completed.
+%5. Select the relevant A B A clusters as follows:
+%   1. find the maximal size cluster of B, denote it as B*
+%   2. find the closest A cluster before B* - denoted as A1
+%   3. find the closest A cluster after B* - denoted as A2
+%   4. mark all other clusters as invalid.
+%6. Select the earliest recording in B*
+%7. Select the earliest recording in A1.
+%8. Select the latest recording in A2 
+
 for k=1:length(ITI)
     if k==length(ITI)
         intervalBetweenITIs= find(AandB(:,2)>ITI(k,2));
@@ -300,8 +319,11 @@ for k=1:length(ITI)
         
         was_in_B = 0; %flag noting whether there was already a visit in Bbeam
         last_Bbeam_arm = 0; %keeps the arm where animal last visited Bbeam
-        
+        count_appearances = selectRelevantSensors(count_appearances);
         for i=1:length(count_appearances(:,1))
+            if (count_appearances(i,4)==0)
+                continue;
+            end
             start_index=sum(count_appearances(1:i-1,3)) + 1;
             end_index=sum(count_appearances(1:i,3));
             %if it's Abeam, and flag=0
@@ -332,4 +354,82 @@ for k=1:length(ITI)
         end
     end
 end
+end
+
+function sensorsRecordings = selectRelevantSensors(sensorsRecordings)
+
+% find flikering sensors and mark them as 0;
+% find the sensors sequence of 1 2 1 with the longest sensor 2 serial
+% give pariority to the first set of 1 2 1 
+% mark these sensors as good
+
+len = size(sensorsRecordings,1);
+sensorsRecordings = [sensorsRecordings, ones(len,1)];
+sensorsRecordings = markFlickeringSensorsRecordings(sensorsRecordings);
+sensorsRecordings = markUnCompletedTrials(sensorsRecordings);
+sensorsRecordings = identifyLongestSequenceOf121Recording(sensorsRecordings);
+
+end
+
+function sensorsRecordings = markFlickeringSensorsRecordings(sensorsRecordings)
+
+%If all recordings are from the same door mark all recordings as valid then do nothing.
+if length(unique(sensorsRecordings))==1
+    return
+end
+
+%find the door with the flickering 
+
+doors = unique(sensorsRecordings(:,1));
+for door=doors'
+    %get the sensors recordings for each door.
+    door_sensor = unique(sensorsRecordings(sensorsRecordings(:,1)==door, 2));
+    % if there is a single sensor recording then it is a flickering in that
+    % sensor - so mark all recordings as invalid.
+    if length(door_sensor) == 1
+        sensorsRecordings(sensorsRecordings(:,1)==door, 4) = 0;
+    end
+end
+end
+
+function sensorsRecordings = identifyLongestSequenceOf121Recording(sensorsRecordings)
+    % We assume that we have a completed trials and all recordings are from
+    % the same door. 
+    % The algorithm:
+    % 1. concentrate on the B recordings
+    % 2. find the longest B sensor recording
+    % 3. Mark all other B recordings as not valid
+    % 4. select the first valid sensor A and the last sensor A.
+    temp = sensorsRecordings; 
+    temp(temp(:,4)==0, :) = 0;
+    temp(temp(:,2)==1, :) = 0;
+    
+    [~,longestBSeqIdx] = max(temp(:,3));  
+    
+    BrecordingsExceptLongets = setdiff(find(sensorsRecordings(:,4)==1 & sensorsRecordings(:,2)==2), longestBSeqIdx); 
+    sensorsRecordings(BrecordingsExceptLongets,4) = 0 ;
+    
+    %find the last A before selected vB and the first A after selected B
+    temp = sensorsRecordings; 
+    temp(temp(:,4)==0, :) = 0;
+    AbeforeBindx = find(temp(1:longestBSeqIdx,2)==1, 1, 'last');
+    AafterBindx = find(temp(longestBSeqIdx+1:end,2)==1, 1, 'first');
+    AafterBindx = AafterBindx + longestBSeqIdx;
+    
+    ArecordingsExceptFound = setdiff(find(sensorsRecordings(:,4)==1 & sensorsRecordings(:,2)==1), [AafterBindx, AbeforeBindx]); 
+    sensorsRecordings(ArecordingsExceptFound,4) = 0 ;
+end
+    
+function sensorsRecordings = markUnCompletedTrials(sensorsRecordings)
+    
+    sensor_seq = sensorsRecordings(sensorsRecordings(:,4)==1, 2);
+    rep = diff(find(diff([-Inf sensor_seq' Inf])));
+    val=sensor_seq(cumsum(rep));
+    if ~isempty(findpattern(val, [1 2 1]))
+        return
+    end
+    
+    %mark all recordings as invalid
+    sensorsRecordings(:,4)= 0;
+    
 end
