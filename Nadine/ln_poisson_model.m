@@ -9,7 +9,8 @@ rate = exp(u);
 
 % roughness regularizer weight - note: these are tuned using the sum of f,
 % and thus have decreasing influence with increasing amounts of data
-b_pos = 8e0; b_hd = 5e1; b_spd = 5e1; b_th = 5e1;
+% TODO: fix these weights.
+b_pos = 0; b_arm = 0; b_rew = 0; b_armtype = 0;
 
 % start computing the Hessian
 rX = bsxfun(@times,rate,X);       
@@ -18,37 +19,37 @@ hessian_glm = rX'*X;
 %% find the P, H, S, or T parameters and compute their roughness penalties
 
 % initialize parameter-relevant variables
-J_pos = 0; J_pos_g = []; J_pos_h = []; 
-J_hd = 0; J_hd_g = []; J_hd_h = [];  
-J_spd = 0; J_spd_g = []; J_spd_h = [];  
-J_theta = 0; J_theta_g = []; J_theta_h = [];  
+J_ev = 0; J_ev_g = []; J_ev_h = []; 
+J_arm = 0; J_arm_g = []; J_arm_h = [];  
+J_rew = 0; J_rew_g = []; J_rew_h = [];  
+J_armType = 0; J_armType_g = []; J_armType_h = [];  
 
 % find the parameters
-numPos = 400; numHD = 18; numSpd = 10; numTheta = 18; % hardcoded: number of parameters
-[param_pos,param_hd,param_spd,param_theta] = find_param(param,modelType,numPos,numHD,numSpd,numTheta);
+numPos = 5; numArms = 4; numRew = 1; numArmType = 1; % hardcoded: number of parameters
+[param_pos,param_arms,param_rew,param_armtypes] = find_param(param,modelType,numPos,numArms,numRew,numArmType);
 
 % compute the contribution for f, df, and the hessian
 if ~isempty(param_pos)
-    [J_pos,J_pos_g,J_pos_h] = rough_penalty_2d(param_pos,b_pos);
+    [J_ev,J_ev_g,J_ev_h] = rough_penalty_1d(param_pos,b_pos);
 end
 
-if ~isempty(param_hd)
-    [J_hd,J_hd_g,J_hd_h] = rough_penalty_1d_circ(param_hd,b_hd);
+if ~isempty(param_arms)
+    [J_arm,J_arm_g,J_arm_h] = rough_penalty_1d(param_arms,b_arm);
 end
 
-if ~isempty(param_spd)
-    [J_spd,J_spd_g,J_spd_h] = rough_penalty_1d(param_spd,b_spd);
+if ~isempty(param_rew)
+    [J_rew,J_rew_g,J_rew_h] = rough_penalty_1d(param_rew,b_rew);
 end
 
-if ~isempty(param_theta)
-    [J_theta,J_theta_g,J_theta_h] = rough_penalty_1d_circ(param_theta,b_th);
+if ~isempty(param_armtypes)
+    [J_armType,J_armType_g,J_armType_h] = rough_penalty_1d(param_armtypes,b_armtype);
 end
 
 %% compute f, the gradient, and the hessian 
 
-f = sum(rate-Y.*u) + J_pos + J_hd + J_spd + J_theta;
-df = real(X' * (rate - Y) + [J_pos_g; J_hd_g; J_spd_g; J_theta_g]);
-hessian = hessian_glm + blkdiag(J_pos_h,J_hd_h,J_spd_h,J_theta_h);
+f = sum(rate-Y.*u) + J_ev + J_arm + J_rew + J_armType;
+df = real(X' * (rate - Y) + [J_ev_g; J_arm_g; J_rew_g; J_armType_g]);
+hessian = hessian_glm + blkdiag(J_ev_h,J_arm_h,J_rew_h,J_armType_h);
 
 
 %% smoothing functions called in the above script
@@ -88,60 +89,60 @@ function [J,J_g,J_h] = rough_penalty_1d(param,beta)
     J_h = beta*DD1;
    
 %% function to find the right parameters given the model type
-function [param_pos,param_hd,param_spd,param_theta] = find_param(param,modelType,numPos,numHD,numSpd,numTheta)
+function [param_pos,param_arms,param_rew,param_armtypes] = find_param(param,modelType,numPos,numArms,numRew,numArmType)
 
-param_pos = []; param_hd = []; param_spd = []; param_theta = [];
+param_pos = []; param_arms = []; param_rew = []; param_armtypes = [];
 
 if all(modelType == [1 0 0 0]) 
     param_pos = param;
 elseif all(modelType == [0 1 0 0]) 
-    param_hd = param;
+    param_arms = param;
 elseif all(modelType == [0 0 1 0]) 
-    param_spd = param;
+    param_rew = param;
 elseif all(modelType == [0 0 0 1]) 
-    param_theta = param;
+    param_armtypes = param;
 
 elseif all(modelType == [1 1 0 0])
     param_pos = param(1:numPos);
-    param_hd = param(numPos+1:numPos+numHD);
+    param_arms = param(numPos+1:numPos+numArms);
 elseif all(modelType == [1 0 1 0]) 
     param_pos = param(1:numPos);
-    param_spd = param(numPos+1:numPos+numSpd);
+    param_rew = param(numPos+1:numPos+numRew);
 elseif all(modelType == [1 0 0 1]) 
     param_pos = param(1:numPos);
-    param_theta = param(numPos+1:numPos+numTheta);
+    param_armtypes = param(numPos+1:numPos+numArmType);
 elseif all(modelType == [0 1 1 0]) 
-    param_hd = param(1:numHD);
-    param_spd = param(numHD+1:numHD+numSpd);
+    param_arms = param(1:numArms);
+    param_rew = param(numArms+1:numArms+numRew);
 elseif all(modelType == [0 1 0 1]) 
-    param_hd = param(1:numHD);
-    param_theta = param(numHD+1:numHD+numTheta);
+    param_arms = param(1:numArms);
+    param_armtypes = param(numArms+1:numArms+numArmType);
 elseif all(modelType == [0 0 1 1])  
-    param_spd = param(1:numSpd);
-    param_theta = param(numSpd+1:numSpd+numTheta);
+    param_rew = param(1:numRew);
+    param_armtypes = param(numRew+1:numRew+numArmType);
     
 elseif all(modelType == [1 1 1 0])
     param_pos = param(1:numPos);
-    param_hd = param(numPos+1:numPos+numHD);
-    param_spd = param(numPos+numHD+1:numPos+numHD+numSpd);
+    param_arms = param(numPos+1:numPos+numArms);
+    param_rew = param(numPos+numArms+1:numPos+numArms+numRew);
 elseif all(modelType == [1 1 0 1]) 
     param_pos = param(1:numPos);
-    param_hd = param(numPos+1:numPos+numHD);
-    param_theta = param(numPos+numHD+1:numPos+numHD+numTheta);
+    param_arms = param(numPos+1:numPos+numArms);
+    param_armtypes = param(numPos+numArms+1:numPos+numArms+numArmType);
 elseif all(modelType == [1 0 1 1]) 
     param_pos = param(1:numPos);
-    param_spd = param(numPos+1:numPos+numSpd);
-    param_theta = param(numPos+numSpd+1:numPos+numSpd+numTheta);
+    param_rew = param(numPos+1:numPos+numRew);
+    param_armtypes = param(numPos+numRew+1:numPos+numRew+numArmType);
 elseif all(modelType == [0 1 1 1]) 
-    param_hd = param(1:numHD);
-    param_spd = param(numHD+1:numHD+numSpd);
-    param_theta = param(numHD+numSpd+1:numHD+numSpd+numTheta);
+    param_arms = param(1:numArms);
+    param_rew = param(numArms+1:numArms+numRew);
+    param_armtypes = param(numArms+numRew+1:numArms+numRew+numArmType);
     
 elseif all(modelType == [1 1 1 1])
     param_pos = param(1:numPos);
-    param_hd = param(numPos+1:numPos+numHD);
-    param_spd = param(numPos+numHD+1:numPos+numHD+numSpd);
-    param_theta = param(numPos+numHD+numSpd+1:numPos+numHD+numSpd+numTheta);
+    param_arms = param(numPos+1:numPos+numArms);
+    param_rew = param(numPos+numArms+1:numPos+numArms+numRew);
+    param_armtypes = param(numPos+numArms+numRew+1:numPos+numArms+numRew+numArmType);
 end
     
 
