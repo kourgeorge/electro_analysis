@@ -254,7 +254,7 @@ end
 % ascribe NP to trials:
 NP_divided_to_trials=[];
 for i=1:length(CorrectArm(:,2))
-    if i==length(CorrectArm(:,2));    %for the last trial:
+    if i==length(CorrectArm(:,2))    %for the last trial:
         indices=find(NPstart(:,2)>=CorrectArm(i,2));
     else
         indices=find(NPstart(:,2)>=CorrectArm(i,2) & NPstart(:,2)<CorrectArm(i+1,2));

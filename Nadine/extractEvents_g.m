@@ -1,4 +1,4 @@
-function eventsStruct = extractEvents(eventsDataPath)
+function eventsStruct = extractEvents_g(eventsDataPath)
 %EXTRACTEVENTS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -27,24 +27,34 @@ timeStamps=(timeStamps/1e6)';  %convert to sec
 ITI = getITI(ports, binaryTTLs, timeStamps);
 
 %after each ITI, search for stimuli presented, and NPs+IR movements.
-rewards = getRewards(ports, binaryTTLs, timeStamps, ITI);
-[correctArm,incorrectArm] = getArmsInfo(ports, binaryTTLs, ITI, timeStamps);
+Rewards = getRewards(ports, binaryTTLs, timeStamps, ITI);
+[CorrectArm1,CorrectArm2] = getArmsInfo(ports, binaryTTLs, ITI, timeStamps);
 NP = getNPInfo(ports, binaryTTLs, timeStamps);
-NP = devideNPsToTrials(NP, [correctArm(:,2), incorrectArm(:,2)], ITI);
-[Abeam_entrance, Abeam_exit, Bbeam_entrance, Bbeam_exit] = getABBeams(ports, binaryTTLs, timeStamps, ITI, rewards);
+%CorrectArm1(end,:) = [];
+NP = devideNPsToTrials(NP, [CorrectArm1(:,2), CorrectArm2(:,2)], ITI);
+[Abeam_entrance, Abeam_exit, Bbeam_entrance, Bbeam_exit] = getABBeams(ports, binaryTTLs, timeStamps, ITI, Rewards);
 
+NP_trial = NP(:,5);
+[C, indxs] = unique(NP_trial, 'first');
+all_indxs = (1:length(NP_trial))';
+[remove_indxs,PS] = removerows(all_indxs, 'ind', indxs);
+[NP_new,PS] = removerows(NP, 'ind',remove_indxs);
+NP_new(:,4) = [];
 
 eventsStruct.ITI = ITI;
-eventsStruct.rewards = rewards;
-eventsStruct.correctArm = correctArm;
-eventsStruct.incorrectArm = incorrectArm;
+eventsStruct.Rewards = Rewards;
+eventsStruct.CorrectArm1 = CorrectArm1;
+eventsStruct.CorrectArm2 = CorrectArm2;
 eventsStruct.NP = NP;
-eventsStruct.aBeamEnter = Abeam_entrance;
-eventsStruct.aBeamExit = Abeam_exit;
-eventsStruct.bBeamEnter = Bbeam_entrance;
-eventsStruct.bBeamExit = Bbeam_exit;
-
-save(fullfile(eventsDataPath,'events.mat'), '-struct', 'eventsStruct' )
+eventsStruct.Abeam_entrance = Abeam_entrance;
+eventsStruct.Abeam_exit = Abeam_exit;
+eventsStruct.Bbeam_entrance = Bbeam_entrance;
+eventsStruct.Bbeam_exit = Bbeam_exit;
+eventsStruct.NP_new = NP_new;
+disp(['writing file ' eventsDataPath 'events_g.mat...']);
+save ([eventsDataPath 'events_g.mat']);
+save ([eventsDataPath 'events_g.mat'] ,  '-struct', 'eventsStruct')
+%save(fullfile(eventsDataPath,'events_g.mat'), '-struct', 'eventsStruct' )
 end
 
 function ITI = getITI(ports, binaryTTLs, timeStamps)
@@ -65,10 +75,10 @@ ITI(indices_to_delete,:)=[];
 
 end
 
-function rewards = getRewards(ports, binaryTTLs, timeStamps, ITI)
+function Rewards = getRewards(ports, binaryTTLs, timeStamps, ITI)
 
 allRewards=[];
-rewards=[];
+Rewards=[];
 %collect all reward events
 for i=1:length(binaryTTLs)
     if ports(i)==1 && binaryTTLs{i,1}(1,6)=='0'
@@ -81,69 +91,72 @@ if ~isempty(allRewards)
         % find the rewards in timestamps between ITI_i and iTI_{i+1}
         minIndex= min( find(allRewards(:,2) > ITI(j,2) & allRewards(:,2) < ITI(j+1,2)));
         if (~isempty(minIndex))
-            rewards = [rewards; [allRewards(minIndex,:), j]];
+            Rewards = [Rewards; [allRewards(minIndex,:), j]];
         end
     end
     j=length(ITI); %for the last trial: there's no ITI after it
     minIndex= min( find(allRewards(:,2) > ITI(j,2)));
     if (~isempty(minIndex))
-        rewards = [rewards; [allRewards(minIndex,:), j]];
+        Rewards = [Rewards; [allRewards(minIndex,:), j]];
     end
 end
 end
 
-function [correctArm, incorrectArm] = getArmsInfo(ports, binaryTTLs, ITI, timeStamps)
-All_CorrectArm=[];
-All_IncorrectArm=[];
+function [CorrectArm1, CorrectArm2] = getArmsInfo(ports, binaryTTLs, ITI, timeStamps)
+All_CorrectArm1=[];
+All_CorrectArm2=[];
 for i=1:length(binaryTTLs)
     if ports(i)==0
         switch(binaryTTLs{i,1}(1,6:8))
             case '110' %this is arm 001 = arm 1
-                All_CorrectArm = [All_CorrectArm; i, 1, timeStamps(i)];
+                All_CorrectArm1 = [All_CorrectArm1; i, 1, timeStamps(i)];
             case '101' %this is arm 010 = arm 2
-                All_CorrectArm = [All_CorrectArm; i, 2, timeStamps(i)];
+                All_CorrectArm1 = [All_CorrectArm1; i, 2, timeStamps(i)];
             case'100' %this is arm 011 = arm 3
-                All_CorrectArm = [All_CorrectArm; i, 3, timeStamps(i)];
+                All_CorrectArm1 = [All_CorrectArm1; i, 3, timeStamps(i)];
             case '011' %this is arm 100 = arm 4
-                All_CorrectArm = [All_CorrectArm; i, 4, timeStamps(i)];
+                All_CorrectArm1 = [All_CorrectArm1; i, 4, timeStamps(i)];
         end
         
         switch binaryTTLs{i,1}(1,3:5)
             case '110' %this is arm 001 = arm 1
-                All_IncorrectArm = [All_IncorrectArm; i, 1, timeStamps(i)];
+                All_CorrectArm2 = [All_CorrectArm2; i, 1, timeStamps(i)];
             case '101' %this is arm 010 = arm 2
-                All_IncorrectArm = [All_IncorrectArm; i, 2, timeStamps(i)];
+                All_CorrectArm2 = [All_CorrectArm2; i, 2, timeStamps(i)];
             case '100' %this is arm 011 = arm 3
-                All_IncorrectArm = [All_IncorrectArm; i, 3, timeStamps(i)];
+                All_CorrectArm2 = [All_CorrectArm2; i, 3, timeStamps(i)];
             case '011' %this is arm 100 = arm 4
-                All_IncorrectArm = [All_IncorrectArm; i, 4, timeStamps(i)];
+                All_CorrectArm2 = [All_CorrectArm2; i, 4, timeStamps(i)];
         end
     end
 end
 
 %choose only the first event in each trial
-correctArm=[];
-incorrectArm=[];
-if ~isempty(All_CorrectArm)
+CorrectArm1=[];
+CorrectArm2=[];
+if ~isempty(All_CorrectArm1)
     for j=1:length(ITI)-1
-        min_index= min( find(All_CorrectArm(:,end) > ITI(j,2) & All_CorrectArm(:,2) < ITI(j+1,2)));
-        correctArm = [correctArm; All_CorrectArm(min_index,1:end-1)]; %Do not add the timestamp field
+        min_index= min( find(All_CorrectArm1(:,end) > ITI(j,2) & All_CorrectArm1(:,2) < ITI(j+1,2)));
+        CorrectArm1 = [CorrectArm1; All_CorrectArm1(min_index,1:end-1)]; %Do not add the timestamp field
     end
     j=length(ITI); %for the last trial: there's no ITI after it
-    min_index= min( find(All_CorrectArm(:,end) > ITI(j,2)));
-    correctArm = [correctArm; All_CorrectArm(min_index,1:end-1)];
+    min_index= min( find(All_CorrectArm1(:,end) > ITI(j,2)));
+    CorrectArm1 = [CorrectArm1; All_CorrectArm1(min_index,1:end-1)];
 end
 
-if ~isempty(All_IncorrectArm)
+if ~isempty(All_CorrectArm2)
     for j=1:length(ITI)-1
-        min_index= min( find(All_IncorrectArm(:,end) > ITI(j,2) & All_IncorrectArm(:,2) < ITI(j+1,2)));
-        incorrectArm = [incorrectArm; All_IncorrectArm(min_index,1:end-1)];
+        min_index= min( find(All_CorrectArm2(:,end) > ITI(j,2) & All_CorrectArm2(:,2) < ITI(j+1,2)));
+        CorrectArm2 = [CorrectArm2; All_CorrectArm2(min_index,1:end-1)];
     end
     j=length(ITI); %for the last trial: there's no ITI after it
-    min_index= min( find(All_IncorrectArm(:,end) > ITI(j,2)));
-    incorrectArm = [incorrectArm; All_IncorrectArm(min_index,1:end-1)];
+    min_index= min( find(All_CorrectArm2(:,end) > ITI(j,2)));
+    CorrectArm2 = [CorrectArm2; All_CorrectArm2(min_index,1:end-1)];
 end
+%change the 3 to a 2 in CorrectArm1:
+CorrectArm1(CorrectArm1(:,2) ==3, 2) = 2;
 end
+
 
 function NP = getNPInfo(ports, binaryTTLs, timeStamps)
 %a new NP event may be defined only after the previous event was closed
@@ -223,7 +236,7 @@ for i=1:numTrials
 end
 end
 
-function [Abeam_entrance, Abeam_exit, Bbeam_entrance, Bbeam_exit] = getABBeams(ports, binaryTTLs, timeStamps, ITI, rewards)
+function [Abeam_entrance, Abeam_exit, Bbeam_entrance, Bbeam_exit] = getABBeams(ports, binaryTTLs, timeStamps, ITI, Rewards)
 
 Abeam=[];
 Bbeam=[];
@@ -391,6 +404,7 @@ for door=doors'
         sensorsRecordings(sensorsRecordings(:,1)==door, 4) = 0;
     end
 end
+
 end
 
 function sensorsRecordings = identifyLongestSequenceOf121Recording(sensorsRecordings)
