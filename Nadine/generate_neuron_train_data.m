@@ -21,18 +21,29 @@ st=Nlx2MatSpike(ss_file,[1 0 0 0 0],0,1,[]);
 [event_times, selected_arms, rewarded_arm1, rewarded_arm2] = extract_event_times(behave);
 st = st / 1e6;
 
-X = [];
-Y = [];
+i=0;
+X = zeros(1e6,22);
+Y = zeros(1e6,1);
+num_bins_in_event = 3;
+
 for trial =1:size(event_times,1)
     start_trial_time = event_times(trial,1);
     end_trial_time = event_times(trial,end);
-    num_bins = round((end_trial_time + 2 - start_trial_time)/dt); 
-    time_bins = linspace(start_trial_time, end_trial_time, num_bins);
+    num_time_bins_in_trial = round((end_trial_time - start_trial_time)/dt); 
+    trial_time_bins = linspace(start_trial_time, end_trial_time, num_time_bins_in_trial);
     
-    for bin = 1:length(time_bins)-1
-        interval = find(event_times(trial,:)<time_bins(bin+1), 1, 'last');
-        event_feature = zeros(1, size(event_times,2)-1);
-        event_feature(interval) = 1;
+    
+    for bin = 1:length(trial_time_bins)-1
+        time = trial_time_bins(bin);
+        event = find(event_times(trial,:)<=time, 1, 'last');
+        start_event_time = event_times(trial,event);
+        end_event_time = event_times(trial,event+1);
+        time_bins_in_event = linspace(start_event_time,end_event_time, num_bins_in_event+1);
+        bin_in_event = find(time_bins_in_event<=time, 1, 'last');
+        %disp([num2str(event),' ',num2str(bin_in_event)])
+        event_feature = zeros(1, (size(event_times,2)-1)*num_bins_in_event);
+        
+        event_feature((event-1)*num_bins_in_event+bin_in_event) = 1;
         selected_arm = selected_arms(trial);
         arm_feature = zeros(1, 4);
         arm_feature(selected_arm) = 1;
@@ -40,14 +51,18 @@ for trial =1:size(event_times,1)
         reward2_feature = selected_arm==rewarded_arm2(trial);
         rewarded_feature = reward1_feature || reward2_feature;
         
-        food_arm_feature = selected_arm == 3 || selected_arm == 4;
+        water_arm_feature = selected_arm == 1 || selected_arm == 2;
+        food_arm_feature = selected_arm == 1 || selected_arm == 2;
         
+        i=i+1;
+        X(i,:) = [event_feature , arm_feature, rewarded_feature, water_arm_feature, food_arm_feature];
+        Y(i,:) = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
         
-        X = [X; [event_feature , arm_feature, rewarded_feature, food_arm_feature]];
-        Y = [Y; length(find (st>time_bins(bin) & st<time_bins(bin+1)))];
     end
     
     
 end
+X=X(1:i,:);
+Y=Y(1:i,:);
 
 end
