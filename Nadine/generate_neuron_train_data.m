@@ -21,10 +21,12 @@ st=Nlx2MatSpike(ss_file,[1 0 0 0 0],0,1,[]);
 [event_times, selected_arms, rewarded_arm1, rewarded_arm2] = extract_event_times(behave);
 st = st / 1e6;
 
-i=0;
-X = zeros(1e6,22);
+%Initilize a huge matrix to avoid increasing it size iteratively.
+i=1;
+X = zeros(1e6,21);
 Y = zeros(1e6,1);
 num_bins_in_event = 3;
+
 
 for trial =1:size(event_times,1)
     start_trial_time = event_times(trial,1);
@@ -51,12 +53,15 @@ for trial =1:size(event_times,1)
         reward2_feature = selected_arm==rewarded_arm2(trial);
         rewarded_feature = reward1_feature || reward2_feature;
         
-        water_arm_feature = selected_arm == 1 || selected_arm == 2;
+        %water_arm_feature = selected_arm == 1 || selected_arm == 2;
         food_arm_feature = selected_arm == 1 || selected_arm == 2;
         
-        i=i+1;
-        X(i,:) = [event_feature , arm_feature, rewarded_feature, water_arm_feature, food_arm_feature];
+        %food_arm_feature = log(length(st)/(st(end)-st(1)));
+        %food_arm_feature = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
+        
+        X(i,:) = [event_feature , arm_feature , rewarded_feature, food_arm_feature];
         Y(i,:) = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
+        i=i+1;
         
     end
     

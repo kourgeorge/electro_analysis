@@ -9,14 +9,14 @@ rate = exp(u);
 
 % roughness regularizer weight - note: these are tuned using the sum of f,
 % and thus have decreasing influence with increasing amounts of data
-% TODO: fix these weights.
-b_pos = 1; b_arm = 10; b_rew = 50; b_armtype = 50;
+% b_pos = 1; b_arm = 10; b_rew = 50; b_armtype = 50;
+b_pos = 0; b_arm = 0; b_rew = 0; b_armtype = 0;
 
 % start computing the Hessian
 rX = bsxfun(@times,rate,X);       
 hessian_glm = rX'*X;
 
-%% find the P, H, S, or T parameters and compute their roughness penalties
+% find the P, H, S, or T parameters and compute their roughness penalties
 
 % initialize parameter-relevant variables
 J_ev = 0; J_ev_g = []; J_ev_h = []; 
@@ -26,6 +26,7 @@ J_armType = 0; J_armType_g = []; J_armType_h = [];
 
 % find the parameters
 numPos = 15; numArms = 4; numRew = 1; numArmType = 1; % hardcoded: number of parameters
+
 [param_pos,param_arms,param_rew,param_armtypes] = find_param(param,modelType,numPos,numArms,numRew,numArmType);
 
 % compute the contribution for f, df, and the hessian

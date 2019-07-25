@@ -1,4 +1,4 @@
-function [testFit,trainFit,param, numFolds, numModels] = fit_all_ln_models(X,spiketrain,dt)
+function [testFit,trainFit,param,numModels] = fit_all_ln_models(X,spiketrain,dt, numFolds)
 %%% Description
 % The model: r = exp(W*theta), where r is the predicted # of spikes, W is a
 % matrix of one-hot vectors describing variable (P, H, S, or T) values, and
@@ -9,12 +9,12 @@ function [testFit,trainFit,param, numFolds, numModels] = fit_all_ln_models(X,spi
 num_pos_bins = 15;
 n_arm_bins = 4;
 n_rew_bins = 1;
-n_armtype_bins = 2;
+n_armtype_bins = 1;
 
 posgrid = X(:,1:num_pos_bins);
 armsgrid = X(:,num_pos_bins+1:num_pos_bins+n_arm_bins);
 rewardgrid = X(:,num_pos_bins+n_arm_bins+1:num_pos_bins+n_arm_bins+n_rew_bins);
-armtypegrid=X(:,num_pos_bins+n_arm_bins+n_armtype_bins+1:num_pos_bins+n_arm_bins+n_rew_bins+n_armtype_bins);
+armtypegrid=X(:,num_pos_bins+n_arm_bins+n_rew_bins+1:num_pos_bins+n_arm_bins+n_rew_bins+n_armtype_bins);
 
 %%% Fit all 15 LN models
 
@@ -52,8 +52,6 @@ fr = spiketrain/dt;
 smooth_fr = conv(fr,filter,'same');
 
 % compute the number of folds we would like to do
-numFolds = 10;
-
 for n = 1:numModels
     fprintf('\t- Fitting model %d of %d\n', n, numModels);
     [testFit{n},trainFit{n},param{n}] = fit_model(A{n},dt,spiketrain,filter,modelType{n},numFolds);

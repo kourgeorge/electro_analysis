@@ -1,4 +1,4 @@
-function selected_model = select_best_model(testFit, numFolds, numModels)
+function selected_model = select_best_model(LLH_values)
 %% Description
 % This code will implement forward feature selection in order to determine
 % the simplest model that best describes neural spiking. First, the
@@ -14,13 +14,6 @@ function selected_model = select_best_model(testFit, numFolds, numModels)
 % the model indexing scheme:
 % PAst, PAs, PAT, PRt, ARt, PA, PR, pt, AR, ht, st, p,  h,  s,  t
 % 1      2    3    4    5    6  7   8   9   10  11  12  13  14  15
-
-
-
-testFit_mat = cell2mat(testFit);
-LLH_values = reshape(testFit_mat(:,3),numFolds,numModels);
-
-
 
 % find the best single model
 singleModels = 12:15;
@@ -90,6 +83,6 @@ end
 % re-set if selected model is not above baseline
 pval_baseline = signrank(LLH_values(:,selected_model),[],'tail','right');
 
-% if pval_baseline > 0.05
-%     selected_model = NaN;
-% end
+if pval_baseline > 0.05
+    selected_model = NaN;
+end

@@ -12,6 +12,8 @@ function [testFit,trainFit,param_mean] = fit_model(A,dt,spiketrain,filter,modelT
 
 
 %% Initialize matrices and section the data for k-fold cross-validation
+% [rows,~] = size(A);
+%A= [ones(rows,1), A];
 
 [~,numCol] = size(A);
 sections = numFolds*5;
@@ -54,6 +56,7 @@ for k = 1:numFolds
         init_param = param;
     end
     [param] = fminunc(@(param) ln_poisson_model(param,data,modelType),init_param,opts);
+    %[param,~,~] = glmfit(data{1},data{2},'poisson', 'Constant', 'off', 'link', 'log');
     
     %%%%%%%%%%%%% TEST DATA %%%%%%%%%%%%%%%%%%%%%%%
     % compute the firing rate
