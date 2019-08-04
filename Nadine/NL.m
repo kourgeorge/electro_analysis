@@ -24,7 +24,7 @@ for i=1:length(events_bins_span)
 end
 
 % Extracting data
-[X,y] = generate_neuron_train_data (ss_file, dt);
+[X,y] = generate_neuron_train_data (st, behave, dt);
 
 disp(['num samples:', num2str(length(y))])
 disp(['num spikes:', num2str(sum(y))])
@@ -63,6 +63,8 @@ set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
 legend('Model performance','Selected Model','Baseline')
 suptitle (ss_file)
 ylabel('LLH increase')
+
+ylim([-1 1])
 
 % lim=10*max(LLH_increase_mean+LLH_increase_mean);
 % ylim([-lim lim])

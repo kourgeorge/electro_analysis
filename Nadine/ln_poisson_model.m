@@ -25,7 +25,7 @@ J_rew = 0; J_rew_g = []; J_rew_h = [];
 J_armType = 0; J_armType_g = []; J_armType_h = [];  
 
 % find the parameters
-numPos = 15; numArms = 4; numRew = 1; numArmType = 1; % hardcoded: number of parameters
+numPos = 15; numArms = 4; numRew = 2; numArmType = 2; % hardcoded: number of parameters
 
 [param_pos,param_arms,param_rew,param_armtypes] = find_param(param,modelType,numPos,numArms,numRew,numArmType);
 

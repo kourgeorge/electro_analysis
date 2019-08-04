@@ -8,8 +8,8 @@ function [testFit,trainFit,param,numModels] = fit_all_ln_models(X,spiketrain,dt,
 
 num_pos_bins = 15;
 n_arm_bins = 4;
-n_rew_bins = 1;
-n_armtype_bins = 1;
+n_rew_bins = 2;
+n_armtype_bins = 2;
 
 posgrid = X(:,1:num_pos_bins);
 armsgrid = X(:,num_pos_bins+1:num_pos_bins+n_arm_bins);
