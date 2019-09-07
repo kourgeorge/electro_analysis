@@ -14,8 +14,14 @@ function [median_times, proportions, num_bins_per_proportion, num_bins_between_e
 
 bin_size = 20; %ms
 
-BHV_files = dir([stage_folder,'\*\rat*_mpfc_*.*events_g*.mat']);
+BHV_files = dir([stage_folder,'\rat*_mpfc_*.*events_g*.mat']);
+%BHV_files = dir([stage_folder,'*\*rat6_mpfc_*events_g.mat']);
 
+if isempty(BHV_files)
+    disp('No behavior data.')
+    return
+end
+    
 all_days_events_times = [];
 for i=1:length(BHV_files)
     behave = load([BHV_files(i).folder,'\',BHV_files(i).name]);
@@ -36,8 +42,7 @@ time_between_events = event_times(:,2:end)-event_times(:,1:end-1);
 % scatter(x(:),a(:));
 
 median_times = round(median(time_between_events),1);
-proportions = ceil((median_times)/sum(median_times+1) *10);
-%proportions = round(softmax(median(a)+1, 0.1)*10);
+proportions = ceil((median_times)/sum(median_times) *10);
 
 
 num_bins_per_proportion = round(sum(median_times)*1000/bin_size/sum(proportions));

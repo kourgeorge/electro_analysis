@@ -10,7 +10,6 @@ behave = load(events_path);
 
 
 st=Nlx2MatSpike(ss_path,[1 0 0 0 0],0,1,[]);
-%save(ss_path, st);
 
 st = st / 1e6;
 
