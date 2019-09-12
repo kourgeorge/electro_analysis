@@ -43,7 +43,7 @@ for trial=1:size(times,1)
         startbin = times(trial, bin);
         endbin = times(trial, bin+1);
         binlength = endbin-startbin;
-        spikes(trial, bin) = length(find (electrode>startbin & electrode<endbin));
+        spikes(trial, bin) = length(find (electrode>=startbin & electrode<endbin));
         spikes_rate(trial, bin) = spikes(trial, bin) /binlength;
         
     end

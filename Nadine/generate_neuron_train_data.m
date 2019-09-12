@@ -1,4 +1,4 @@
-function [X,Y] = generate_neuron_train_data (st, behave, dt)
+function [X,Y] = generate_neuron_train_data (st, behave, dt, proportions)
 % Given a apiking and behavioural data, this function creates extracts 
 % relevant input features and responses to create dataset that can be fitted
 % using GLM.
@@ -10,16 +10,10 @@ function [X,Y] = generate_neuron_train_data (st, behave, dt)
 
 [event_times, selected_arms, rewarded_arm1, rewarded_arm2] = extract_event_times(behave);
 
-%Get proportions - BIN-BOUT is the diff trash
-time_between_events = event_times(:,2:end)-event_times(:,1:end-1);
-median_times = round(median(time_between_events),1);
-proportions = ceil((median_times)/sum(median_times) * 15);
-proportions(3) = proportions(3)-(sum(proportions)-15);
-
 
 %Initilize a huge matrix to avoid increasing it size iteratively.
 i=1;
-X = zeros(1e6,15+4+2+1+1);
+X = zeros(1e6,sum(proportions)+4+2+1+1);
 Y = zeros(1e6,1);
 
 
@@ -67,6 +61,12 @@ for trial =1:size(event_times,1)
         %food_arm_feature = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
         
         X(i,:) = [event_feature , arm_feature , rewarded_feature, food_arm_feature, water_arm_feature];
+%         if find(event_feature==1)==1 || find(event_feature==1)==1
+%             Y(i,:) = poissrnd(.5);
+%         else
+%             Y(i,:) = poissrnd(.1);
+%         end
+        %Y(i,:) = find(event_feature==1) * 2 + find(arm_feature==1) * 1 + randi([-3,3]);
         Y(i,:) = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
         i=i+1;
         

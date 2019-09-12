@@ -1,6 +1,6 @@
 
-electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
+electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_14.10';
+day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 
 identifiable_neurons = 0;
 total_neurons = 0;
@@ -19,7 +19,7 @@ for i = 1:length(day_files)
         
         total_neurons=total_neurons+1;
         
-        ss_file = [SS_files(i).folder,'\',SS_files(i).name];
+        ss_file = [SS_files(i).folder,'\',SS_files(i).name]
         
         %extract data to show neural activity during the day
         idcs   = strfind(ss_file,'\');
@@ -27,28 +27,54 @@ for i = 1:length(day_files)
         
         %Load data and extract meta information
         [behave, st] = load_spikes_and_behavioral_data (ss_file);
+        
+        
+        %%%% Manipulate st to check the model validity %%%%%%
+        
+%         [event_times, ~, ~, ~] = extract_event_times(behave);
+%         
+%         old_st = st;
+%         diff_st = diff(st);
+%         perm = randperm(length(st)-1);
+%         diff_st = diff_st(perm);
+%         st = cumsum([st(1) diff_st]);
+% 
+%         ain_times = event_times(:,4);
+%         %add spikes in the area
+%         for k=1:length(ain_times)
+%             a_spikes = randn([1,10])*0.2+ain_times(k);
+%             st = [st, a_spikes];
+%         end
+% 
+%         st = sort(st);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        
         [median_times, proportions, num_bins_per_proportion, num_bins_between_events] = analyze_behavior_in_stage(day_folder);
         
         % Allign st to events.
-        [spike_count, bined_spikes_cell, events_bins_span] = ss_activity_inday (behave, st, num_bins_between_events);
+        [spike_count, binned_spikes_cell, events_bins_span] = ss_activity_inday (behave, st, num_bins_between_events);
         
         %subplot(num_neurons,2,(i-1)*2+1)
         
         %heatmap(bined_spikes_cell, 1:size(bined_spikes_cell,2), num2str(spike_count),[] ,'ColorBar', true)
         
         subplot(num_neurons+1,2,(i-1)*2+1)
-        w = gausswin(30);
+        w = gausswin(10);
         w=w./sum(w);
         %y = filter(w,1,bined_spikes_cell);
-        y = filtfilt(w,1,bined_spikes_cell);
+        y = filtfilt(w,1,binned_spikes_cell);
         plot(y)
         ylim([-0.3,0.3])
+        xlim([0,length(binned_spikes_cell)+100])
         
         for j=1:length(events_bins_span)
             vline(events_bins_span(j),'b')
         end
         
-        [LLH_values, selected_model] = fit_model_to_neuron(st, behave, numFolds);
+        [LLH_values, selected_model] = fit_model_to_neuron(st, behave, numFolds, proportions);
+        
+        selected_model
         
         LLH_increase_mean = mean(LLH_values);
         LLH_increase_sem = std(LLH_values)/sqrt(numFolds);
@@ -61,6 +87,7 @@ for i = 1:length(day_files)
             plot(selected_model,LLH_increase_mean(selected_model),'.r','markersize',25)
             identifiable_neurons = identifiable_neurons+1;
             neurons_type(selected_model) = neurons_type(selected_model)+1;
+            
         end
         hold off
         %box off
@@ -93,7 +120,7 @@ for i = 1:length(day_files)
     
     saveas(f, fullfile(day_folder,'mmodels.jpg'))
     %Print the heatmap for the entire day
-    close(f)
+    %close(f)
     %alligned_heatmap_view (day_folder)
     %savefig(fullfile(day_folder,'aactivity'))
     

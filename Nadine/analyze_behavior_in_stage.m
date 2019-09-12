@@ -41,12 +41,24 @@ time_between_events = event_times(:,2:end)-event_times(:,1:end-1);
 % figure
 % scatter(x(:),a(:));
 
-median_times = round(median(time_between_events),1);
-proportions = ceil((median_times)/sum(median_times) *10);
+%median_times = round(median(time_between_events),1);
+%proportions = ceil((median_times)/sum(median_times) *10);
 
+
+
+%num_bins_per_proportion = 100;
+
+%Get proportions - BIN-BOUT is the diff trash
+
+num_bins = 15;
+
+time_between_events = event_times(:,2:end)-event_times(:,1:end-1);
+median_times = round(median(time_between_events),1);
+proportions = ceil((median_times)/sum(median_times) * num_bins);
+proportions(3) = proportions(3)-(sum(proportions)-num_bins);
 
 num_bins_per_proportion = round(sum(median_times)*1000/bin_size/sum(proportions));
-%num_bins_per_proportion = 100;
+
 
 num_bins_between_events = proportions*num_bins_per_proportion;
 
