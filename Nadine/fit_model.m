@@ -52,6 +52,8 @@ for k = 1:numFolds
     data{1} = train_A; data{2} = train_spikes;
     if k == 1
         init_param = 1e-3*randn(numCol, 1);
+        %init_param(10) = 10;
+        %init_param(11) = 10;
     else
         init_param = param;
     end

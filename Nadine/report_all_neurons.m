@@ -42,12 +42,12 @@ for i = 1:length(day_files)
 %         ain_times = event_times(:,4);
 %         %add spikes in the area
 %         for k=1:length(ain_times)
-%             a_spikes = randn([1,10])*0.2+ain_times(k);
+%             a_spikes = randn([1,100])*0.2+ain_times(k);
 %             st = [st, a_spikes];
 %         end
 % 
 %         st = sort(st);
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
 
         
         [median_times, proportions, num_bins_per_proportion, num_bins_between_events] = analyze_behavior_in_stage(day_folder);
@@ -98,7 +98,7 @@ for i = 1:length(day_files)
         %legend('Model performance','Selected Model','Baseline')
         suptitle (day_folder)
         %ylabel('LLH increase')
-        ylabel(['Spikes - ', num2str(spike_count)])
+        ylabel([num2str(spike_count), '[S]',])
         
         ylim([-1 1])
         
@@ -118,7 +118,7 @@ for i = 1:length(day_files)
     hist(rewards, [0,1,2])
     title('rewards Dist')
     
-    saveas(f, fullfile(day_folder,'mmodels.jpg'))
+    %saveas(f, fullfile(day_folder,'mmodels.jpg'))
     %Print the heatmap for the entire day
     %close(f)
     %alligned_heatmap_view (day_folder)

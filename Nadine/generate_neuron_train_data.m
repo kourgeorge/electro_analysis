@@ -20,9 +20,9 @@ Y = zeros(1e6,1);
 for trial =1:size(event_times,1)
     start_trial_time = event_times(trial,1);
     end_trial_time = event_times(trial,end);
-    num_time_bins_in_trial = round((end_trial_time - start_trial_time)/dt); 
+    num_time_bins_in_trial = floor((end_trial_time - start_trial_time)/dt); 
+    end_trial_time = end_trial_time - mod(end_trial_time - start_trial_time,dt);
     trial_time_bins = linspace(start_trial_time, end_trial_time, num_time_bins_in_trial);
-    
     
     for bin = 1:length(trial_time_bins)-1
         
@@ -76,6 +76,21 @@ end
 X=X(1:i,:);
 Y=Y(1:i,:);
 
+% r=[];
+% z=[];
+% for i=1:sum(proportions)
+%     indices_i = find(X(:,i)==1);
+%     x = [x; i*ones(length(indices_i),1)];
+%     bar_y = mean(Y(X(:,i)==1))
+%     z = [z; Y(X(:,i)==1)];
+% end
+% 
+% stem(x,y)
+% 
+% x = x + randn(length(r),1)*0.25;
+% z = z + randn(length(z),1)*0.25;
+% plot(r,z, '.')
+
 % p = randperm(length(Y));
 % Y=Y(p);
 % 
@@ -83,5 +98,12 @@ Y=Y(1:i,:);
 % 
 % Y=max(0,Y + 20*positions);
 
+% make samples balanced with respect to the position.
+% find the number of samples in each position
 
+% filter_ind = find(X(:,6)==1 | X(:,7)==1 | X(:,8)==1 | X(:,9)==1);
+% remain_ind = setdiff(1:numel(Y),filter_ind);
+% X = X(remain_ind,:);
+% X(:,[6,7,8,9]) = [];
+% Y = Y(remain_ind);
 end
