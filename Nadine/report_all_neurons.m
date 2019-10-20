@@ -1,25 +1,31 @@
 
-electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_14.10';
+%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_8\odor1_WR\rat8_mpfc_21.6';
+%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_14.10';
+electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_11\odor1_WR\rat11_mpfc_14.10';
+
+%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
+
 day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
+%day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
 
 identifiable_neurons = 0;
 total_neurons = 0;
 neurons_type = zeros(1, 15);
 
-for i = 1:length(day_files)
-    day_folder = day_files(i).folder
+for j = 1:length(day_files)
+    day_folder = day_files(j).folder
     %day_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_6\odor1_WR\rat6_mpfc_20.6';
     numFolds = 10;
     f = figure('units','normalized','outerposition',[0 0 1 1]);
     % Draw the data per neuron
     SS_files = dir([day_folder,'\*_SS_*.ntt']); %look for all single units files in the stage
-    num_neurons = length(SS_files);
     
+    num_neurons = length(SS_files);
     for i = 1:num_neurons
         
         total_neurons=total_neurons+1;
-        
-        ss_file = [SS_files(i).folder,'\',SS_files(i).name]
+        neuron_filename = SS_files(i).name;
+        ss_file = [SS_files(i).folder,'\',neuron_filename]
         
         %extract data to show neural activity during the day
         idcs   = strfind(ss_file,'\');
@@ -29,20 +35,21 @@ for i = 1:length(day_files)
         [behave, st] = load_spikes_and_behavioral_data (ss_file);
         
         
-        %%%% Manipulate st to check the model validity %%%%%%
-        
+%         %%%% Manipulate st to check the model validity %%%%%%
+%         
 %         [event_times, ~, ~, ~] = extract_event_times(behave);
 %         
 %         old_st = st;
+%         %old_fr = length(st)/(st(end)-st(1));
 %         diff_st = diff(st);
 %         perm = randperm(length(st)-1);
 %         diff_st = diff_st(perm);
 %         st = cumsum([st(1) diff_st]);
 % 
-%         ain_times = event_times(:,4);
+%         ain_times = event_times(:,2);
 %         %add spikes in the area
-%         for k=1:length(ain_times)
-%             a_spikes = randn([1,100])*0.2+ain_times(k);
+%         for k=1:length(ain_times)            
+%             a_spikes = randn([1,1])*0.2+0.1+ain_times(k);
 %             st = [st, a_spikes];
 %         end
 % 
@@ -68,8 +75,8 @@ for i = 1:length(day_files)
         ylim([-0.3,0.3])
         xlim([0,length(binned_spikes_cell)+100])
         
-        for j=1:length(events_bins_span)
-            vline(events_bins_span(j),'b')
+        for k=1:length(events_bins_span)
+            vline(events_bins_span(k),'b')
         end
         
         [LLH_values, selected_model] = fit_model_to_neuron(st, behave, numFolds, proportions);
@@ -101,9 +108,7 @@ for i = 1:length(day_files)
         ylabel([num2str(spike_count), '[S]',])
         
         ylim([-1 1])
-        
-        % lim=10*max(LLH_increase_mean+LLH_increase_mean);
-        % ylim([-lim lim])
+
         
     end
     
@@ -118,7 +123,7 @@ for i = 1:length(day_files)
     hist(rewards, [0,1,2])
     title('rewards Dist')
     
-    %saveas(f, fullfile(day_folder,'mmodels.jpg'))
+    saveas(f, fullfile(day_folder,'mmodels_17_10.jpg'))
     %Print the heatmap for the entire day
     %close(f)
     %alligned_heatmap_view (day_folder)
@@ -126,8 +131,9 @@ for i = 1:length(day_files)
     
 end
 
+figure
 stem(neurons_type, 'filled')
 set(gca,'XLim',[0 16]); set(gca,'XTick',1:15)
         set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
             'AT','RT','P','A','R','T'});
-title(['Neurons models distribution - Total neurons:', num2str(total_neurons)]);
+title(['Neurons models distribution. Total:', num2str(total_neurons), '. Identified: ', num2str(sum(neurons_type))]);
