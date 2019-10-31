@@ -100,8 +100,10 @@ for j = 1:length(day_files)
         %box off
         %set(gca,'fontsize',20)
         set(gca,'XLim',[0 16]); set(gca,'XTick',1:15)
-        set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
-            'AT','RT','P','A','R','T'});
+        %set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
+        %    'AT','RT','P','A','R','T'});
+        set(gca,'XTickLabel',{'IBOA','IBO','IBA','IOA','BOA','IB','IO','IA','BO',...
+            'BA','OA','I','B','O','A'});
         %legend('Model performance','Selected Model','Baseline')
         suptitle (day_folder)
         %ylabel('LLH increase')
@@ -123,17 +125,21 @@ for j = 1:length(day_files)
     hist(rewards, [0,1,2])
     title('rewards Dist')
     
-    saveas(f, fullfile(day_folder,'mmodels_17_10.jpg'))
+    saveas(f, fullfile(day_folder,'mmodels_24_10.jpg'))
     %Print the heatmap for the entire day
-    %close(f)
+    close(f)
     %alligned_heatmap_view (day_folder)
-    %savefig(fullfile(day_folder,'aactivity'))
+    savefig(fullfile(day_folder,'aactivity'))
     
 end
 
 figure
 stem(neurons_type, 'filled')
+% set(gca,'XLim',[0 16]); set(gca,'XTick',1:15)
+%         set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
+%             'AT','RT','P','A','R','T'});
+        
 set(gca,'XLim',[0 16]); set(gca,'XTick',1:15)
-        set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
-            'AT','RT','P','A','R','T'});
+        set(gca,'XTickLabel',{'IBOA','IBO','IBA','IOA','BOA','IB','IO','IA','BO',...
+            'BA','OA','I','B','O','A'});
 title(['Neurons models distribution. Total:', num2str(total_neurons), '. Identified: ', num2str(sum(neurons_type))]);

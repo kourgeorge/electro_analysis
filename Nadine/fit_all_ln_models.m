@@ -6,10 +6,11 @@ function [testFit,trainFit,param,numModels] = fit_all_ln_models(X,spiketrain,dt,
 
 %%% compute the position, head direction, speed, and theta phase matrices
 
-num_pos_bins = 15;
-n_arm_bins = 4;
-n_rew_bins = 2;
-n_armtype_bins = 2;
+
+n_arm_bins = 8;
+n_rew_bins = 8;
+n_armtype_bins = 4;
+num_pos_bins = size(X,2)-n_arm_bins-n_rew_bins-n_armtype_bins;
 
 posgrid = X(:,1:num_pos_bins);
 armsgrid = X(:,num_pos_bins+1:num_pos_bins+n_arm_bins);

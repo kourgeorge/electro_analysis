@@ -8,7 +8,7 @@ dt = 0.02;
 
 
 % Extracting data
-[X,y] = generate_neuron_train_data (st, behave, dt, proportions);
+[X,y] = generate_neuron_train_data2 (st, behave, dt, proportions);
 
 disp(['num samples:', num2str(length(y))])
 disp(['num spikes:', num2str(sum(y))])
