@@ -52,13 +52,21 @@ for k = 1:numFolds
     data{1} = train_A; data{2} = train_spikes;
     if k == 1
         init_param = 1e-3*randn(numCol, 1);
-        %init_param(10) = 10;
-        %init_param(11) = 10;
     else
         init_param = param;
     end
-    [param] = fminunc(@(param) ln_poisson_model(param,data,modelType),init_param,opts);
-    %[param,~,~] = glmfit(data{1},data{2},'poisson', 'Constant', 'off', 'link', 'log');
+    
+    [fmin_param] = fminunc(@(param) ln_poisson_model(param,data,modelType),init_param,opts);
+    
+	%%%%%%%%%%%using other models%%%%%%%%%%%%%%%%
+    %r = rank(data{1});
+    %init_param_glmfit = init_param(1:r);
+    %[glmfit_param,dev,glmfit_stats] = glmfit(data{1},data{2},'poisson', 'Constant', 'off', 'link', 'log', 'EstDisp', 'on', 'B0', init_param_glmfit);
+    %nbreg_stats = nbreg(data{1},data{2}, 'b', init_param );
+    %nbreg_param = nbreg_stats.b;
+    %param = nbreg_param;
+    
+    
     
     %%%%%%%%%%%%% TEST DATA %%%%%%%%%%%%%%%%%%%%%%%
     % compute the firing rate
