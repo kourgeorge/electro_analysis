@@ -1,7 +1,7 @@
 
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_8\odor1_WR\rat8_mpfc_21.6';
-%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_14.10';
-electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_11\odor1_WR\rat11_mpfc_14.10';
+electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_10.10';
+%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_11\odor1_WR\rat11_mpfc_14.10';
 
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
 
@@ -10,7 +10,7 @@ day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units f
 
 identifiable_neurons = 0;
 total_neurons = 0;
-neurons_type = zeros(1, 15);
+neurons_type = zeros(1, 26);
 
 for j = 1:length(day_files)
     day_folder = day_files(j).folder
@@ -88,22 +88,21 @@ for j = 1:length(day_files)
         
         subplot(num_neurons+1,2,(i-1)*2+2)
         hold on
-        plot(0.5:15.5,zeros(16,1),'--b','linewidth',2)
+        plot(0.5:26,zeros(26,1),'--b','linewidth',2)
         errorbar(LLH_increase_mean,LLH_increase_sem,'ok','linewidth',3)
         if (~isnan(selected_model))
             plot(selected_model,LLH_increase_mean(selected_model),'.r','markersize',25)
             identifiable_neurons = identifiable_neurons+1;
             neurons_type(selected_model) = neurons_type(selected_model)+1;
-            
+        
         end
         hold off
         %box off
         %set(gca,'fontsize',20)
-        set(gca,'XLim',[0 16]); set(gca,'XTick',1:15)
-        %set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
-        %    'AT','RT','P','A','R','T'});
-        set(gca,'XTickLabel',{'IBOA','IBO','IBA','IOA','BOA','IB','IO','IA','BO',...
-            'BA','OA','I','B','O','A'});
+        set(gca,'XLim',[0 26]); set(gca,'XTick',1:26)
+        set(gca,'XTickLabel',{'I^B^O^','IB^O^','I^BO^','I^B^O', 'IBO^','IB^O', 'I^BO', 'I^B^', ...
+            'I^O^', 'B^O^', 'IB^', 'IO^', 'BI^', 'BO^', 'OI^', 'OB^' ...
+            'I^', 'B^' ,'O^' ,'IBO','IB', 'IO', 'BO','I','B','O'});
         %legend('Model performance','Selected Model','Baseline')
         suptitle (day_folder)
         %ylabel('LLH increase')
@@ -125,7 +124,7 @@ for j = 1:length(day_files)
     hist(rewards, [0,1,2])
     title('rewards Dist')
     
-    saveas(f, fullfile(day_folder,'mmodels_24_10.jpg'))
+    saveas(f, fullfile(day_folder,'mmodels_3_11.jpg'))
     %Print the heatmap for the entire day
     close(f)
     %alligned_heatmap_view (day_folder)
@@ -134,12 +133,9 @@ for j = 1:length(day_files)
 end
 
 figure
-stem(neurons_type, 'filled')
-% set(gca,'XLim',[0 16]); set(gca,'XTick',1:15)
-%         set(gca,'XTickLabel',{'PART','PAR','PAT','PRT','ART','PA','PR','PT','AR',...
-%             'AT','RT','P','A','R','T'});
-        
-set(gca,'XLim',[0 16]); set(gca,'XTick',1:15)
-        set(gca,'XTickLabel',{'IBOA','IBO','IBA','IOA','BOA','IB','IO','IA','BO',...
-            'BA','OA','I','B','O','A'});
+stem(neurons_type, 'filled')        
+set(gca,'XLim',[0 26]); set(gca,'XTick',1:26)
+        set(gca,'XTickLabel',{'I^B^O^','IB^O^','I^BO^','I^B^O', 'IBO^','IB^O', 'I^BO', 'I^B^', ...
+            'I^O^', 'B^O^', 'IB^', 'IO^', 'BI^', 'BO^', 'OI^', 'OB^' ...
+            'I^', 'B^' ,'O^' ,'IBO','IB', 'IO', 'BO','I','B','O'});
 title(['Neurons models distribution. Total:', num2str(total_neurons), '. Identified: ', num2str(sum(neurons_type))]);

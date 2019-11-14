@@ -29,7 +29,7 @@ numPos = 8; numArms = 8; numRew = 8; numArmType = 4; % hardcoded: number of para
 
 [param_pos,param_arms,param_rew,param_armtypes] = find_param(param,modelType,numPos,numArms,numRew,numArmType);
 
-% compute the contribution for f, df, and the hessian
+%compute the contribution for f, df, and the hessian
 if ~isempty(param_pos)
     [J_ev,J_ev_g,J_ev_h] = rough_penalty_1d(param_pos,b_pos);
 end

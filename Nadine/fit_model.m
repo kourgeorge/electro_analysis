@@ -15,6 +15,7 @@ function [testFit,trainFit,param_mean] = fit_model(A,dt,spiketrain,filter,modelT
 % [rows,~] = size(A);
 %A= [ones(rows,1), A];
 
+A = [A, ones(size(A,1),1)];
 [~,numCol] = size(A);
 sections = numFolds*5;
 
@@ -56,15 +57,15 @@ for k = 1:numFolds
         init_param = param;
     end
     
-    [fmin_param] = fminunc(@(param) ln_poisson_model(param,data,modelType),init_param,opts);
+    %[fmin_param] = fminunc(@(param) ln_poisson_model(param,data,modelType),init_param,opts);
     
 	%%%%%%%%%%%using other models%%%%%%%%%%%%%%%%
     %r = rank(data{1});
     %init_param_glmfit = init_param(1:r);
-    %[glmfit_param,dev,glmfit_stats] = glmfit(data{1},data{2},'poisson', 'Constant', 'off', 'link', 'log', 'EstDisp', 'on', 'B0', init_param_glmfit);
+    [glmfit_param,dev,glmfit_stats] = glmfit(data{1},data{2},'poisson', 'Constant', 'off', 'link', 'log', 'EstDisp', 'on');
     %nbreg_stats = nbreg(data{1},data{2}, 'b', init_param );
     %nbreg_param = nbreg_stats.b;
-    %param = nbreg_param;
+    param = glmfit_param;
     
     
     

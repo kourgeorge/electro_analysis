@@ -13,7 +13,7 @@ function [X,Y] = generate_neuron_train_data2 (st, behave, dt, proportions)
 
 %Initilize a huge matrix to avoid increasing it size iteratively.
 i=1;
-X = zeros(1e6,6+3);
+X = zeros(1e6,6);
 Y = zeros(1e6,1);
 
 
@@ -34,11 +34,19 @@ for trial=1:num_trials
         time = trial_time_bins(bin);
         time_from_events = event_times(trial,:)-time;
         position = convert(time_from_events);
+        ITI = 1; AIN = 2; BIN = 3; BOUT = 4; AOUT=5;
+        
         
         selected_arm = selected_arms(trial);
         is_rewarded = 2 - (selected_arm==rewarded_arm1(trial) || selected_arm==rewarded_arm2(trial));
         water_arm_feature = 2 - (selected_arm == 1 || selected_arm == 2);
-        X(i,:) = [position, selected_arm, is_rewarded, water_arm_feature];
+        %X(i,:) = [position, selected_arm, is_rewarded, water_arm_feature];
+        
+        interaction_feature = water_arm_feature;
+        X(i,:)=[position(AIN), position(BIN), position(AOUT), ...
+            position(AIN)*interaction_feature, position(BIN)*interaction_feature, ...
+            position(AOUT)*interaction_feature];
+        
         
         Y(i,:) = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
         i=i+1;
@@ -48,8 +56,6 @@ end
 
 X=X(1:i-1,:);
 Y=Y(1:i-1,:);
-X = X(:,[2,3,5,7]);
-X = dummyvar(X);
 end
 
 function res = convert(dists)

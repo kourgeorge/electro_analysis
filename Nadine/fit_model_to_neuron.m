@@ -25,3 +25,5 @@ selected_model = select_best_model(LLH_values);
 explained_var = reshape(testFit_mat(:,1),numFolds,numModels);
 explained_var_mean = mean(explained_var);
 explained_var_sem = std(explained_var)/sqrt(numFolds);
+
+
