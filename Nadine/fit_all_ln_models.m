@@ -1,4 +1,4 @@
-function [testFit,trainFit,param,numModels] = fit_all_ln_models(X,spiketrain,dt, numFolds)
+function [testFit,trainFit,param,modelType] = fit_all_ln_models(X, spiketrain, dt, numFolds)
 %%% Description
 % The model: r = exp(W*theta), where r is the predicted # of spikes, W is a
 % matrix of one-hot vectors describing variable (P, H, S, or T) values, and

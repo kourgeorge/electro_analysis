@@ -1,4 +1,4 @@
-function [X,Y] = generate_neuron_train_data2 (st, behave, dt, proportions)
+function [X, Y, feature_names, interaction_feature_name] = generate_neuron_train_data2 (st, behave, dt, proportions)
 % Given a apiking and behavioural data, this function creates extracts
 % relevant input features and responses to create dataset that can be fitted
 % using GLM.
@@ -13,7 +13,7 @@ function [X,Y] = generate_neuron_train_data2 (st, behave, dt, proportions)
 
 %Initilize a huge matrix to avoid increasing it size iteratively.
 i=1;
-X = zeros(1e6,6);
+X = zeros(1e6,9);
 Y = zeros(1e6,1);
 
 
@@ -39,13 +39,13 @@ for trial=1:num_trials
         
         selected_arm = selected_arms(trial);
         is_rewarded = 2 - (selected_arm==rewarded_arm1(trial) || selected_arm==rewarded_arm2(trial));
-        water_arm_feature = 2 - (selected_arm == 1 || selected_arm == 2);
+        arm_type = 2 - (selected_arm == 1 || selected_arm == 2);
         %X(i,:) = [position, selected_arm, is_rewarded, water_arm_feature];
         
-        interaction_feature = water_arm_feature;
+        interaction_feature = arm_type;
         X(i,:)=[position(AIN), position(BIN), position(AOUT), ...
             position(AIN)*interaction_feature, position(BIN)*interaction_feature, ...
-            position(AOUT)*interaction_feature];
+            position(AOUT)*interaction_feature, selected_arm, arm_type, is_rewarded];
         
         
         Y(i,:) = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
@@ -56,10 +56,14 @@ end
 
 X=X(1:i-1,:);
 Y=Y(1:i-1,:);
+interaction_feature_name = 'arm_type';
+feature_names = [{'Ain'},{'Bin'}, {'Aout'}, {['Ain',interaction_feature_name]}, ...
+    {['Ain',interaction_feature_name]}, {['Bin', interaction_feature_name]}, ...
+    {['Aout', interaction_feature_name]}, 'arm', 'armtype', 'reward'];
 end
 
 function res = convert(dists)
-res = floor(2*dists);
+res = floor(2*dists); %Why we multipky by 2.
 res = min(res,3);
 res = max(res,-4);
 res = res+5;
