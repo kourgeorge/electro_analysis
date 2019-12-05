@@ -4,12 +4,12 @@ function report_all_neurons()
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_8\odor1_WR\rat8_mpfc_21.6';
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_10.10';
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_11\odor1_WR\rat11_mpfc_14.10';
-electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_12.10';
+%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_12.10';
 
-%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
+electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
 
-day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
-%day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
+%day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
+day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
 
 identifiable_neurons = 0;
 total_neurons = 0;
@@ -184,6 +184,18 @@ modeling_metadata.feature_names = feature_names;
 modeling_metadata.tfe_bin = 0.5;
 modeling_metadata.proportions=proportions;
 modeling_metadata.model_names = model_names;
+modeling_metadata.numFolds = numFolds;
+
+modeling_data.X = X;
+modeling_data.Y = y;
+modeling_data.arm = selected_arm;
+modeling_data.reward = selected_arm==rewarded_arm1 | selected_arm==rewarded_arm2;
+modeling_data.arm_type = 2 - (selected_arm == 1 | selected_arm == 2);
+
+fitting.param = param;
+fitting.testFit = testFit;
+fitting.trainFit= trainFit;
+fitting.selected_model = selected_model;
 
 result.rat = rat;
 result.stage = stage;
@@ -191,19 +203,13 @@ result.day = day;
 result.neuron_name = neuron_name;
 result.spikestime = st;
 result.behave = behave;
+result.modeling_data = modeling_data;
+result.fitting = fitting;
+
 result.modeling_metadata = modeling_metadata;
-result.X = X;
-result.y = y;
-result.numFolds = numFolds;
-result.param = param;
-result.testFit = testFit;
-result.trainFit= trainFit;
-result.selected_model = selected_model;
-result.arm = selected_arm;
-result.reward = selected_arm==rewarded_arm1 | selected_arm==rewarded_arm2;
-result.arm_type = 2 - (selected_arm == 1 | selected_arm == 2);
+result.modeling_data = modeling_data;
 result.psth_data = psth_data;
 
 
-save([ss_file,['_', interaction_feature_name,'_result.mat'], '-struct', 'result')
+save([ss_file,'_', interaction_feature_name,'_result.mat'], '-struct', 'result')
 end
