@@ -6,10 +6,10 @@ electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_8\odor1_WR\rat8_m
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_11\odor1_WR\rat11_mpfc_14.10';
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_12.10';
 
-%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
+electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
 
-day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
-%day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
+%day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
+day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
 
 identifiable_neurons = 0;
 total_neurons = 0;
@@ -70,7 +70,7 @@ for j = 1:length(day_files)
         dt = 0.02;
          
         % Extracting data
-        [X, y, feature_names, interaction_feature_name] = generate_neuron_train_data2 (st, behave, dt, proportions);
+        [X, y, feature_names, interaction_feature_name] = prepare_cell_data2 (st, behave, dt, proportions);
         [testFit, trainFit, param, Models] = fit_model_to_neuron(X,y,dt,numFolds);
         
         %Select the best model

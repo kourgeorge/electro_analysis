@@ -1,4 +1,4 @@
-function [X,Y] = generate_neuron_train_data (st, behave, dt, proportions)
+function [X,Y] = prepare_cell_data (st, behave, dt, proportions)
 % Given a apiking and behavioural data, this function creates extracts 
 % relevant input features and responses to create dataset that can be fitted
 % using GLM.

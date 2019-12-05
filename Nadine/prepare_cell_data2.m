@@ -1,4 +1,4 @@
-function [X, Y, feature_names, interaction_feature_name] = generate_neuron_train_data2 (st, behave, dt, proportions)
+function [X, Y, feature_names, interaction_feature_name] = prepare_cell_data2 (st, behave, dt, proportions)
 % Given a apiking and behavioural data, this function creates extracts
 % relevant input features and responses to create dataset that can be fitted
 % using GLM.
@@ -42,10 +42,10 @@ for trial=1:num_trials
         arm_type = 2 - (selected_arm == 1 || selected_arm == 2);
         %X(i,:) = [position, selected_arm, is_rewarded, water_arm_feature];
         
-        interaction_feature = arm_type;
+        interaction_feature = selected_arm;
         X(i,:)=[position(AIN), position(BIN), position(AOUT), ...
             position(AIN)*interaction_feature, position(BIN)*interaction_feature, ...
-            position(AOUT)*interaction_feature, selected_arm, arm_type, is_rewarded];
+            position(AOUT)*interaction_feature, selected_arm, selected_arm, is_rewarded];
         
         
         Y(i,:) = length(find (st>trial_time_bins(bin) & st<trial_time_bins(bin+1)));
@@ -56,7 +56,7 @@ end
 
 X=X(1:i-1,:);
 Y=Y(1:i-1,:);
-interaction_feature_name = 'arm_type';
+interaction_feature_name = 'selected_arm';
 feature_names = [{'Ain'},{'Bin'}, {'Aout'}, {['Ain',interaction_feature_name]}, ...
     {['Ain',interaction_feature_name]}, {['Bin', interaction_feature_name]}, ...
     {['Aout', interaction_feature_name]}, 'arm', 'armtype', 'reward'];
