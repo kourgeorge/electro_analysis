@@ -1,15 +1,15 @@
 
 function report_all_neurons()
 
-%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_8\odor1_WR\rat8_mpfc_21.6';
+electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_8\odor1_WR\rat8_mpfc_21.6';
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_10.10';
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_11\odor1_WR\rat11_mpfc_14.10';
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_12.10';
 
-electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
+%electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
 
-%day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
-day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
+day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
+%day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
 
 identifiable_neurons = 0;
 total_neurons = 0;
@@ -17,7 +17,6 @@ neurons_type = zeros(1, 26);
 
 for j = 1:length(day_files)
     day_folder = day_files(j).folder
-    %day_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_6\odor1_WR\rat6_mpfc_20.6';
     numFolds = 10;
     %f = figure('units','normalized','outerposition',[0 0 1 1]);
     % Draw the data per neuron
@@ -34,34 +33,15 @@ for j = 1:length(day_files)
         idcs   = strfind(ss_file,'\');
         neuron_name = ss_file(idcs(end)+1:end-4);
         stage_folder_name = ss_file(1:idcs(end-1)-1);
-        %stage_name = ss_file(idcs(end-2)-1);
         rat = ss_file(idcs(end-3)+1:idcs(end-2)-1);
         stage = ss_file(idcs(end-2)+1:idcs(end-1)-1);
         day = ss_file(idcs(end-1)+1:idcs(end)-1);
         
         %Load data and extract meta information
         [behave, st] = load_spikes_and_behavioral_data (ss_file);
-        
-        
-%         %%%% Manipulate st to check the model validity %%%%%%
-%         
+
          [~, selected_arms, rewarded_arm1, rewarded_arm2] = extract_event_times(behave);
-%         
-%         old_st = st;
-%         %old_fr = length(st)/(st(end)-st(1));
-%         diff_st = diff(st);
-%         perm = randperm(length(st)-1);
-%         diff_st = diff_st(perm);
-%         st = cumsum([st(1) diff_st]);
-% 
-%         ain_times = event_times(:,2);
-%         %add spikes in the area
-%         for k=1:length(ain_times)            
-%             a_spikes = randn([1,1])*0.2+0.1+ain_times(k);
-%             st = [st, a_spikes];
-%         end
-% 
-%         st = sort(st);
+
         %%%%%%%%%%%%%%%%%%%%%%%%%%
 
         
