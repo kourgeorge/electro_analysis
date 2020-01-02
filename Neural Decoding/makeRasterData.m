@@ -22,6 +22,7 @@ trialInfo(:,[3 4]) = [behaveStruct.rewarded_arm1, behaveStruct.rewarded_arm2];
 trialInfo(:,5) = behaveStruct.selected_arms==behaveStruct.rewarded_arm1 | ...
     behaveStruct.selected_arms==behaveStruct.rewarded_arm2;
 trialInfo(:,6) = 2 - (behaveStruct.selected_arms == 1 | behaveStruct.selected_arms == 2);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
@@ -32,15 +33,15 @@ blmn=mean(ns/windowSize);
 blstd=std(ns/windowSize);
 nspikes=length(st);
 
-[BinRaster, BinLabels]=CreateStruct(behaveStruct.event_times(:,3), st, cut, binsize, trialInfo);
-[AinRaster, AinLabels]=CreateStruct(behaveStruct.event_times(:,2), st, cut,binsize, trialInfo);
-[AoutRaster, AoutLabels]=CreateStruct(behaveStruct.event_times(:,5), st, cut,binsize, trialInfo);
+[BinRaster, BinLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,3), st, cut, binsize, trialInfo);
+[AinRaster, AinLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,2), st, cut,binsize, trialInfo);
+[AoutRaster, AoutLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,5), st, cut,binsize, trialInfo);
 
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [Raster, Labels] = CreateStruct(Event, st, cut, binsize, trialInfo)
+function [Raster, Labels] = CreateRasterLabelsStruct(Event, st, cut, binsize, trialInfo)
 binneddotd = sparse(size(Event,1),length(cut(1)*1000:binsize:cut(2)*1000)); % for psth
 dotd=sparse(size(Event,1),length(cut(1)*1000:cut(2)*1000));
 
