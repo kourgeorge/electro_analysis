@@ -186,7 +186,7 @@ classdef pvalue_object < handle
         null_distribution_directory_name = []; % name of the directory that has the null distribution results files
         the_result_type = 1;                  % the type of decoding results to use to get the p-values (default, use 0-1 loss results)
 %         null_distribution_file_prefix_name = '';  % prefix string specifying to only use null distribution files that start with this string
-        null_distribution_file_prefix_name = 'Ain_Chosen';  % prefix string specifying to only use null distribution files that start with this string
+        null_distribution_file_prefix_name = 'Bin_ArmType';  % prefix string specifying to only use null distribution files that start with this string
   
 training_time_ind_to_use = -1;  % if this is less than 1, the diagonal of TCT matrix is used (or if mean decoding results is a vector, then this vector is used); otherwise this ind in the TCT plot is used.
         saved_results_structure_name = 'DECODING_RESULTS';  % name of variable that has the saved standard results

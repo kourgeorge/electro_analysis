@@ -1,7 +1,7 @@
 function [EnoughCells,EnoughCellsINX] = prepareClassifier(ratersDir, event,toDecode,binSize,sampleWindow)
 
 
-%[EnoughCells,EnoughCellsINX] = prepareClassifier('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding', 'Ain','Chosen',150,50)
+%[EnoughCells,EnoughCellsINX] = prepareClassifier('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters', 'Ain','Chosen',150,50)
 
 maxSplits = 40;
 %%%%%%%%%%%%%%%
@@ -10,16 +10,14 @@ maxSplits = 40;
 % (suggested default 50) ms
 rastersFolder = fullfile(ratersDir,event);
 binnedName = fullfile(ratersDir,[event,'_Binned']);
-create_binned_data_from_raster_data(rastersFolder,binnedName,binSize,sampleWindow);
+saved_binned_data_file_name = create_binned_data_from_raster_data(rastersFolder,binnedName,binSize,sampleWindow);
 
 %%%%%%%%%%%%%
 % determine how many cross validation splits to use
 % find how many cells with at least k repetitions of each condition (according to the labels)
 % exists for a particular decoding variable binned_label.stimulusID
-
-binnedDataName = fullfile(ratersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
-l = load(binnedDataName,'binned_labels');
-eval(['labelToDecode = l.binned_labels.',toDecode,';']);
+l = load(saved_binned_data_file_name,'binned_labels');
+labelToDecode = l.binned_labels.(toDecode);
 % labelToDecode = {['binned_labels.',toDecode]};
 EnoughCells = zeros(maxSplits,1);
 for k = 1:maxSplits
