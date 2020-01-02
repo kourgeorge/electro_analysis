@@ -1,14 +1,15 @@
-function [EnoughCells,EnoughCellsINX] = prepareClassifier(event,toDecode,binSize,sampleWindow)
+function [EnoughCells,EnoughCellsINX] = prepareClassifier(ratersDir, event,toDecode,binSize,sampleWindow)
 
-%[EnoughCells,EnoughCellsINX] = prepareClassifier('Ain','Chosen',150,50)
+
+%[EnoughCells,EnoughCellsINX] = prepareClassifier('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding', 'Ain','Chosen',150,50)
 
 maxSplits = 40;
 %%%%%%%%%%%%%%%
 % create binned vectors from the rasters in the folder 'event', by binning
 % binSize (ms) bins (suggested default 150), and averageing every sampleWindow
 % (suggested default 50) ms
-rastersFolder = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',event);
-binnedName = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_Binned']);
+rastersFolder = fullfile(ratersDir,event);
+binnedName = fullfile(ratersDir,[event,'_Binned']);
 create_binned_data_from_raster_data(rastersFolder,binnedName,binSize,sampleWindow);
 
 %%%%%%%%%%%%%
@@ -16,7 +17,7 @@ create_binned_data_from_raster_data(rastersFolder,binnedName,binSize,sampleWindo
 % find how many cells with at least k repetitions of each condition (according to the labels)
 % exists for a particular decoding variable binned_label.stimulusID
 
-binnedDataName = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
+binnedDataName = fullfile(ratersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
 l = load(binnedDataName,'binned_labels');
 eval(['labelToDecode = l.binned_labels.',toDecode,';']);
 % labelToDecode = {['binned_labels.',toDecode]};
@@ -26,8 +27,9 @@ for k = 1:maxSplits
 end
 end
 
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [EnoughCells,EnoughCellsINX] = whichCellsHaveEnough(toDecode,labelToDecode,k)
 EnoughCells = 0;

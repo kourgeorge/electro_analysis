@@ -1,11 +1,11 @@
-function runClassifierPVal(event,toDecode,binSize,sampleWindow,numSplits,EnoughCellsINX)
+function runClassifierPVal(ratersDir, event,toDecode,binSize,sampleWindow,numSplits,EnoughCellsINX)
 
 % runClassifierPVal('Ain','Chosen',150,50,20,EnoughCellsINX)
 
 
 rng('shuffle','twister'); 
-saveFile = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_',toDecode,'_Results']);
-binnedDataName = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
+saveFile = fullfile(ratersDir,[event,'_',toDecode,'_Results']);
+binnedDataName = fullfile(ratersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
 l = load(binnedDataName,'binned_labels');
 eval(['labelToDecode = l.binned_labels.',toDecode,';']);
 % the name of your binned-format data
@@ -21,18 +21,18 @@ switch toDecode
     case 'ArmType'
         allPossibilities = [1 2];
 end
-binnedDataName = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
+binnedDataName = fullfile(ratersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
  
 
 % create a feature proprocessor and a classifier
 the_feature_preprocessors{1} = zscore_normalize_FP;
-the_classifier = max_correlation_coefficient_CL;
-% the_classifier = libsvm_CL;
+%the_classifier = max_correlation_coefficient_CL;
+the_classifier = libsvm_CL;
 for shuff_num = 0:5
     
 % create suffled results for the null distribution
 if shuff_num == 0
-    saveFile = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_',toDecode,'_Results']);
+    saveFile = fullfile(ratersDir,[event,'_',toDecode,'_Results']);
 % create a basic datasource
 ds = basic_DS(binnedDataName, toDecode, numSplits);
 ds = ds.set_specific_sites_to_use(EnoughCellsINX{numSplits});
@@ -55,7 +55,7 @@ the_cross_validator.num_resample_runs = 10;
 % suppress displays
 the_cross_validator.display_progress.zero_one_loss = 0;
 the_cross_validator.display_progress.resample_run_time = 0;
-saveFile = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding','Shuffle',[event,'_',toDecode,'_ShuffRun_',num2str(shuff_num,'%03d')]);
+saveFile = fullfile(ratersDir,'Shuffle',[event,'_',toDecode,'_ShuffRun_',num2str(shuff_num,'%03d')]);
 end
 the_cross_validator.test_only_at_training_times = 1; % to speed up 
 % run the decoding analysis

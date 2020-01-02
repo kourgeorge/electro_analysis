@@ -1,9 +1,10 @@
 function createRasterFiles()
-%CREATERASTERFILES Summary of this function goes here
-%   Detailed explanation goes here
+%CREATERASTERFILES Given the single unit data and the behavioural data
+% folder, this functions scan all the files to extract raster files.
+% 
 
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding';
+saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
@@ -27,9 +28,16 @@ for j = 1:length(day_files)
         %Load data and extract meta information
         [behave, st] = load_spikes_and_behavioral_data (ss_file);
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Load data from the eventsStruct
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        [behave_struct.event_times, behave_struct.selected_arms, behave_struct.rewarded_arm1, behave_struct.rewarded_arm2] = extract_event_times(behave);
+
         binsize = 1;
         cutLength = [-1,2];
-        [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels] = makeRasterFile(behave,st, binsize,cutLength);
+        [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels] = ...
+            makeRasterData(behave_struct, st, binsize, cutLength);
         
         raster_data = AinRaster;
         raster_labels = AinLabels;

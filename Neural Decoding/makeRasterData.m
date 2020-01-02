@@ -1,4 +1,4 @@
-function [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels]= makeRasterFile(eventsStruct, st, binsize, cut)
+function [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels]= makeRasterData(behaveStruct, st, binsize, cut)
 
 if nargin == 2 % default
     binsize = 1; % 1 ms bin
@@ -12,22 +12,16 @@ windowSize = diff(cut)/1;   % for baseline calculations, to create z scores
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Load data from the eventsStruct
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-[event_times, selected_arms, rewarded_arm1, rewarded_arm2] = extract_event_times(eventsStruct);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Creating a table containing for each trial the relevant data values
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-num_trials = size(selected_arms,1);
-trialInfo = 9 * ones(num_trials,6);  % 9 will code formissing data (usually unperformed trial)
-
+num_trials = size(behaveStruct.selected_arms,1);
+trialInfo = 9 * ones(num_trials,6);  % 9 will code for missing data (usually uncomplete trial)
 trialInfo(:,1) = 1:num_trials;
-trialInfo(:,2) = selected_arms;
-trialInfo(:,[3 4]) = [rewarded_arm1, rewarded_arm2];
-trialInfo(:,5) = selected_arms==rewarded_arm1 | selected_arms==rewarded_arm2;
-trialInfo(:,6) = 2 - (selected_arms == 1 | selected_arms == 2);
+trialInfo(:,2) = behaveStruct.selected_arms;
+trialInfo(:,[3 4]) = [behaveStruct.rewarded_arm1, behaveStruct.rewarded_arm2];
+trialInfo(:,5) = behaveStruct.selected_arms==behaveStruct.rewarded_arm1 | ...
+    behaveStruct.selected_arms==behaveStruct.rewarded_arm2;
+trialInfo(:,6) = 2 - (behaveStruct.selected_arms == 1 | behaveStruct.selected_arms == 2);
 
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
@@ -38,15 +32,15 @@ blmn=mean(ns/windowSize);
 blstd=std(ns/windowSize);
 nspikes=length(st);
 
-[BinRaster, BinLabels]=CreateStruct(event_times(:,3), st, cut, binsize, trialInfo);
-[AinRaster, AinLabels]=CreateStruct(event_times(:,2), st, cut,binsize, trialInfo);
-[AoutRaster, AoutLabels]=CreateStruct(event_times(:,5), st, cut,binsize, trialInfo);
+[BinRaster, BinLabels]=CreateStruct(behaveStruct.event_times(:,3), st, cut, binsize, trialInfo);
+[AinRaster, AinLabels]=CreateStruct(behaveStruct.event_times(:,2), st, cut,binsize, trialInfo);
+[AoutRaster, AoutLabels]=CreateStruct(behaveStruct.event_times(:,5), st, cut,binsize, trialInfo);
 
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [Raster, Labels]=CreateStruct(Event, st, cut, binsize, trialInfo)
+function [Raster, Labels] = CreateStruct(Event, st, cut, binsize, trialInfo)
 binneddotd = sparse(size(Event,1),length(cut(1)*1000:binsize:cut(2)*1000)); % for psth
 dotd=sparse(size(Event,1),length(cut(1)*1000:cut(2)*1000));
 

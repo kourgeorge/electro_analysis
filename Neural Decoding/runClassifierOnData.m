@@ -1,10 +1,10 @@
-function runClassifierOnData(event,toDecode,binSize,sampleWindow,numSplits,EnoughCellsINX)
+function runClassifierOnData(ratersDir, event,toDecode,binSize,sampleWindow,numSplits,EnoughCellsINX)
 
-% runClassifierOnData('Ain','Chosen',150,50,10,EnoughCellsINX)
+% runClassifierOnData('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding', 'Ain','Chosen',150,50,10,EnoughCellsINX)
 
 rng('shuffle','twister'); 
-saveFile = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_',toDecode,'_Results']);
-binnedDataName = fullfile('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Decoding',[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
+saveFile = fullfile(ratersDir,[event,'_',toDecode,'_Results']);
+binnedDataName = fullfile(ratersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
 l = load(binnedDataName,'binned_labels');
 eval(['labelToDecode = l.binned_labels.',toDecode,';']);
 % the name of your binned-format data
