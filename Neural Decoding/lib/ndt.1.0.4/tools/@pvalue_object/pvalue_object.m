@@ -185,10 +185,15 @@ classdef pvalue_object < handle
         real_decoding_results_file_name = [];  % name of the file that has the real decoding results
         null_distribution_directory_name = []; % name of the directory that has the null distribution results files
         the_result_type = 1;                  % the type of decoding results to use to get the p-values (default, use 0-1 loss results)
-%         null_distribution_file_prefix_name = '';  % prefix string specifying to only use null distribution files that start with this string
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Change By Genela %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %null_distribution_file_prefix_name = '';  % prefix string specifying to only use null distribution files that start with this string
         null_distribution_file_prefix_name = 'Bin_ArmType';  % prefix string specifying to only use null distribution files that start with this string
-  
-training_time_ind_to_use = -1;  % if this is less than 1, the diagonal of TCT matrix is used (or if mean decoding results is a vector, then this vector is used); otherwise this ind in the TCT plot is used.
+  		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        training_time_ind_to_use = -1;  % if this is less than 1, the diagonal of TCT matrix is used (or if mean decoding results is a vector, then this vector is used); otherwise this ind in the TCT plot is used.
         saved_results_structure_name = 'DECODING_RESULTS';  % name of variable that has the saved standard results
         
         p_values = [];  % the p-values.  This can be set using the create_pvalues_from_nulldist_files, or can set it directly to a vector and then use the get_latency method to calculate information latency
@@ -298,13 +303,23 @@ training_time_ind_to_use = -1;  % if this is less than 1, the diagonal of TCT ma
             
             
             % create the null distribution for each time bin
-            %             the_null_dist_dir = dir([pval_obj.null_distribution_directory_name pval_obj.null_distribution_file_prefix_name '*.mat']);
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Change By Genela %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %the_null_dist_dir = dir([pval_obj.null_distribution_directory_name pval_obj.null_distribution_file_prefix_name '*.mat']);
             the_null_dist_dir = dir(fullfile(pval_obj.null_distribution_directory_name,[pval_obj.null_distribution_file_prefix_name '*.mat']));
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
             for iNullDist = 1:length(the_null_dist_dir)
-                
-%                 curr_all_null_data = load([pval_obj.null_distribution_directory_name the_null_dist_dir(iNullDist).name]);
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Change By Genela %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%               
+                %curr_all_null_data = load([pval_obj.null_distribution_directory_name the_null_dist_dir(iNullDist).name]);
                 curr_all_null_data = load(fullfile(pval_obj.null_distribution_directory_name,the_null_dist_dir(iNullDist).name));
-                if pval_obj.the_result_type == 6
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+				if pval_obj.the_result_type == 6
                     curr_null_results = eval(['curr_all_null_data.' pval_obj.saved_results_structure_name '.' pval_obj.result_type_name '.decoding_results']);
                 else
                     curr_null_results = eval(['curr_all_null_data.' pval_obj.saved_results_structure_name '.' pval_obj.result_type_name '.mean_decoding_results']);
