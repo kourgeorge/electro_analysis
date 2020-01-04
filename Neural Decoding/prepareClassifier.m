@@ -6,7 +6,7 @@ function [EnoughCells,EnoughCellsINX] = prepareClassifier(ratersDir, event,toDec
 maxSplits = 40;
 %%%%%%%%%%%%%%%
 % create binned vectors from the rasters in the folder 'event', by binning
-% binSize (ms) bins (suggested default 150), and averageing every sampleWindow
+% binSize (ms) bins (suggested default 150), and averaging every sampleWindow
 % (suggested default 50) ms
 rastersFolder = fullfile(ratersDir,event);
 binnedName = fullfile(ratersDir,[event,'_Binned']);
@@ -18,7 +18,7 @@ saved_binned_data_file_name = create_binned_data_from_raster_data(rastersFolder,
 % exists for a particular decoding variable binned_label.stimulusID
 l = load(saved_binned_data_file_name,'binned_labels');
 labelToDecode = l.binned_labels.(toDecode);
-% labelToDecode = {['binned_labels.',toDecode]};
+
 EnoughCells = zeros(maxSplits,1);
 for k = 1:maxSplits
     [EnoughCells(k),EnoughCellsINX{k}] = whichCellsHaveEnough(toDecode,labelToDecode,k);
