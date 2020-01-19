@@ -1,11 +1,14 @@
-function runClassifierPVal(ratersDir, event,toDecode,binSize,sampleWindow,numSplits,EnoughCellsINX)
+function runClassifierPVal(rastersDir, event, toDecode, binSize, ...
+    sampleWindow, numSplits, EnoughCellsINX, stage)
 
 % runClassifierPVal('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters','Ain','Rewarded',150,50,20,EnoughCellsINX)
-
+if nargin < 8
+    stage = [];
+end
 
 rng('shuffle','twister');
-saveFile = fullfile(ratersDir,[event,'_',toDecode,'_Results']);
-binnedDataName = fullfile(ratersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
+saveFile = fullfile(rastersDir,[stage, event,'_',toDecode,'_Results']);
+binnedDataName = fullfile(rastersDir,[stage, event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
 l = load(binnedDataName,'binned_labels');
 labelToDecode = l.binned_labels.(toDecode);
 
@@ -22,18 +25,25 @@ switch toDecode
     case 'ArmType'
         allPossibilities = [1 2];
 end
-binnedDataName = fullfile(ratersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
+binnedDataName = fullfile(rastersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
 
 
 % create a feature proprocessor and a classifier
 the_feature_preprocessors{1} = zscore_normalize_FP;
 %the_classifier = max_correlation_coefficient_CL;
 the_classifier = libsvm_CL;
+the_classifier.multiclass_classificaion_scheme = 'one_vs_all';
+the_classifier.multiclass_classificaion_scheme = 'all_pairs';  %uncomment for svm
+% the_classifier.kernel = 'polynomial';
+the_classifier.kernel = 'linear';  %uncomment for svm
+
+% the_classifier.poly_degree = 2;
+
 for shuff_num = 0:5
     
     % create suffled results for the null distribution
     if shuff_num == 0
-        saveFile = fullfile(ratersDir,[event,'_',toDecode,'_Results']);
+        saveFile = fullfile(rastersDir,[stage, event,'_',toDecode,'_Results']);
         % create a basic datasource
         ds = basic_DS(binnedDataName, toDecode, numSplits);
         ds = ds.set_specific_sites_to_use(EnoughCellsINX{numSplits});
@@ -56,7 +66,7 @@ for shuff_num = 0:5
         % suppress displays
         the_cross_validator.display_progress.zero_one_loss = 0;
         the_cross_validator.display_progress.resample_run_time = 0;
-        saveFile = fullfile(ratersDir,'Shuffle',[event,'_',toDecode,'_ShuffRun_',num2str(shuff_num,'%03d')]);
+        saveFile = fullfile(rastersDir,'Shuffle',[event,'_',toDecode,'_ShuffRun_',num2str(shuff_num,'%03d')]);
     end
     the_cross_validator.test_only_at_training_times = 1; % to speed up
     % run the decoding analysis

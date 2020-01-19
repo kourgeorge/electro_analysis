@@ -168,8 +168,8 @@ classdef libsvm_CL
             
             if strcmp(cl.multiclass_classificaion_scheme, 'all_pairs')
                
-                cl.model = svmtrain2(YTr, double(XTr'), paramstring);  % renamed the libsvm function svmtrain2 because the Matlab bioinformatics toolbox now has a funciton named svmtrain
-                %cl.model = svmtrain(YTr, double(XTr'), paramstring);  
+                %cl.model = svmtrain2(YTr, double(XTr'), paramstring);  % renamed the libsvm function svmtrain2 because the Matlab bioinformatics toolbox now has a funciton named svmtrain
+                cl.model = svmtrain(YTr, double(XTr'), paramstring);  
 
                 
             elseif strcmp(cl.multiclass_classificaion_scheme, 'one_vs_all')
