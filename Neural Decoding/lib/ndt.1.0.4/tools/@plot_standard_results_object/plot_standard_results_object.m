@@ -163,7 +163,7 @@ classdef plot_standard_results_object
       
       result_file_names;
       result_type_to_plot = 1;   % 1: 0-1 loss, 2: normalized rank, 3: mean decision values 4: Area under ROC curve separate, 5: Areau udner ROC curve combined over CV splits
-      
+      null_distribution_file_prefix_name = ''; %Added by George Kour
       errorbar_file_names = [];
       errorbar_type_to_plot = 1; % 1: over_resamples, 2: over_CVs, 3: over_CVs_combined_over_resamples, 4: all_single_CV_vals_combined, 5: all_single_CV_vals, 6: over_classes
       errorbar_stdev_multiplication_factor = 1;
@@ -211,9 +211,10 @@ classdef plot_standard_results_object
     methods 
 
         % constructor 
-        function plot_obj = plot_standard_results_object(result_file_names)
+        function plot_obj = plot_standard_results_object(result_file_names, null_distribution_file_prefix_name)
             
             plot_obj.result_file_names = result_file_names;
+            plot_obj.null_distribution_file_prefix_name=null_distribution_file_prefix_name;
             
         end
         
@@ -521,7 +522,7 @@ classdef plot_standard_results_object
                        end
                         
                         
-                       pval_obj = pvalue_object(plot_obj.result_file_names{iResult}, plot_obj.p_values{iResult});
+                       pval_obj = pvalue_object(plot_obj.result_file_names{iResult}, plot_obj.p_values{iResult}, plot_obj.null_distribution_file_prefix_name);
                        pval_obj.the_result_type = plot_obj.result_type_to_plot;
                        pval_obj.collapse_all_times_when_estimating_pvals = plot_obj.collapse_all_times_when_estimating_pvals;
                        plot_obj.p_values{iResult} = pval_obj.create_pvalues_from_nulldist_files;

@@ -188,8 +188,8 @@ classdef pvalue_object < handle
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Change By Genela %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %null_distribution_file_prefix_name = '';  % prefix string specifying to only use null distribution files that start with this string
-        null_distribution_file_prefix_name = 'Bin_ArmType';  % prefix string specifying to only use null distribution files that start with this string
+        null_distribution_file_prefix_name = '';  % prefix string specifying to only use null distribution files that start with this string
+        %null_distribution_file_prefix_name = 'Ain_Chosen';  % prefix string specifying to only use null distribution files that start with this string
   		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -231,7 +231,7 @@ classdef pvalue_object < handle
         
         
         % the constructor (two arguments can be set here, or they can be set later prior to calling the create_pvalues_from_nulldist_files method)
-        function pval_obj = pvalue_object(real_decoding_results_file_name, null_distribution_directory_name)
+        function pval_obj = pvalue_object(real_decoding_results_file_name, null_distribution_directory_name, null_distribution_file_prefix_name)
             
             if nargin > 0
                 pval_obj.real_decoding_results_file_name = real_decoding_results_file_name;
@@ -239,8 +239,11 @@ classdef pvalue_object < handle
             
             if nargin > 1
                 pval_obj.null_distribution_directory_name = null_distribution_directory_name;
+                
             end
-            
+            if nargin > 2
+                pval_obj.null_distribution_file_prefix_name=null_distribution_file_prefix_name;
+            end
         end
         
         
