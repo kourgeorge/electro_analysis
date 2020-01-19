@@ -13,7 +13,7 @@ plot_obj.significant_event_times = 1000;
 plot_obj.errorbar_file_names = ({decoding_results});
 plot_obj.errorbar_transparency_level = .15;
 plot_obj.errorbar_edge_transparency_level = 0.05;
-plot_obj.errorbar_stdev_multiplication_factor = 1/sqrt(length(EnoughCellsINX{numSplits})); %to make it SEM
+plot_obj.errorbar_stdev_multiplication_factor = 1/sqrt(numSplits); %to make it SEM
 
 plot_obj.null_distribution_file_prefix_name=[event,'_',toDecode];
 
