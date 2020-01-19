@@ -1,4 +1,4 @@
-function [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels]= makeRasterData(behaveStruct, st, binsize, cut)
+function [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels, NPRaster, NPLabels]= makeRasterData(behaveStruct, st, binsize, cut)
 
 if nargin == 2 % default
     binsize = 1; % 1 ms bin
@@ -33,9 +33,10 @@ blmn=mean(ns/windowSize);
 blstd=std(ns/windowSize);
 nspikes=length(st);
 
-[BinRaster, BinLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,3), st, cut, binsize, trialInfo);
-[AinRaster, AinLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,2), st, cut,binsize, trialInfo);
-[AoutRaster, AoutLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,5), st, cut,binsize, trialInfo);
+[BinRaster, BinLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,4), st, cut, binsize, trialInfo);
+[AinRaster, AinLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,3), st, cut,binsize, trialInfo);
+[AoutRaster, AoutLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,6), st, cut,binsize, trialInfo);
+[NPRaster, NPLabels]=CreateRasterLabelsStruct(behaveStruct.event_times(:,2), st, cut,binsize, trialInfo);
 
 end
 

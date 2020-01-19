@@ -34,10 +34,11 @@ for j = 1:length(day_files)
 
         binsize = 1;
         cutLength = [-1,2];
-        [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels] = ...
+        [nspikes,blmn,blstd,AinRaster,AinLabels,AoutRaster,AoutLabels,BinRaster,BinLabels,NPRaster, NPLabels] = ...
             makeRasterData(behave_struct, st, binsize, cutLength);
         
-        dataCelllArr = [{'Ain'}, {AinRaster}, {AinLabels};
+        dataCelllArr = [{'NP'}, {NPRaster}, {NPLabels};
+            {'Ain'}, {AinRaster}, {AinLabels};
             {'Aout'}, {AoutRaster}, {AoutLabels};
             {'Bin'}, {BinRaster}, {BinLabels}];
         
