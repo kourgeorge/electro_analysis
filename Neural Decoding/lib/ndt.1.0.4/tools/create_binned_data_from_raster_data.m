@@ -108,23 +108,19 @@ function saved_binned_data_file_name = create_binned_data_from_raster_data(raste
 %  fix the directory name in case there it does not end with a slash
 last_char = raster_file_directory_name(end);
 if (strcmp(last_char, '/') + strcmp(last_char, '\') + strcmp(last_char, '*')) == 0
-    raster_file_directory_name = [raster_file_directory_name '/']
+    raster_file_directory_name = [raster_file_directory_name '/'];
 end
 
 
 % if the directory ends with a name a * then use only those file names that have the string up to the *
 % for example my_raster_directory/*PFC* will use only the files that have PFC in the file name 
+
 if strcmp(last_char, '*')
     raster_file_dir = dir(raster_file_directory_name);
-    [t r] = strtok(raster_file_directory_name, '/');
-    while ~isempty(r)
-        [t r] = strtok(r, '/');
-    end
-    raster_file_directory_name = raster_file_directory_name(1:(end - length(t)));  % remove the end string from the directory name
+    [raster_file_directory_name,~,~] = fileparts(raster_file_directory_name);
 else
     raster_file_dir = dir([raster_file_directory_name '*.mat']);
 end
-
 
 
 if isempty(raster_file_dir)
@@ -140,7 +136,7 @@ if nargin < 5
     start_time = 1;
 end
 if nargin < 6
-    load([raster_file_directory_name raster_file_dir(1).name]);
+    load(fullfile(raster_file_directory_name,raster_file_dir(1).name));
     end_time = size(raster_data, 2);  
 end
 
@@ -180,7 +176,7 @@ for i = 1:length(raster_file_dir)
 
     
     
-   load([raster_file_directory_name raster_file_dir(i).name]);  
+   load(fullfile(raster_file_directory_name,raster_file_dir(i).name));  
 
    curr_binned_data = bin_one_site(raster_data, the_bin_start_times, the_bin_widths);  % use the below helper function to bin the data
 

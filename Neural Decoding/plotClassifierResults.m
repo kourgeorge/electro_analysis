@@ -24,7 +24,7 @@ plot_obj.p_value_alpha_level = 0.05;
 plot_obj.plot_results;
 
 grid off
-title([event, ' ', toDecode]);
+title([event, ' ', toDecode, ' Num Splits: ', num2str(numSplits) ,' Num Cells: ', num2str(length(EnoughCellsINX{numSplits}))]);
 legend off;
 
 end

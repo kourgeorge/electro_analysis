@@ -1,15 +1,23 @@
-function [EnoughCells,EnoughCellsINX] = prepareClassifier(ratersDir, event,toDecode,binSize,sampleWindow)
+function [EnoughCells,EnoughCellsINX] = prepareClassifier(rastersDir, event,toDecode,binSize, sampleWindow, stage)
 
 
 %[EnoughCells,EnoughCellsINX] = prepareClassifier('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters', 'Ain','Chosen',150,50)
+
+if nargin > 5
+	rastersFolder = fullfile(rastersDir,event,['*', stage,'*']);
+    binnedName = fullfile(rastersDir,[event,'_Binned']);
+else
+	rastersFolder = fullfile(rastersDir,event);
+    binnedName = fullfile(rastersDir,[event,'_Binned']);
+end
 
 maxSplits = 40;
 %%%%%%%%%%%%%%%
 % create binned vectors from the rasters in the folder 'event', by binning
 % binSize (ms) bins (suggested default 150), and averaging every sampleWindow
 % (suggested default 50) ms
-rastersFolder = fullfile(ratersDir,event);
-binnedName = fullfile(ratersDir,[event,'_Binned']);
+
+
 saved_binned_data_file_name = create_binned_data_from_raster_data(rastersFolder,binnedName,binSize,sampleWindow);
 
 %%%%%%%%%%%%%
