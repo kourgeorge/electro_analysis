@@ -65,6 +65,7 @@ classdef max_correlation_coefficient_CL
 
 
   properties 
+        name = 'Max Correlation Coefficient'
         templates = [];   % average of the training vectors for each class
         labels = [];  % all the unique labels for each class (one for each template)  
   end

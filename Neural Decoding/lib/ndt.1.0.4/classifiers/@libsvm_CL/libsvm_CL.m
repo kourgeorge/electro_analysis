@@ -106,6 +106,7 @@ classdef libsvm_CL
 
 
   properties 
+        name = 'LibSVM'
         C = 1;  % inverse of the regularization constant - higher values cause more emphasis to be place on the
                 %  emperical loss (and cause the classifier use more complex functions, which could lead to overfitting).
         kernel = 'linear';  % the type of kernel used in the SVM.  Choices are 'linear', 'polynomial'/'poly', or 'gaussian'/'rbf'.

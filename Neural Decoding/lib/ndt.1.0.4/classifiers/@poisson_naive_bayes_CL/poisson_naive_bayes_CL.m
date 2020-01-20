@@ -65,6 +65,7 @@ classdef poisson_naive_bayes_CL
 
 
   properties 
+        name = 'Poisson Naive Bayes'
         lambdas = [];   % the expected number of occurances for each neuron for each class
         labels = [];  % the unique labels for the different classes
     end
