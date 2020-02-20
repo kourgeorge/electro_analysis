@@ -1,6 +1,6 @@
 function eventsStruct = extractEvents(eventsDataPath)
 %EXTRACTEVENTS Summary of this function goes here
-%   Detailed explanation goes here
+% eventsStruct = extractEvents('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_6\odor1_WR\rat6_mpfc_20.6')
 
 eventsFilePath = fullfile(eventsDataPath,'Events.nev');
 
@@ -228,7 +228,6 @@ function [Abeam_entrance, Abeam_exit, Bbeam_entrance, Bbeam_exit] = getABBeams(p
 Abeam=[];
 Bbeam=[];
 AandB=[];
-AandBwithITI=[];
 %first collect all IR beams events:
 for i=1:length(binaryTTLs)
     if ports(i)==1
@@ -236,35 +235,33 @@ for i=1:length(binaryTTLs)
             case'1110' %this is arm 0001 = arm 1, A beam
                 Abeam = [Abeam; i, timeStamps(i), 1];
                 AandB=[AandB; Abeam(end,:) ,1];
-                AandBwithITI=[AandBwithITI; Abeam(end,:) ,1];
+                
             case '1101' %this is arm 0010 = arm 2, A beam
                 Abeam = [Abeam; i, timeStamps(i), 2];
                 AandB=[AandB; Abeam(end,:) ,1];
-                AandBwithITI=[AandBwithITI; Abeam(end,:) ,1];
+                
             case '1100' %this is arm 0011 = arm 3, A beam
                 Abeam = [Abeam; i, timeStamps(i), 3];
                 AandB=[AandB; Abeam(end,:) ,1];
-                AandBwithITI=[AandBwithITI; Abeam(end,:) ,1];
+                
             case '1011' %this is arm 0100= arm 4, A beam
                 Abeam = [Abeam; i, timeStamps(i), 4];
                 AandB=[AandB; Abeam(end,:) ,1];
-                AandBwithITI=[AandBwithITI; Abeam(end,:) ,1];
+                
             case '1010' %this is arm 0101= arm 1, B beam
                 Bbeam = [Bbeam; i, timeStamps(i), 1];
                 AandB=[AandB; Bbeam(end,:) ,2];
-                AandBwithITI=[AandBwithITI; Bbeam(end,:) ,2];
+                
             case '1001' %this is arm 0110= arm 2, B beam
                 Bbeam = [Bbeam; i, timeStamps(i), 2];
                 AandB=[AandB; Bbeam(end,:) ,2];
-                AandBwithITI=[AandBwithITI; Bbeam(end,:) ,2];
+                
             case '1000' %this is arm 0111= arm 3, B beam
                 Bbeam = [Bbeam; i, timeStamps(i), 3];
                 AandB=[AandB; Bbeam(end,:) ,2];
-                AandBwithITI=[AandBwithITI; Bbeam(end,:) ,2];
             case '0111' %this is arm 1000= arm 4, B beam
                 Bbeam = [Bbeam; i, timeStamps(i), 4];
                 AandB=[AandB; Bbeam(end,:) ,2];
-                AandBwithITI=[AandBwithITI; Bbeam(end,:) ,2];
         end
     end
 end
@@ -273,6 +270,7 @@ Abeam_entrance = [];
 Abeam_exit = [];
 Bbeam_exit = [];
 
+
 %now look for contiuous sequences of A beam, and for B beam sequences of the same
 %arm, that are inside those A beam sequences:
 % % A=Abeam(:,3)';
@@ -280,7 +278,7 @@ Bbeam_exit = [];
 % % rep=diff(find(diff([-Inf A Inf])));  %how many times the val appears in its sequence
 % % val=A(cumsum(rep));  %the value in each sequence
 
-% AandB structure: eventID | timestamp | arm | A/B(1/2)
+% 
 %The algorithm:
 %==============%
 %1. Use the ITI to partition A and B beam recordings to the different trials.
@@ -300,7 +298,11 @@ Bbeam_exit = [];
 %7. Select the earliest recording in A1.
 %8. Select the latest recording in A2 
 
-for k=1:length(ITI)
+% Structures:
+% Abeam and Bbeam: <eventID| timestamp| arm>
+% AandB structure: <eventID | timestamp | arm | A/B(1/2)
+
+for k=1:length(ITI) 
     if k==length(ITI)
         intervalBetweenITIs= find(AandB(:,2)>ITI(k,2));
     else
