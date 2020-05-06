@@ -1,11 +1,11 @@
-function createRasterFiles()
+function createRasterFiles(filerLabel, filterValues)
 %CREATERASTERFILES Given the single unit data and the behavioural data
 % folder, this functions scan all the files to extract raster files and save the to the disk
 % with the relevant name and in the relevant folder which represent the event.
 % 
 
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters';
+saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters2';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
@@ -34,13 +34,26 @@ for j = 1:length(day_files)
 
         binsize = 1;
         cutLength = [-1,2];
-        [nspikes , blmn, blstd, Labels, AinRaster, AoutRaster, BinRaster, NPRaster] = ...
+        [nspikes ,blmn, blstd, Labels, AinRaster, AoutRaster, BinRaster, NPRaster, AllRaster] = ...
             makeRasterData(behave_struct, st, binsize, cutLength);
         
-        dataCelllArr = [{'NP'}, {NPRaster};
-            {'Ain'}, {AinRaster};
-            {'Aout'}, {AoutRaster};
-            {'Bin'}, {BinRaster}];
+         dataCelllArr = [{'NP'}, {NPRaster};
+                {'Ain'}, {AinRaster};
+                {'Aout'}, {AoutRaster};
+                {'Bin'}, {BinRaster}
+                {'All'}, {AllRaster}];
+            
+            
+        if nargin>1
+            
+            indcs = find(ismember(Labels.(filerLabel),filterValues));
+            Labels = filter_all_struct_fields(Labels,indcs);
+            for k=1:size(dataCelllArr,1)
+                tmp=dataCelllArr{k,2};
+                dataCelllArr(k,2)={tmp(indcs,:)};
+                
+            end
+        end
         
         for ev=1:size(dataCelllArr,1)
             eventName = dataCelllArr{ev,1};
@@ -63,47 +76,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [nspikes, blmn, blstd, Labels, AinRaster, AoutRaster, ...
-    BinRaster, NPRaster] =  makeRasterData(behaveStruct, st, binsize, cut)
-
-% Given the behavioural data and spiketimes of a cell, this function
-% returns the rasters and labels for the different events 
-
-if nargin == 2 % default
-    binsize = 1; % 1 ms bin
-    cut = [-2.5 2.5]; %+-/ 2.5 s
-    plotOption = 0;
-elseif nargin == 3
-    cut = [-2.5 2.5]; %+-/ 2.5 s
-    plotOption = 0;
-end
-windowSize = diff(cut)/1;   % for baseline calculations, to create z scores
-
-
-num_trials = size(behaveStruct.selected_arms,1);
-
-Labels.TrialNum = 1:num_trials;
-Labels.Chosen = behaveStruct.selected_arms;
-Labels.CorrectArm1 = behaveStruct.rewarded_arm1;
-Labels.CorrectArm2 = behaveStruct.rewarded_arm2;
-Labels.Rewarded = behaveStruct.selected_arms==behaveStruct.rewarded_arm1 | ...
-    behaveStruct.selected_arms==behaveStruct.rewarded_arm2;
-Labels.ArmType = 2 - (behaveStruct.selected_arms == 1 | behaveStruct.selected_arms == 2);
-
-blTimeBins = st(1):windowSize:st(end);
-ns = zeros(1,length(blTimeBins));
-for b = 2:length(blTimeBins)
-    ns(b) = length(find(st > blTimeBins(b-1) & st <= blTimeBins(b)));
-end
-blmn=mean(ns/windowSize);
-blstd=std(ns/windowSize);
-nspikes=length(st);
-
-BinRaster=getRasterAroundEvent(behaveStruct.event_times(:,4), st, cut, binsize);
-AinRaster=getRasterAroundEvent(behaveStruct.event_times(:,3), st, cut,binsize);
-AoutRaster=getRasterAroundEvent(behaveStruct.event_times(:,6), st, cut,binsize);
-NPRaster=getRasterAroundEvent(behaveStruct.event_times(:,2), st, cut,binsize);
-
+function struct = filter_all_struct_fields(struct, indcs)
+fn=fieldnames(struct);
+for k=1:numel(fn)
+    label = struct.(fn{k});
+    struct.(fn{k})= label(indcs);
 end
 
-
+end
