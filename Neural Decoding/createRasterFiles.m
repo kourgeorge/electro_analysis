@@ -4,6 +4,7 @@ function createRasterFiles(filerLabel, filterValues)
 % with the relevant name and in the relevant folder which represent the event.
 % 
 
+
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
 saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters2';
 
