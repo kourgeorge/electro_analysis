@@ -32,9 +32,9 @@ binnedDataName = fullfile(rastersDir,[event,'_Binned_',num2str(binSize),'ms_bins
 the_feature_preprocessors{1} = zscore_normalize_FP;
 %the_classifier = max_correlation_coefficient_CL;
 the_classifier = libsvm_CL;
-the_classifier.multiclass_classificaion_scheme = 'one_vs_all';
+%the_classifier.multiclass_classificaion_scheme = 'one_vs_all';
 the_classifier.multiclass_classificaion_scheme = 'all_pairs';  %uncomment for svm
-% the_classifier.kernel = 'polynomial';
+the_classifier.kernel = 'polynomial';
 the_classifier.kernel = 'linear';  %uncomment for svm
 
 % the_classifier.poly_degree = 2;

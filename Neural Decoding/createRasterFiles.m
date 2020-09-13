@@ -6,7 +6,7 @@ function createRasterFiles(filerLabel, filterValues)
 
 
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters2';
+saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters_test';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
@@ -34,15 +34,22 @@ for j = 1:length(day_files)
             behave_struct.rewarded_arm1, behave_struct.rewarded_arm2] = extract_event_times(behave);
 
         binsize = 1;
-        cutLength = [-1,2];
-        [nspikes ,blmn, blstd, Labels, AinRaster, AoutRaster, BinRaster, NPRaster, AllRaster] = ...
-            makeRasterData(behave_struct, st, binsize, cutLength);
+        cut_info.ITI = [-1,2];
+        cut_info.NP = [-1,2];
+        cut_info.Ain = [-1,2];
+        cut_info.Bin = [-1,2];
+        cut_info.Aout = [-1,2];
+
+        [nspikes ,blmn, blstd, Labels, ITIRaster, AinRaster,AoutRaster, BinRaster, NPRaster, AllRaster] = ...
+            makeRasterData(behave_struct, st, binsize, cut_info);
         
-         dataCelllArr = [{'NP'}, {NPRaster};
+         dataCelllArr = [{'ITI'}, {ITIRaster};
+                {'NP'}, {NPRaster};
                 {'Ain'}, {AinRaster};
                 {'Aout'}, {AoutRaster};
                 {'Bin'}, {BinRaster}
-                {'All'}, {AllRaster}];
+                %{'All'}, {AllRaster}
+                ];
             
             
         if nargin>1
@@ -67,6 +74,7 @@ for j = 1:length(day_files)
             raster_site_info.stage = stage;
             raster_site_info.basemean = blmn;
             raster_site_info.basestd = blstd;
+            raster_site_info.cut_info = cut_info.(eventName);
             saveFile = fullfile(saveFolder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
             save(saveFile,'raster_data','raster_labels','raster_site_info');
         end
