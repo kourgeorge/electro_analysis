@@ -6,7 +6,7 @@ function createRasterFiles(filerLabel, filterValues)
 
 
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters_test';
+saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters_test2';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
@@ -33,7 +33,7 @@ for j = 1:length(day_files)
         [behave_struct.event_times, behave_struct.selected_arms, ...
             behave_struct.rewarded_arm1, behave_struct.rewarded_arm2] = extract_event_times(behave);
 
-        binsize = 1;
+        binsize = 50;
         cut_info.ITI = [-1,2];
         cut_info.NP = [-1,2];
         cut_info.Ain = [-1,2];
@@ -75,6 +75,7 @@ for j = 1:length(day_files)
             raster_site_info.basemean = blmn;
             raster_site_info.basestd = blstd;
             raster_site_info.cut_info = cut_info.(eventName);
+            raster_site_info.binsize = binsize;
             saveFile = fullfile(saveFolder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
             save(saveFile,'raster_data','raster_labels','raster_site_info');
         end
