@@ -16,14 +16,12 @@ for r=1:size(EventTimes,1)
     binneddotd(r,:) = hist(s,trange(1):binsize/1000:trange(2));
 end
 
-Raster = full(dotd);
 %BinnedRaster = sum(full(binneddotd))/size(binneddotd,1)*(1000/binsize);
-RasterInfo.Raster = Raster;
-RasterInfo.BinnedRaster = full(binneddotd);
+RasterInfo.Raster = full(dotd);
+RasterInfo.BinnedRaster = full(binneddotd)*(1000/binsize); % convert to HZ
 
-%binpst = sum(full(binneddotd))/size(binneddotd,1)*(1000/binsize);
+%binpst = sum(full(binneddotd))/size(binneddotd,1);
 %binpst = filtfilt(gauss(1),1,binpst);
-
 
 end
 
