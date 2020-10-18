@@ -1,4 +1,4 @@
-function CellStats()
+function CellsSelectivityStats()
 
 % 1. Load the cell data (for a given event under s apecific filering by the label) for instace
 % 2. get the firing rate from the PSTH data in the time bins in interst.
