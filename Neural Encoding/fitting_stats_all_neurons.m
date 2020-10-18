@@ -12,7 +12,7 @@ function [unique_rat_day_names, sum_neurons_types_day]= fitting_stats_all_neuron
 %results_files = dir([electro_folder,'\*_result.mat']); %look for all single units files in the stage
 
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-results_files = dir([electro_folder,'\*\*\*\*_result.mat']); %look for all single units files in the stage
+results_files = dir([electro_folder,'\*\*\*\*arm_type_result.mat']); %look for all single units files in the stage
 
 
 neurons_types = [];

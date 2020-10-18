@@ -327,6 +327,7 @@ classdef standard_resample_CV
 
         datasource;
         classifier;
+        trained_models;
         feature_preprocessors = [];   % cell array of feature-preprocessor objects
        
         num_resample_runs = 50;
@@ -384,6 +385,7 @@ classdef standard_resample_CV
                 cv.test_only_at_training_times = 0;
             end
             
+            trained_models = [];
 
             % might speed things up a bit to assign these to separate variables (matlab is a bit lame)
             datasource = cv.datasource;
@@ -479,7 +481,8 @@ classdef standard_resample_CV
                             
                             
                             % train the classifier 
-                            classifier = classifier.train(XTr, YTr);   
+                            classifier = classifier.train(XTr, YTr); 
+                            trained_models = [trained_models; classifier];
                             
                             
                             % if one wants to only test at the same time points that were used for training (to speed things up)
@@ -906,6 +909,7 @@ classdef standard_resample_CV
             DECODING_RESULTS.CV_PARAMETERS.stop_resample_runs_only_when_specfic_results_have_converged = cv.stop_resample_runs_only_when_specfic_results_have_converged;
             DECODING_RESULTS.CV_PARAMETERS.num_resample_runs_actually_run = iResample;
             DECODING_RESULTS.CV_PARAMETERS.convergence_values = convergence_values;  % might be more appropriate to save this elsewhere, but ok for now...
+            DECODING_RESULTS.TRAINED_MODELS = trained_models;
             for iFP = 1:length(feature_preprocessors), DECODING_RESULTS.CV_PARAMETERS.feature_preprocessor_names{iFP} = class(feature_preprocessors{iFP}); end
             
             % if the datasource has a method get_DS_properties, save the datasource properties returned my this method as well

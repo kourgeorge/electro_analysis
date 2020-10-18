@@ -1,5 +1,5 @@
 function plotClassifierResults(rastersDir, event, toDecode, EnoughCellsINX, numSplits)
-%PLOTCLASSIFIERRESULTS Summary of this function goes here
+%PLOTCLASSIFIERRESULTS Plots the classifier decoding results. 
 %   plotClassifierResults('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters','Ain', 'Rewarded',EnoughCellsINX ,20)
 
 
@@ -9,7 +9,7 @@ figure;
 result_names{1} = fullfile(rastersDir,[event,'_',toDecode,'_Results']);
 plot_obj = plot_standard_results_object(result_names, '');
 
-plot_obj.significant_event_times = 1000;
+plot_obj.significant_event_times = [1000,4000,5000,5600,10600];
 plot_obj.errorbar_file_names = ({decoding_results});
 plot_obj.errorbar_transparency_level = .15;
 plot_obj.errorbar_edge_transparency_level = 0.05;

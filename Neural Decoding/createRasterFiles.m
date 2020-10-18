@@ -6,7 +6,7 @@ function createRasterFiles(filerLabel, filterValues)
 
 
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters_test2';
+saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters2';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage

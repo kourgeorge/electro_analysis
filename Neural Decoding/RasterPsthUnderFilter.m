@@ -1,6 +1,5 @@
 function [raster, raster_binned] = RasterPsthUnderFilter (cell_data, filter_labels, filter_values)
-%RASTERPSTHUNDERFILTER Gfor a cell data, returns the raster and PSTH of a
-%given labels filter.
+%RASTERPSTHUNDERFILTER for a cell data, returns the raster and PSTH of a given labels filter.
 
 relevant_trial = filter_trials(cell_data, filter_labels, filter_values);
 raster = cell_data.raster_data.Raster(relevant_trial,:);

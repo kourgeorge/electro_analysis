@@ -25,11 +25,11 @@ blmn=mean(ns/windowSize);
 blstd=std(ns/windowSize);
 nspikes=length(st);
 
-ITIRaster=getRasterAroundEvent(behaveStruct.event_times(:,1), st, cut_info.ITI ,binsize);
-NPRaster=getRasterAroundEvent(behaveStruct.event_times(:,2), st, cut_info.NP ,binsize);
-AinRaster=getRasterAroundEvent(behaveStruct.event_times(:,3), st, cut_info.Ain,binsize);
-BinRaster=getRasterAroundEvent(behaveStruct.event_times(:,4), st, cut_info.Bin , binsize);
-AoutRaster=getRasterAroundEvent(behaveStruct.event_times(:,6), st,cut_info.Aout  ,binsize);
+ITIRaster=getRasterAroundEvent(behaveStruct.event_times(:,1), st, cut_info.ITI, binsize);
+NPRaster=getRasterAroundEvent(behaveStruct.event_times(:,2), st, cut_info.NP, binsize);
+AinRaster=getRasterAroundEvent(behaveStruct.event_times(:,3), st, cut_info.Ain, binsize);
+BinRaster=getRasterAroundEvent(behaveStruct.event_times(:,4), st, cut_info.Bin, binsize);
+AoutRaster=getRasterAroundEvent(behaveStruct.event_times(:,6), st,cut_info.Aout , binsize);
 AllRaster = [ITIRaster,NPRaster, AinRaster, BinRaster, AoutRaster];
 
 end
