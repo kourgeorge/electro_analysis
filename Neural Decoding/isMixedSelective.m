@@ -6,11 +6,11 @@ function is_selective = isMixedSelective(  cell_data, labels , baseline_range_bi
 
 pvals = [];
 pval2 = [];
-samples = [];
-groups = [];
-num_bins_in_target = target_range_bins(2)-target_range_bins(1);
+num_bins_in_target = target_range_bins(2)-target_range_bins(1)+1;
 for i=1:num_bins_in_target
     % for each label
+    samples = [];
+    groups = [];
     for v=1:length(targets)
         bin_samples = targets{v}(:,i);
         samples = [samples;bin_samples];

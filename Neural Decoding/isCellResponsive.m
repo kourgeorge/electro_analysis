@@ -23,7 +23,6 @@ legend_arr = [];
  [label_values, baseline, targets, binned_raster ]  = getCellBaselineTargetFR( event_cell_data, label , baseline_range_bins, target_range_bins );
 
 for v=1:length(label_values)
-    
     baseline_fr = baseline{v};
     target_fr = targets{v};
     for i=1:size(target_fr,2)

@@ -5,13 +5,14 @@ function is_selective = isCellSelective( cell_data, labels , baseline_range_bins
 [~ , ~, targets, ~ ] = getCellBaselineTargetFR( cell_data, labels , baseline_range_bins, target_range_bins );
 
 is_selective = [];
-samples = [];
-groups = [];
+
 pvals = [];
 
 % for each bin in target
-num_bins_in_target = target_range_bins(2)-target_range_bins(1);
+num_bins_in_target = target_range_bins(2)-target_range_bins(1)+1;
 for i=1:num_bins_in_target
+    samples = [];
+    groups = [];
     % for each label
     for v=1:length(targets)
         bin_samples = targets{v}(:,i);

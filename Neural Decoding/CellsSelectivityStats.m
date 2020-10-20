@@ -1,15 +1,12 @@
 function CellsSelectivityStats()
+%%% Presents cells selectivity information. For each Cell it finds the
+%%% responsiveness and selectivity type given the event and labels.
 
-% 1. Load the cell data (for a given event under s apecific filering by the label) for instace
-% 2. get the firing rate from the PSTH data in the time bins in interst.
-% 3. Calcuate statistics such as determine responsiveness and selectivity.
 
 raster_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters2';
-event = 'Aout';
+event = 'ITI';
 labels = [{'Chosen'},{'Rewarded'}];
-addplot = false;
-
-% PARAMS
+show_cell_plot = false;
 baseline_range_bins = [-7,-1];
 target_range_bins = [0,12];
 alpha = 0.05;
@@ -19,12 +16,11 @@ stats = [];
 i=1;
 raster_cells_data = dir([fullfile(raster_folder, event), '\*.mat']);
 for cell_raster_file = fliplr(raster_cells_data')
-
-    
-%     if ~strcmp(cell_raster_file.name,'spatial_WR_rat11_mpfc_22.10_TT3_SS_6.mat')
+%     
+%     if ~strcmp(cell_raster_file.name,'odor1_WR_rat10_mpfc_10.10_TT2_SS_7.mat')
 %         continue
 %     end
-    
+
 
     disp (cell_raster_file.name)
     disp(i/length(raster_cells_data)*100)
@@ -41,7 +37,7 @@ for cell_raster_file = fliplr(raster_cells_data')
     is_mixed_selective = isMixedSelective(cell_data, labels , baseline_range_bins, target_range_bins, alpha, min_consecutive_bins );
     
     stats = [stats; {cell_raster_file.name}, is_responsive_1, is_selective_1, is_responsive_2, is_selective_2, is_mixed_selective];
-    if addplot 
+    if show_cell_plot 
         psth_plot = drawCellResponse(cell_data, labels);
         binsize = cell_data.raster_site_info.binsize;
         binned_xaxis = cell_data.raster_site_info.cut_info(1)*1000/binsize:cell_data.raster_site_info.cut_info(2)*1000/binsize;
@@ -80,8 +76,10 @@ ss_per_rel = sum(strcmp(stats(:,6),'SS')& responsive_to_either);
 lms_per_rel = sum(strcmp(stats(:,6),'LMS')& responsive_to_either);
 nms_per_rel = sum(strcmp(stats(:,6),'NMS')& responsive_to_either);
 
+disp(stats)
 
-figure;
+
+f = figure;
 subplot(2,3,1)
 X = [1-responsive_per1 responsive_per1];
 pie(X)
@@ -107,26 +105,23 @@ pie(X)
 legend([{'Non Selective'},{'Selective'}])
 title(['Selective Cells From Responsive: ',labels{2}])
 
+eps = 0.0001;
 
 subplot(2,3,3)
-X = [no_per ss_per lms_per nms_per];
+X = [no_per+eps ss_per+eps lms_per+eps nms_per+eps];
 pie(X)
 legend([{'Non Selective'},{'SS'},{'LMS'},{'NMS'}])
 title('Mixed Selectivity Type over all Cells')
 
 
 subplot(2,3,6)
-X = [no_per_rel ss_per_rel lms_per_rel nms_per_rel];
+X = [no_per_rel+eps ss_per_rel+eps lms_per_rel+eps nms_per_rel+eps];
 pie(X)
 legend([{'Non Selective'},{'SS'},{'LMS'},{'NMS'}])
 title('Mixed Selectivity Type from responsive Cells')
 
 suptitle(['Selectivity Analysis: ', event, ' ', labels{1},'+', labels{2}])
-
-
-disp(stats)
-% mean(stats(:,2))
-% mean(stats(:,3))
+saveas(f, fullfile(pwd,[event,'_',labels{1},'-' ,labels{2}]))
 
 end
 

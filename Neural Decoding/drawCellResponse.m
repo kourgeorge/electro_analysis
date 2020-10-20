@@ -1,6 +1,6 @@
 function psth_plot = drawCellResponse(cell_data, combination_labels)
 
-minimum_trials_in_condition = 4;
+minimum_trials_in_condition = 0;
 
 colors = [0, 0.4470, 0.7410
     0.8500, 0.3250, 0.0980
