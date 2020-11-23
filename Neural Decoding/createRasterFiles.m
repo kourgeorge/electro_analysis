@@ -6,7 +6,7 @@ function createRasterFiles(filerLabel, filterValues)
 
 
 electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters2';
+saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters_test';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
@@ -31,7 +31,10 @@ for j = 1:length(day_files)
         [behave, st] = load_spikes_and_behavioral_data (ss_file);
         
         [behave_struct.event_times, behave_struct.selected_arms, ...
-            behave_struct.rewarded_arm1, behave_struct.rewarded_arm2] = extract_event_times(behave);
+            behave_struct.rewarded_arm1, behave_struct.rewarded_arm2, behave_struct.selected_np] = extract_event_times(behave);
+
+		% Correction of the ITI - make it a second before.
+        % behave_struct.event_times(:,1)=behave_struct.event_times(:,1)-1;
 
         binsize = 50;
         cut_info.ITI = [-1,2];
