@@ -1,4 +1,4 @@
-function is_responsive = isCellResponsive( event_cell_data, label , baseline_range_bins, target_range_bins , alpha, min_consecutive_bins)
+function [is_responsive,pvals, values_responsive] = isCellResponsive( event_cell_data, label , baseline_range_bins, target_range_bins , alpha, min_consecutive_bins)
 %ISCELLRESPONSIVE Given cell data checks if the cell is responsive for a
 %given label.
 
@@ -20,20 +20,26 @@ pvals = [];
 is_responsive = false;
 legend_arr = [];
 
+alpha_selectivity = (alpha/(target_range_bins(2)-target_range_bins(1)-min_consecutive_bins+2))^(1/min_consecutive_bins);
+alpha_responsivity = alpha_selectivity/length(label_values);
+
  [label_values, baseline, targets, binned_raster ]  = getCellBaselineTargetFR( event_cell_data, label , baseline_range_bins, target_range_bins );
 
+values_responsive = [];
 for v=1:length(label_values)
     baseline_fr = baseline{v};
     target_fr = targets{v};
     for i=1:size(target_fr,2)
-        [sig , pval] = ttest2(baseline_fr(:), target_fr(:,i), 'alpha', alpha, 'Vartype','unequal');
-        significance(v,i) = sig;
+        [~ , pval] = ttest2(baseline_fr(:), target_fr(:,i), 'alpha', alpha, 'Vartype','unequal');
+        %significance(v,i) = sig;
         pvals(v,i)=pval;
     end
     
-    significance(isnan(significance))=0;
-    is_responsive = is_responsive || longestConsecutiveOnes(significance(end,:))>=min_consecutive_bins;
-    
+    %significance(isnan(significance))=0;
+    significance=pvals<alpha_responsivity;
+    value_responsive = longestConsecutiveOnes(significance(end,:))>=min_consecutive_bins;
+    is_responsive = is_responsive ||value_responsive;
+    values_responsive = [values_responsive, value_responsive];
 %    [psth_mean, ~, psth_sem ] = binedRasterToPSTH( binned_raster{v} );
     
 %     options.color_line = colors(v,:);
