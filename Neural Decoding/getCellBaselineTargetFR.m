@@ -13,6 +13,7 @@ for v=1:length(combinations)
     
     [~, binned_raster] = RasterPsthUnderFilter (event_cell_data, labels, combinations(:,v));
     
+    % Add Smoothing - Can be removed
     binned_raster = filter2(gausswin(3)/sum(gausswin(3))',binned_raster')';
     
     bin_size = event_cell_data.raster_site_info.binsize;
