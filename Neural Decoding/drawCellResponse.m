@@ -66,9 +66,10 @@ if isempty(combinations)
     spy(raster{1},'.k')
 else
     for k=1:length(raster)
-        spy(raster{k})
+        spy(raster{k}, 3)
         ax = gca;
         ax.Children(1).Color = colors(k,:);
+        ax.Children(1).MarkerSize = 10;
         hold on
     end
     hold off
