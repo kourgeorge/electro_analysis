@@ -482,7 +482,7 @@ classdef standard_resample_CV
                             
                             % train the classifier 
                             classifier = classifier.train(XTr, YTr); 
-                            trained_models = [trained_models; classifier];
+                            
                             
                             
                             % if one wants to only test at the same time points that were used for training (to speed things up)
@@ -659,7 +659,7 @@ classdef standard_resample_CV
                             
                             
                     end  % end for the train time periods
-
+                    trained_models = [trained_models; classifier];
 
                     
                 end  % end for the CV blocks
