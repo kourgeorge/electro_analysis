@@ -1,3 +1,4 @@
+
 function [is_selective,pvals,values_selective] = isCellSelective( cell_data, labels , baseline_range_bins, target_range_bins, alpha, min_consecutive_bins)
 %IS Summary of this function goes here
 %   Detailed explanation goes here
@@ -5,13 +6,14 @@ function [is_selective,pvals,values_selective] = isCellSelective( cell_data, lab
 [~ , baseline, targets, ~ ] = getCellBaselineTargetFR( cell_data, labels , baseline_range_bins, target_range_bins );
 
 pvals = [];
-num_pairs = target_range_bins(2)-target_range_bins(1)-min_consecutive_bins+2;
+% alpha_selectivity = (alpha/(target_range_bins(2)-target_range_bins(1)-min_consecutive_bins+2))^(1/min_consecutive_bins);
 num_bins = target_range_bins(2) - target_range_bins(1);
 % alpha_selectivity = (alpha/num_pairs)^(1/min_consecutive_bins);
 % alpha_selectivity = (1-(1-alpha)^(1/num_pairs))^(1/min_consecutive_bins);
 % alpha_selectivity = 0.105; % for tl=6;
 % alpha_selectivity = 0.078; % tl = 10;
 alpha_selectivity = solve_probability_bernouli_runs(min_consecutive_bins,num_bins,alpha);
+
 
 type = 0;
 values_selective = [];
@@ -36,12 +38,12 @@ for i=1:num_bins_in_target
         groups = [groups; repmat({num2str(v)}, length(bin_samples), 1)];
     end
     % perform anova between samples values in the same bin
-    %     if (length(targets)==2)
-    %         [~ , pval] = ttest2(samples([groups{:}]=='1'), samples([groups{:}]=='2'), 'alpha', alpha, 'Vartype','unequal');
-    %     else
-    %         pval= anova1(samples,groups,'off');
-    %
-    %     end
+%     if (length(targets)==2)
+%         [~ , pval] = ttest2(samples([groups{:}]=='1'), samples([groups{:}]=='2'), 'alpha', alpha, 'Vartype','unequal');        
+%     else
+%         pval= anova1(samples,groups,'off');
+%         
+%     end
     pval= anova1(samples,groups,'off');
     pvals(i) = pval;
     
@@ -57,3 +59,5 @@ is_selective = longestConsecutiveOnes(significance)>=min_consecutive_bins;
 
 
 end
+
+% >>>>>>> 7c3eb62b0f4941c22b8eedd7097f71d062a9fe92

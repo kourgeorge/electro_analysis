@@ -10,12 +10,15 @@ num_trials = size(behaveStruct.selected_arms,1);
 
 Labels.TrialNum = 1:num_trials;
 Labels.Chosen = behaveStruct.selected_arms;
+Labels.NPChosen = behaveStruct.selected_np;
 Labels.CorrectArm1 = behaveStruct.rewarded_arm1;
 Labels.CorrectArm2 = behaveStruct.rewarded_arm2;
 Labels.Rewarded = behaveStruct.selected_arms==behaveStruct.rewarded_arm1 | ...
     behaveStruct.selected_arms==behaveStruct.rewarded_arm2;
 Labels.ArmType = 2 - (behaveStruct.selected_arms == 1 | behaveStruct.selected_arms == 2);
-
+Labels.NPRewarded = behaveStruct.selected_np==behaveStruct.rewarded_arm1 | ...
+    behaveStruct.selected_np==behaveStruct.rewarded_arm2;
+	
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
 for b = 2:length(blTimeBins)

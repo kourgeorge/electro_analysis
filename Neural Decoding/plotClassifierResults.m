@@ -2,7 +2,6 @@ function plotClassifierResults(rastersDir, event, toDecode, EnoughCellsINX, numS
 %PLOTCLASSIFIERRESULTS Plots the classifier decoding results. 
 %   plotClassifierResults('C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters','Ain', 'Rewarded',EnoughCellsINX ,20)
 
-
 decoding_results = fullfile(rastersDir,[event,'_',toDecode,'_Results']);
 
 figure;

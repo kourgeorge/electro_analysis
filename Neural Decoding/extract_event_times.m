@@ -1,4 +1,4 @@
-function [event_times, selected_arms, rewarded_arm1, rewarded_arm2] = extract_event_times(behave)
+function [event_times, selected_arms, rewarded_arm1, rewarded_arm2,selected_np] = extract_event_times(behave)
 % 
 
 %all_trials = 1:size(behave.ITI,1);
@@ -7,6 +7,7 @@ event_times = [];
 selected_arms = [];
 rewarded_arm1 = [];
 rewarded_arm2 = [];
+selected_np = [];
 removed_trails = 0;
 
 for trial = all_trials
@@ -39,6 +40,7 @@ for trial = all_trials
     rewarded_arm2 = [rewarded_arm2; behave.CorrectArm2(trial,2)];
     event_times = [event_times; current_trial_events_times];
     selected_arms = [selected_arms; selected_arm]; 
+    selected_np = [selected_np;behave.NP_new(find(behave.NP_new(:,4)==trial,1,'last'),3)];
     
 end
 %disp(['Removed ', num2str(removed_trails), ' trials from total ', num2str(all_trials)])

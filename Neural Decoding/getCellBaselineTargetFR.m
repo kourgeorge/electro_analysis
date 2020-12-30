@@ -12,6 +12,10 @@ combinations = getLabelsCombinations(labels);
 for v=1:length(combinations)
     
     [~, binned_raster] = RasterPsthUnderFilter (event_cell_data, labels, combinations(:,v));
+    
+    % Add Smoothing - Can be removed
+    binned_raster = filter2(gausswin(3)/sum(gausswin(3))',binned_raster')';
+    
     bin_size = event_cell_data.raster_site_info.binsize;
     binned_xaxis = event_cell_data.raster_site_info.cut_info(1)*1000/bin_size:event_cell_data.raster_site_info.cut_info(2)*1000/bin_size;
     event_bin = find(binned_xaxis==0);
