@@ -1,7 +1,7 @@
-function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
+function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent,hdl)
 % function H=shadedErrorBar(x,y,errBar,lineProps,transparent)
 %
-% Purpose 
+% Purpose
 % Makes a 2-d line plot with a pretty shaded error bar made
 % using patch. Error bar color is chosen automatically.
 %
@@ -17,45 +17,45 @@ function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
 %          statistic the line should be and the second defines the
 %          error bar.
 % lineProps - [optional,'-k' by default] defines the properties of
-%             the data line. e.g.:    
+%             the data line. e.g.:
 %             'or-', or {'-or','markerfacecolor',[1,0.2,0.2]}
 % transparent - [optional, 0 by default] if ==1 the shaded error
 %               bar is made transparent, which forces the renderer
 %               to be openGl. However, if this is saved as .eps the
 %               resulting file will contain a raster not a vector
-%               image. 
+%               image.
 %
 % Outputs
-% H - a structure of handles to the generated plot objects.     
+% H - a structure of handles to the generated plot objects.
 %
 %
 % Examples
 % y=randn(30,80); x=1:size(y,2);
 % shadedErrorBar(x,mean(y,1),std(y),'g');
-% shadedErrorBar(x,y,{@median,@std},{'r-o','markerfacecolor','r'});    
-% shadedErrorBar([],y,{@median,@std},{'r-o','markerfacecolor','r'});    
+% shadedErrorBar(x,y,{@median,@std},{'r-o','markerfacecolor','r'});
+% shadedErrorBar([],y,{@median,@std},{'r-o','markerfacecolor','r'});
 %
 % Overlay two transparent lines
 % y=randn(30,80)*10; x=(1:size(y,2))-40;
-% shadedErrorBar(x,y,{@mean,@std},'-r',1); 
+% shadedErrorBar(x,y,{@mean,@std},'-r',1);
 % hold on
 % y=ones(30,1)*x; y=y+0.06*y.^2+randn(size(y))*10;
-% shadedErrorBar(x,y,{@mean,@std},'-b',1); 
+% shadedErrorBar(x,y,{@mean,@std},'-b',1);
 % hold off
 %
 %
 % Rob Campbell - November 2009
 
 
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-% Error checking    
-narginchk(3,5)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Error checking
+narginchk(3,6)
 
 
 %Process y using function handles if needed to make the error bar
 %dynamically
-if iscell(errBar) 
+if iscell(errBar)
     fun1=errBar{1};
     fun2=errBar{2};
     errBar=fun2(y);
@@ -97,11 +97,14 @@ if nargin<5, transparent=0; end
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-% Plot to get the parameters of the line 
-H.mainLine=plot(x,y,lineProps{:});
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot to get the parameters of the line
 
-
+if nargin < 6
+    H. mainLine = plot(x,y,lineProps{:});
+else
+    H.mainLine=plot(hdl,x,y,lineProps{:}); %%% GM&GK 21/12/2020 added handle
+end
 % Work out the color of the shaded region and associated lines
 % Using alpha requires the render to be openGL and so you can't
 % save a vector image. On the other hand, you need alpha if you're
@@ -121,7 +124,7 @@ else
     set(gcf,'renderer','painters')
 end
 
-    
+
 %Calculate the error bars
 uE=y+errBar(1,:);
 lE=y-errBar(2,:);
@@ -140,16 +143,27 @@ xP=[x,fliplr(x)];
 xP(isnan(yP))=[];
 yP(isnan(yP))=[];
 
+if nargin < 6
+    H.patch=patch(xP,yP,1,'facecolor',patchColor,...
+        'edgecolor','none',...
+        'facealpha',faceAlpha);
+else
+    H.patch = patch(hdl,xP,yP,1,'facecolor',patchColor,...
+        'edgecolor','none',...
+        'facealpha',faceAlpha);
+end
 
-H.patch=patch(xP,yP,1,'facecolor',patchColor,...
-              'edgecolor','none',...
-              'facealpha',faceAlpha);
 
-
-%Make pretty edges around the patch. 
-H.edge(1)=plot(x,lE,'-','color',edgeColor);
-H.edge(2)=plot(x,uE,'-','color',edgeColor);
-
+%Make pretty edges around the patch.
+if nargin < 6
+    
+    H.edge(1)=plot(x,lE,'-','color',edgeColor);
+    H.edge(2)=plot(x,uE,'-','color',edgeColor);
+else
+    
+    H.edge(1)=plot(hdl,x,lE,'-','color',edgeColor);
+    H.edge(2)=plot(hdl,x,uE,'-','color',edgeColor);
+end
 %Now replace the line (this avoids having to bugger about with z coordinates)
 uistack(H.mainLine,'top')
 
