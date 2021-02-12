@@ -5,23 +5,23 @@ function createRasterFiles(filerLabel, filterValues)
 % 
 
 
-electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
-saveFolder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\Rasters_test';
+electro_folder = '/Users/gkour/Box/phd/Electro_Rats';
+saveFolder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_100_augmented';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
-day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
+day_files = dir([electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
 
 for j = 1:length(day_files)
     day_folder = day_files(j).folder;
-    SS_files = dir([day_folder,'\*_SS_*.ntt']); %look for all single units files in the stage
+    SS_files = dir([day_folder,'/*_SS_*.ntt']); %look for all single units files in the stage
     
     num_neurons = length(SS_files);
     for i = 1:num_neurons
         neuron_filename = SS_files(i).name;
-        ss_file = [SS_files(i).folder,'\',neuron_filename];
+        ss_file = [SS_files(i).folder,'/',neuron_filename];
         
         %Extract data to show neural activity during the day
-        idcs   = strfind(ss_file,'\');
+        idcs   = strfind(ss_file,'/');
         neuron_name = ss_file(idcs(end)+1:end-4);
         stage = ss_file(idcs(end-2)+1:idcs(end-1)-1);
         day = ss_file(idcs(end-1)+1:idcs(end)-1);
@@ -36,24 +36,29 @@ for j = 1:length(day_files)
 		% Correction of the ITI - make it a second before.
         % behave_struct.event_times(:,1)=behave_struct.event_times(:,1)-1;
 
-        binsize = 50;
-        cut_info.ITI = [-1,2];
-        cut_info.NP = [-1,2];
-        cut_info.Ain = [-1,2];
-        cut_info.Bin = [-1,2];
-        cut_info.Aout = [-1,2];
+        binsize = 100;
+        cut_info.ITI = [-0.2,0.6];
+        cut_info.NP = [-0.2,0.6];
+        cut_info.Ain = [-0.2,0.6];
+        cut_info.Bin = [-0.2,0.6];
+        cut_info.Aout = [-0.2,0.6];
+        cut_info.All = [-0.2,0.6];
 
         [nspikes ,blmn, blstd, Labels, ITIRaster, AinRaster,AoutRaster, BinRaster, NPRaster, AllRaster] = ...
             makeRasterData(behave_struct, st, binsize, cut_info);
         
-         dataCelllArr = [{'ITI'}, {ITIRaster};
-                {'NP'}, {NPRaster};
-                {'Ain'}, {AinRaster};
-                {'Aout'}, {AoutRaster};
-                {'Bin'}, {BinRaster}
+         rep_factor = 10;
+         dataCelllArr = [{'ITI'}, {repmat(ITIRaster,rep_factor,1)};
+                {'NP'}, {repmat(NPRaster,rep_factor,1)};
+                {'Ain'}, {repmat(AinRaster,rep_factor,1)};
+                {'Aout'}, {repmat(AoutRaster,rep_factor,1)};
+                {'Bin'}, {repmat(BinRaster,rep_factor,1)}
                 %{'All'}, {AllRaster}
                 ];
-            
+           
+            for field = fieldnames(Labels)'
+                Labels.(field{:}) = repmat(Labels.(field{:}),rep_factor,1);
+           end
             
         if nargin>1
             

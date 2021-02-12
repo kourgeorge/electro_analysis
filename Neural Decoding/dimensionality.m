@@ -15,34 +15,35 @@ raster_folder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_100ms_8';
 [coeff,score2,latent,~,explained2] = pca(Adata_stage2,'Economy', false );
 [coeff,score3,latent,~,explained3] = pca(Adata_stage3,'Economy', false );
 
-explained1 = cumsum(explained1);
-explained2 = cumsum(explained2);
-explained3 = cumsum(explained3);
+%explained1 = cumsum(explained1);
+%explained2 = cumsum(explained2);
+%explained3 = cumsum(explained3);
 
+% figure;
+% hold on;
+% scatter(score3(:,1),score3(:,2))
+% scatter(score1(:,1),score1(:,2))
+% scatter(score2(:,1),score2(:,2))
+% hold off;
 figure;
-hold on;
-scatter(score3(:,1),score3(:,2))
-scatter(score1(:,1),score1(:,2))
-scatter(score2(:,1),score2(:,2))
-hold off;
-
 plot([explained1,explained2,explained3])
 legend('stage1', 'stage2', 'stage3')
 title("Explained PCA variance vs. num LC for each stage.")
 
 
-label = 'CorrectArm2';
-% [X_LDA_stage1, labels1] = create_stage_labeled_pseudo_population(raster_folder, 20, 'odor1_WR', 'CorrectArm1');
-% [X_LDA_stage2, labels2] = create_stage_labeled_pseudo_population(raster_folder, 20, 'odor2_WR', 'CorrectArm1');
-% [X_LDA_stage3, labels3] = create_stage_labeled_pseudo_population(raster_folder, 20, 'odor2_XFR', label);
-% 
-% [Adata_LDA_stage1,~] = get_ICA_components_learning2(X_LDA_stage1,20);
-% [Adata_LDA_stage2,~] = get_ICA_components_learning2(X_LDA_stage2,20);
-% [Adata_LDA_stage3,~] = get_ICA_components_learning2(X_LDA_stage3,20);
-% 
-% explained1=LDA_explained(Adata_LDA_stage1, labels1);
-% explained2=LDA_explained(Adata_LDA_stage2, labels2);
-% explained3=LDA_explained(Adata_LDA_stage3, labels3);
+label = 'ArmType';
+[X_LDA_stage1, labels1] = create_stage_labeled_pseudo_population(raster_folder, 20, 'odor1_WR', label);
+[X_LDA_stage2, labels2] = create_stage_labeled_pseudo_population(raster_folder, 20, 'odor2_WR', label);
+[X_LDA_stage3, labels3] = create_stage_labeled_pseudo_population(raster_folder, 20, 'odor2_XFR', label);
+
+[Adata_LDA_stage1,~] = get_ICA_components_learning2(X_LDA_stage1,20);
+[Adata_LDA_stage2,~] = get_ICA_components_learning2(X_LDA_stage2,20);
+[Adata_LDA_stage3,~] = get_ICA_components_learning2(X_LDA_stage3,20);
+
+explained1=LDA_explained(Adata_LDA_stage1, labels1);
+explained2=LDA_explained(Adata_LDA_stage2, labels2);
+explained3=LDA_explained(Adata_LDA_stage3, labels3);
+figure;
 plot([explained1,explained2,explained3])
 legend('stage1', 'stage2', 'stage3')
 title(["explained LDA variance vs. num LC on label ",label])
@@ -52,7 +53,7 @@ end
 
 function [pseudo_population] = create_stage_pseudo_population(raster_folder, num_cells, stage)
 
-stage_rasters = get_rasters(raster_folder,'All', stage);
+stage_rasters = get_rasters(raster_folder,'All_end', stage);
 map = EnoughRepeats(stage_rasters);
 
 pseudo_population = [];
@@ -71,7 +72,7 @@ end
 
 function [pseudo_population, labels] = create_stage_labeled_pseudo_population(raster_folder, num_label_repeats, stage, label)
 
-stage_rasters = get_rasters(raster_folder,'All', stage);
+stage_rasters = get_rasters(raster_folder,'All_end', stage);
 
 pseudo_population = [];
 labels = []; 
@@ -109,36 +110,6 @@ end
 
 
 
-function rows_indx = EnoughLabelsRepeats(cells, label, trials_per_value)
-%%% numTrialsToCells is a table [M,N,CellsM].
-%%% M - Number of trials.
-%%% N - number of cells having at least N trials per .
-%%% CellsM - the indices of the cells having at least N trials. 
-
-cell_num_trials = [];
-numTrialsToCells = [];
-label_values = getLabelValues(label);
-label_count_cell = [];
-    for i=1:length(cells)
-        celli = cells(i);
-        counts = histc(int8(celli.raster_labels.(label)), label_values);
-        label_count_cell = [label_count_cell;counts'];
-        %cell_num_trials=[cell_num_trials,size(cells(i).raster_data.BinnedRaster,1)];    
-    end
-    
-    rows_indx = rows_larger(label_count_cell,trials_per_value);
-    
-end
-
-function indx = rows_larger(mat, n)
-indx = [];
-for i=1:size(mat,1)
-    if all(mat(i,:)>n)
-        indx = [indx;i];
-    end
-end
-end
-
 function explained = LDA_explained(data,labels)
 
 Mdl = fitcdiscr(data,labels,'DiscrimType','linear');
@@ -150,7 +121,8 @@ Mdl = fitcdiscr(data,labels,'DiscrimType','linear');
 % end
 
 eigen_values = flipud(eig(Mdl.Sigma));
-explained = cumsum(eigen_values/sum(eigen_values)*100);
+%explained = cumsum(eigen_values/sum(eigen_values)*100);
+explained = eigen_values/sum(eigen_values);
 
 end
 

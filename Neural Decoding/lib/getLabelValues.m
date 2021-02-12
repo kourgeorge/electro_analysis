@@ -15,6 +15,9 @@ switch label
         allPossibilities = [0 1];
     case 'ArmType'
         allPossibilities = [1 2];
+    case 'combination'
+        allPossibilities = [{'right_R_water','left_R_water', 'right_NR_water','left_NR_water'...
+            'right_R_food','left_R_food', 'right_NR_food','left_NR_food'}];
 end
 
 end
