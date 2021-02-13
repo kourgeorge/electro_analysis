@@ -4,7 +4,7 @@ function RasterInfo  = getRasterAroundEvent(EventTimes, st, cut, binsize)
 %   Detailed explanation goes here
 
 
-binneddotd = sparse(size(EventTimes,1),length(cut(1)*1000:binsize:cut(2)*1000)); % for psth
+%binneddotd = sparse(size(EventTimes,1),length(cut(1)*1000:binsize:cut(2)*1000)); % for psth
 dotd=sparse(size(EventTimes,1),length(cut(1)*1000:cut(2)*1000));
 
 for r=1:size(EventTimes,1)
@@ -13,9 +13,10 @@ for r=1:size(EventTimes,1)
     inxsp=st>trange(1)&st<=trange(2);
     s=st(inxsp);
     dotd(r,max(1,floor((s-trange(1))*1000)))=1;
-    binneddotd(r,:) = hist(s,trange(1):binsize/1000:trange(2));
+    
 end
 
+%binneddotd(r,:) = hist(s,trange(1):binsize/1000:trange(2));
 %BinnedRaster = sum(full(binneddotd))/size(binneddotd,1)*(1000/binsize);
 %RasterInfo.Raster = full(dotd);
 %RasterInfo.BinnedRaster = full(binneddotd)*(1000/binsize); % convert to HZ
