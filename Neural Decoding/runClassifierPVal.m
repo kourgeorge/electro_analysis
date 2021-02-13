@@ -1,79 +1,84 @@
-function runClassifierPVal(rastersDir, event, label, binSize, sampleWindow, numSplits, stage)
+function runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, train_label_values, test_label_values, stage)
 
 %runClassifierPVal('/Users/gkour/Box/phd/Electro_Rats/Rasters_100_simple','Ain','Rewarded',150,50,20)
+%runClassifierPVal('/Users/gkour/Box/phd/Electro_Rats/Rasters_100_augmented','Ain','combination',150,50,20, the_training_label_names, the_test_label_names)
+generalization = true;
+
 if nargin < 8
+    generalization = false;
+end
+
+if nargin < 9
     stage = [];
 end
 
-[EnoughCells,EnoughCellsINX] = prepareClassifier(rastersDir, event, label,150,50);
-
 rng('shuffle','twister');
-saveFile = fullfile(rastersDir,[stage, event,'_',label,'_Results']);
-binnedDataName = fullfile(rastersDir,[stage, event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
-l = load(binnedDataName,'binned_labels');
-labelToDecode = l.binned_labels.(label);
-
-% the name of your binned-format data
-allPossibilities = getLabelValues(label);
-binnedDataName = fullfile(rastersDir,[event,'_Binned_',num2str(binSize),'ms_bins_',num2str(sampleWindow),'ms_sampled.mat']);
-
 
 % create a feature proprocessor and a classifier
 the_feature_preprocessors{1} = zscore_normalize_FP;
-%the_classifier = max_correlation_coefficient_CL;
+the_classifier = max_correlation_coefficient_CL;
 %the_classifier = libsvm_CL;
 %the_classifier.multiclass_classificaion_scheme = 'one_vs_all';
 %the_classifier.multiclass_classificaion_scheme = 'all_pairs';  %uncomment for svm
 %the_classifier.kernel = 'polynomial';
 %the_classifier.kernel = 'linear';  %uncomment for svm
 %the_classifier.kernel = 'rbf';
-
 % the_classifier.poly_degree = 2;
 
-for shuff_num = 0:5
+
+%%% Create the Binned-data
+event_raster_dir = fullfile(rastersDir,event);
+save_prefix_name = fullfile(rastersDir,[event,'_Binned']);
+binned_data_file_name = create_binned_data_from_raster_data(event_raster_dir, save_prefix_name, binSize, stepSize);%, start_time, end_time);
+
+l = load(binned_data_file_name);
+trialsLabels = l.binned_labels.(label);
+
+enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, numSplits);
+
+%%% Build the Data Source                           
+if generalization
+    ds = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);
+else
+    ds = basic_DS(binned_data_file_name, label, numSplits);
+end
+
+ds.sites_to_use = enoughCellIndx;
+ds.randomly_shuffle_labels_before_running = 0;
+
+%%% Build and run the cross validation
+the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
+the_cross_validator.test_only_at_training_times = 1; % train and test on same time slot
+DECODING_RESULTS = the_cross_validator.run_cv_decoding;
     
-    % create suffled results for the null distribution
-    if shuff_num == 0
-        saveFile = fullfile(rastersDir,[stage, event,'_',label,'_Results']);
-        % create a basic datasource
-        ds = basic_DS(binnedDataName, label, numSplits);
-        ds.sample_sites_with_replacement = 0;
-        ds = ds.set_specific_sites_to_use(EnoughCellsINX{numSplits});
-        ds.label_names_to_use = allPossibilities;
-        ds.randomly_shuffle_labels_before_running = 0;
-        %ds.num_times_to_repeat_each_label_per_cv_split=10;
-        
-        % create a cross-validation object
-        the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
-        
+% save the decoding results as 'My_Decoding_Results
+save(fullfile(rastersDir,[stage, event,'_',label,'_Results']), 'DECODING_RESULTS');
+    
+
+for shuff_num = 1:5
+    
+    disp('running reshuffle decoding');
+    disp(['Shuffle number ',num2str(shuff_num )]);
+    %%% Build the Data Source                           
+    if generalization
+        ds = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);
     else
-        disp('running reshuffle decoding');
-        disp(['Shuffle number ',num2str(shuff_num )]);
-        % randomly shuffle the labels before running
-        % create a basic datasource
-        ds = basic_DS(binnedDataName, label, numSplits);
-        ds = ds.set_specific_sites_to_use(EnoughCellsINX{numSplits});
-        ds.label_names_to_use = allPossibilities;
-        ds.randomly_shuffle_labels_before_running = 1;
-        
-        %ds.num_times_to_repeat_each_label_per_cv_split=10;
-        
-        the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
-        the_cross_validator.num_resample_runs = 10;
-        % suppress displays
-        the_cross_validator.display_progress.zero_one_loss = 0;
-        the_cross_validator.display_progress.resample_run_time = 0;
-        saveFile = fullfile(rastersDir,'Shuffle',[event,'_',label,'_ShuffRun_',num2str(shuff_num,'%03d')]);
+        ds = basic_DS(binned_data_file_name, label, numSplits);
     end
-    the_cross_validator.test_only_at_training_times = 1; % to speed up
+
+    ds.sites_to_use = enoughCellIndx;
+    ds.randomly_shuffle_labels_before_running = 1;
     
-    % run the decoding analysis
+    the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
+    the_cross_validator.num_resample_runs = 10;
+    % suppress displays
+    the_cross_validator.display_progress.zero_one_loss = 0;
+    the_cross_validator.display_progress.resample_run_time = 0;
     DECODING_RESULTS = the_cross_validator.run_cv_decoding;
     
     
-    % save the decoding results as 'My_Decoding_Results
+    saveFile = fullfile(rastersDir,'Shuffle',[event,'_',label,'_ShuffRun_',num2str(shuff_num,'%03d')]);
     save(saveFile, 'DECODING_RESULTS');
-     
 end
 
-plotClassifierResults(rastersDir, event, label, numSplits, EnoughCellsINX)
+plotClassifierResults(rastersDir, event, label, numSplits, enoughCellIndx)
