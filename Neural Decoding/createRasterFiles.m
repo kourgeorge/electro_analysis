@@ -4,7 +4,7 @@ function createRasterFiles(rep_factor, filerLabel, filterValues)
 % with the relevant name and in the relevant folder which represent the event.
 % 
 
-if nargin<2
+if nargin<1
     rep_factor=1;
 end
 
