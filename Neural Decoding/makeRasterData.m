@@ -20,30 +20,30 @@ Labels.NPRewarded = behaveStruct.selected_np==behaveStruct.rewarded_arm1 | ...
     behaveStruct.selected_np==behaveStruct.rewarded_arm2;
 
 for trial=1:numel(Labels.TrialNum)
-    l = '';
+    cond = '';
     if (Labels.ArmType(trial)==1 && Labels.Chosen(trial)==1) || ...
             (Labels.ArmType(trial)==2 && Labels.Chosen(trial)==3)
-        l=[l,'right_'];
+        cond=[cond,'right_'];
         Labels.direction(trial) = 1;
     else
-        l=[l,'left_'];
+        cond=[cond,'left_'];
         Labels.direction(trial) = 2;
     end
     if Labels.Rewarded(trial)
-        l=[l,'R_'];
+        cond=[cond,'R_'];
     else
-        l=[l,'NR_'];
+        cond=[cond,'NR_'];
     end
     if Labels.ArmType(trial)==1
-        l=[l,'food'];
+        cond=[cond,'food'];
     else
-        l=[l,'water'];
+        cond=[cond,'water'];
     end
     
-   Labels.combination(trial) = {l}; 
+   Labels.combination(trial) = {cond}; 
 end
-Labels.combination = Labels.combination';
-Labels.direction = Labels.direction';
+Labels.Combination = Labels.combination';
+Labels.Direction = Labels.direction';
 
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
@@ -54,19 +54,13 @@ blmn=mean(ns/windowSize);
 blstd=std(ns/windowSize);
 nspikes=length(st);
 
-ITIRaster=getRasterAroundEvent(behaveStruct.event_times(:,1), st, cut_info.ITI, binsize);
-
-           
+ITIRaster=getRasterAroundEvent(behaveStruct.event_times(:,1), st, cut_info.ITI, binsize);  
 NPRaster=getRasterAroundEvent(behaveStruct.event_times(:,2), st, cut_info.NP, binsize);
 AinRaster=getRasterAroundEvent(behaveStruct.event_times(:,3), st, cut_info.Ain, binsize);
 BinRaster=getRasterAroundEvent(behaveStruct.event_times(:,4), st, cut_info.Bin, binsize);
 AoutRaster=getRasterAroundEvent(behaveStruct.event_times(:,6), st,cut_info.Aout , binsize);
-%AllRaster.Raster = [ITIRaster.Raster,NPRaster.Raster, AinRaster.Raster];% , BinRaster.Raster, AoutRaster.Raster];
-%AllRaster.BinnedRaster = [ITIRaster.BinnedRaster,NPRaster.BinnedRaster, AinRaster.BinnedRaster];% BinRaster.BinnedRaster, AoutRaster.BinnedRaster];
+AllRaster = [ITIRaster,NPRaster, AinRaster, BinRaster, AoutRaster];
 
-%AllRaster.Raster = [BinRaster.Raster, AoutRaster.Raster];
-%AllRaster.BinnedRaster = [BinRaster.BinnedRaster, AoutRaster.BinnedRaster];
-AllRaster = {};
 end
 
 

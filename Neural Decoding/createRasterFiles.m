@@ -1,14 +1,16 @@
-function createRasterFiles(filerLabel, filterValues)
+function createRasterFiles(rep_factor, filerLabel, filterValues)
 %CREATERASTERFILES Given the single unit data and the behavioural data
 % folder, this functions scan all the files to extract raster files and save the to the disk
 % with the relevant name and in the relevant folder which represent the event.
 % 
 
+if nargin<2
+    rep_factor=1;
+end
 
 electro_folder = '/Users/gkour/Box/phd/Electro_Rats';
 saveFolder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_100_augmented';
 
-%day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
 day_files = dir([electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
 
 for j = 1:length(day_files)
@@ -47,20 +49,19 @@ for j = 1:length(day_files)
         [nspikes ,blmn, blstd, Labels, ITIRaster, AinRaster,AoutRaster, BinRaster, NPRaster, AllRaster] = ...
             makeRasterData(behave_struct, st, binsize, cut_info);
         
-         rep_factor = 10;
          dataCelllArr = [{'ITI'}, {repmat(ITIRaster,rep_factor,1)};
                 {'NP'}, {repmat(NPRaster,rep_factor,1)};
                 {'Ain'}, {repmat(AinRaster,rep_factor,1)};
                 {'Aout'}, {repmat(AoutRaster,rep_factor,1)};
                 {'Bin'}, {repmat(BinRaster,rep_factor,1)}
-                %{'All'}, {AllRaster}
+                {'All'}, {repmat(AllRaster,rep_factor,1)}
                 ];
            
             for field = fieldnames(Labels)'
                 Labels.(field{:}) = repmat(Labels.(field{:}),rep_factor,1);
            end
             
-        if nargin>1
+        if nargin>3
             
             indcs = find(ismember(Labels.(filerLabel),filterValues));
             Labels = filter_all_struct_fields(Labels,indcs);
@@ -85,6 +86,7 @@ for j = 1:length(day_files)
             raster_site_info.cut_info = cut_info.(eventName);
             raster_site_info.binsize = binsize;
             saveFile = fullfile(saveFolder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
+            softmkdir(fullfile(saveFolder,eventName));
             save(saveFile,'raster_data','raster_labels','raster_site_info');
         end
     end
