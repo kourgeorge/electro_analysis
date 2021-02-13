@@ -1,4 +1,5 @@
-function [is_responsive,pvals, values_responsive] = isCellResponsive( event_cell_data, label , baseline_range_bins, target_range_bins , alpha, min_consecutive_bins)
+
+function [is_responsive,pvals, values_responsive] = isCellResponsive( event_cell_data, label , baseline_range_bins, target_range_bins , alpha, min_consecutive_bins,correction)
 %ISCELLRESPONSIVE Given cell data checks if the cell is responsive for a
 %given label.
 
@@ -12,6 +13,9 @@ function [is_responsive,pvals, values_responsive] = isCellResponsive( event_cell
 %     0 0 0];
 
 %figure;
+if nargin < 7
+    correction = 'bonferroni';
+end
 
 label_values = getLabelValues(label{1});
 
@@ -20,8 +24,19 @@ pvals = [];
 is_responsive = false;
 legend_arr = [];
 
-alpha_selectivity = (alpha/(target_range_bins(2)-target_range_bins(1)-min_consecutive_bins+2))^(1/min_consecutive_bins);
-alpha_responsivity = alpha_selectivity/length(label_values);
+num_bins = target_range_bins(2)-target_range_bins(1) +1;
+% alpha_selectivity = (alpha/(target_range_bins(2)-target_range_bins(1)-min_consecutive_bins+2))^(1/min_consecutive_bins);
+alpha_selectivity = solve_probability_bernouli_runs(min_consecutive_bins,num_bins,alpha);
+
+% alpha_responsivity = alpha_selectivity/length(label_values);
+switch correction
+    case 'independent'
+alpha_responsivity = alpha_selectivity/((length(label_values))^(1/min_consecutive_bins)); % correction for multiple conditions, assuming independence between conditions
+    case 'bonferroni'
+        alpha_responsivity = alpha_selectivity/length(label_values); % correction for multiple conditions using bonferroni correction
+    otherwise
+        error('missing correction type')
+end
 
  [label_values, baseline, targets, binned_raster ]  = getCellBaselineTargetFR( event_cell_data, label , baseline_range_bins, target_range_bins );
 

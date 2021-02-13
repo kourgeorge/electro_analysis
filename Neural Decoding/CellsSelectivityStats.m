@@ -1,9 +1,11 @@
 function [stats, agg_results] = CellsSelectivityStats(event, labels, stage, rat)
 %%% Presents cells selectivity information. For each Cell it finds the
 %%% responsiveness and selectivity type given the event and labels.
+global PROJECTS_DIR
 
+% raster_folder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_test';
+raster_folder = fullfile(PROJECTS_DIR, 'plusMazeMotivationExpt','Rasters');
 
-raster_folder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_test';
 % event = 'ITI';
 % labels = [{'ArmType'},{'NPRewarded'}];
 show_cell_plot = false;

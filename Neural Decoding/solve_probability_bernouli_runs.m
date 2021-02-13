@@ -8,7 +8,7 @@ syms p
 eqn = bernouli_runs_probability(p, n, r)==q_n;
 s = vpasolve(eqn,p, [0 1]);
 
-fplot([lhs(eqn) rhs(eqn)], [0 1])
+% fplot([lhs(eqn) rhs(eqn)], [0 1])
 
 end
 
