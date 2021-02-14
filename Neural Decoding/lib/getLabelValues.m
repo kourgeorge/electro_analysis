@@ -9,6 +9,8 @@ switch label
         allPossibilities = [1 2];
     case 'CorrectArm2'
         allPossibilities = [3 4];
+    case 'CorrectArm'
+        allPossibilities = [1 1];
     case 'Rewarded'
         allPossibilities = [0 1];
     case 'NPRewarded'

@@ -1,4 +1,4 @@
-function runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, train_label_values, test_label_values, stage)
+function runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, stage, train_label_values, test_label_values)
 
 %runClassifierPVal('/Users/gkour/Box/phd/Electro_Rats/Rasters_100_simple','Ain','Rewarded',150,50,20)
 %runClassifierPVal('/Users/gkour/Box/phd/Electro_Rats/Rasters_100_augmented','Ain','combination',150,50,20, the_training_label_names, the_test_label_names)
@@ -8,7 +8,7 @@ if nargin < 8
     generalization = false;
 end
 
-if nargin < 9
+if nargin < 7
     stage = [];
 end
 
@@ -27,8 +27,17 @@ the_classifier = max_correlation_coefficient_CL;
 
 
 %%% Create the Binned-data
-event_raster_dir = fullfile(rastersDir,event);
-save_prefix_name = fullfile(rastersDir,[event,'_Binned']);
+
+
+
+if ~isempty(stage)
+    event_raster_dir = fullfile(rastersDir,event,['*',stage,'*']);
+    save_prefix_name = fullfile(rastersDir,[stage,'_',event,'_Binned']);
+else
+    event_raster_dir = fullfile(rastersDir,event);
+    save_prefix_name = fullfile(rastersDir,[event,'_Binned']);
+end
+
 binned_data_file_name = create_binned_data_from_raster_data(event_raster_dir, save_prefix_name, binSize, stepSize);%, start_time, end_time);
 
 l = load(binned_data_file_name);
@@ -52,7 +61,8 @@ the_cross_validator.test_only_at_training_times = 1; % train and test on same ti
 DECODING_RESULTS = the_cross_validator.run_cv_decoding;
     
 % save the decoding results as 'My_Decoding_Results
-save(fullfile(rastersDir,[stage, event,'_',label,'_Results']), 'DECODING_RESULTS');
+decoding_results_path = fullfile(rastersDir,[stage, '_',event,'_',label,'_Results']);
+save(decoding_results_path, 'DECODING_RESULTS');
     
 
 for shuff_num = 1:5
@@ -75,10 +85,10 @@ for shuff_num = 1:5
     the_cross_validator.display_progress.zero_one_loss = 0;
     the_cross_validator.display_progress.resample_run_time = 0;
     DECODING_RESULTS = the_cross_validator.run_cv_decoding;
-    
-    
-    saveFile = fullfile(rastersDir,'Shuffle',[event,'_',label,'_ShuffRun_',num2str(shuff_num,'%03d')]);
-    save(saveFile, 'DECODING_RESULTS');
+    shuffle_dir_name = fullfile(rastersDir,['Shuffle_',stage,'_' ,event,'_',label]);
+    softmkdir(shuffle_dir_name)
+    save(fullfile(shuffle_dir_name,['ShuffRun_',num2str(shuff_num,'%03d')]), ...
+        'DECODING_RESULTS');
 end
 
-plotClassifierResults(rastersDir, event, label, numSplits, enoughCellIndx)
+plotClassifierResults(decoding_results_path, shuffle_dir_name)

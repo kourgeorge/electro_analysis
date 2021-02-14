@@ -49,6 +49,14 @@ for j = 1:length(day_files)
         [nspikes ,blmn, blstd, Labels, ITIRaster, AinRaster,AoutRaster, BinRaster, NPRaster, AllRaster] = ...
             makeRasterData(behave_struct, st, binsize, cut_info);
         
+        % Fix the CorrectArm label depending on the current motivational stage.
+        if contains(stage,'WR')
+          Labels.CorrectArm(:,2) = Labels.CorrectArm(:,2) - 2;
+          Labels.CorrectArm(:,1) = [];
+        else
+          Labels.CorrectArm(:,2) = [];
+        end
+        
          dataCelllArr = [{'ITI'}, {repmat(ITIRaster,rep_factor,1)};
                 {'NP'}, {repmat(NPRaster,rep_factor,1)};
                 {'Ain'}, {repmat(AinRaster,rep_factor,1)};

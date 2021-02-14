@@ -18,17 +18,20 @@ Labels.Rewarded = behaveStruct.selected_arms==behaveStruct.rewarded_arm1 | ...
 Labels.ArmType = 2 - (behaveStruct.selected_arms == 1 | behaveStruct.selected_arms == 2);
 Labels.NPRewarded = behaveStruct.selected_np==behaveStruct.rewarded_arm1 | ...
     behaveStruct.selected_np==behaveStruct.rewarded_arm2;
+Labels.CorrectArm = [behaveStruct.rewarded_arm1, behaveStruct.rewarded_arm1];
 
 for trial=1:numel(Labels.TrialNum)
     cond = '';
     if (Labels.ArmType(trial)==1 && Labels.Chosen(trial)==1) || ...
             (Labels.ArmType(trial)==2 && Labels.Chosen(trial)==3)
         cond=[cond,'right_'];
-        Labels.direction(trial) = 1;
+        direction = 1;
     else
         cond=[cond,'left_'];
-        Labels.direction(trial) = 2;
+        direction = 2;
     end
+    Labels.Direction(trial) = direction;
+    
     if Labels.Rewarded(trial)
         cond=[cond,'R_'];
     else
@@ -40,10 +43,12 @@ for trial=1:numel(Labels.TrialNum)
         cond=[cond,'water'];
     end
     
-   Labels.combination(trial) = {cond}; 
+   Labels.Combination(trial) = {cond}; 
+   
 end
-Labels.Combination = Labels.combination';
-Labels.Direction = Labels.direction';
+%Fix the dimensions of Combination and Direction.
+Labels.Combination = Labels.Combination';
+Labels.Direction = Labels.Direction';
 
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
