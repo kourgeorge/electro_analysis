@@ -9,7 +9,7 @@ if nargin<1
 end
 
 electro_folder = '/Users/gkour/Box/phd/Electro_Rats';
-saveFolder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_100_augmented';
+saveFolder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_augmented';
 
 day_files = dir([electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
 
@@ -20,14 +20,25 @@ for j = 1:length(day_files)
     num_neurons = length(SS_files);
     for i = 1:num_neurons
         neuron_filename = SS_files(i).name;
-        ss_file = [SS_files(i).folder,'/',neuron_filename];
+        ss_file = fullfile(SS_files(i).folder,neuron_filename);
         
         %Extract data to show neural activity during the day
-        idcs   = strfind(ss_file,'/');
+        idcs   = strfind(ss_file,filesep);
         neuron_name = ss_file(idcs(end)+1:end-4);
         stage = ss_file(idcs(end-2)+1:idcs(end-1)-1);
         day = ss_file(idcs(end-1)+1:idcs(end)-1);
         
+        %rename the stages for better selection
+        switch stage
+            case 'odor1_WR'
+                stage = 'odor1_WR1';
+            case 'odor2_WR'
+                stage = 'odor2_WR1';
+            case 'odor3_WR'
+                stage = 'odor3_WR2';
+            case 'spatial_WR'
+                stage = 'spatial_WR2';
+        end
         
         %Load data and extract meta information
         [behave, st] = load_spikes_and_behavioral_data (ss_file);
@@ -69,7 +80,7 @@ for j = 1:length(day_files)
                 Labels.(field{:}) = repmat(Labels.(field{:}),rep_factor,1);
            end
             
-        if nargin>3
+        if nargin>1
             
             indcs = find(ismember(Labels.(filerLabel),filterValues));
             Labels = filter_all_struct_fields(Labels,indcs);
