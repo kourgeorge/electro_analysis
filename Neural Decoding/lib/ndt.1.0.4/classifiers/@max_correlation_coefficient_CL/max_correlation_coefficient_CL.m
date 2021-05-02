@@ -86,7 +86,7 @@ classdef max_correlation_coefficient_CL
                error('Number of columns in YTr, and XTr must be the same (i.e., there must be one and exactly one label for each data point)') 
             end
 
-            unique_labels = unique(YTr);
+            unique_labels = unique(YTr, 'stable');
 
             for i = 1:length(unique_labels)
                 template(:, i) = mean(XTr(:, (YTr == unique_labels(i))), 2);

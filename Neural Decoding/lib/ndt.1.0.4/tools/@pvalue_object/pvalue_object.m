@@ -197,7 +197,7 @@ classdef pvalue_object < handle
         saved_results_structure_name = 'DECODING_RESULTS';  % name of variable that has the saved standard results
         
         p_values = [];  % the p-values.  This can be set using the create_pvalues_from_nulldist_files, or can set it directly to a vector and then use the get_latency method to calculate information latency
-        
+        two_sided = false;
         
         % information needed to an estimate of the latency when the results are above chance
         latency_alpha_significance_level = 0;  % alpha level that the p-values must be less than to be considered significant (i.e., decoding results above chance).
@@ -418,7 +418,12 @@ classdef pvalue_object < handle
             % find the bin index where the p-values are first below chance
             
             % definition of latency:  the first time p-values < the alpha significance level, and stays below that level for latency_num_consecutive_sig_bins time periods
-            nonsignificant_pvalue_times = double(~(pval_obj.p_values <= pval_obj.latency_alpha_significance_level));  % 1 indicates nonsignicant time, 0 indicates significant time
+            if pval_obj.two_sided
+                nonsignificant_pvalue_times = double(~(pval_obj.p_values <= pval_obj.latency_alpha_significance_level/2));
+                nonsignificant_pvalue_times = nonsignificant_pvalue_times & double(~(pval_obj.p_values > 1-pval_obj.latency_alpha_significance_level/2));
+            else 
+                nonsignificant_pvalue_times = double(~(pval_obj.p_values <= pval_obj.latency_alpha_significance_level));  % 1 indicates nonsignicant time, 0 indicates significant time
+            end
             
             conv_consec_sig_times = conv(ones(pval_obj.latency_num_consecutive_sig_bins, 1), nonsignificant_pvalue_times);
             conv_consec_sig_times = conv_consec_sig_times(pval_obj.latency_num_consecutive_sig_bins:end);

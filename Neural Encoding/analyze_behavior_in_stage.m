@@ -14,7 +14,7 @@ function [median_times, proportions, num_bins_per_proportion, num_bins_between_e
 
 bin_size = 20; %ms
 
-BHV_files = dir([stage_folder,'\rat*_mpfc_*.*events_g*.mat']);
+BHV_files = dir([stage_folder,'/rat*_mpfc_*.*events_g*.mat']);
 %BHV_files = dir([stage_folder,'*\*rat6_mpfc_*events_g.mat']);
 
 if isempty(BHV_files)
@@ -24,7 +24,7 @@ end
     
 all_days_events_times = [];
 for i=1:length(BHV_files)
-    behave = load([BHV_files(i).folder,'\',BHV_files(i).name]);
+    behave = load([BHV_files(i).folder,'/',BHV_files(i).name]);
     event_times = extract_event_times(behave);
     all_days_events_times = [all_days_events_times; event_times];
 end

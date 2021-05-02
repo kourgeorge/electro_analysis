@@ -180,6 +180,7 @@ classdef plot_standard_results_object
       
       p_values = [];
       p_value_alpha_level = eps;
+      two_sided_pvalue = false;
       add_pvalue_latency_to_legends_alignment = 4;   % by default add full start and end interval latency to the legend if p-values are specified and fields .bin_width and .sampling_interval are specified for plot_time_intervals
       collapse_all_times_when_estimating_pvals = 0;  
       
@@ -523,6 +524,7 @@ classdef plot_standard_results_object
                         
                         
                        pval_obj = pvalue_object(plot_obj.result_file_names{iResult}, plot_obj.p_values{iResult}, plot_obj.null_distribution_file_prefix_name);
+                       pval_obj.two_sided = plot_obj.two_sided_pvalue;
                        pval_obj.the_result_type = plot_obj.result_type_to_plot;
                        pval_obj.collapse_all_times_when_estimating_pvals = plot_obj.collapse_all_times_when_estimating_pvals;
                        plot_obj.p_values{iResult} = pval_obj.create_pvalues_from_nulldist_files;
@@ -580,8 +582,14 @@ classdef plot_standard_results_object
                     edges = diff(all_time_intervals{iResult}(all_plot_inds{iResult}))./2;
                     start_intervals = all_time_intervals{iResult}(all_plot_inds{iResult}) -  [edges(1) edges];   % for first interval, left marker length be equal to the right marker length
                     end_intervals = all_time_intervals{iResult}(all_plot_inds{iResult}) + [edges edges(end)];   % for the last interval, have the right marker length be equal to the left marker length
-                    inds_to_use = find(plot_obj.p_values{iResult}(all_plot_inds{iResult}) < plot_obj.p_value_alpha_level); 
-                                      
+                    
+                    if plot_obj.two_sided_pvalue
+                        inds_to_use = find(plot_obj.p_values{iResult}(all_plot_inds{iResult}) < plot_obj.p_value_alpha_level/2);
+                        inds_to_use = [inds_to_use , find(plot_obj.p_values{iResult}(all_plot_inds{iResult}) >= 1-plot_obj.p_value_alpha_level/2)];
+                    else
+                        inds_to_use = find(plot_obj.p_values{iResult}(all_plot_inds{iResult}) < plot_obj.p_value_alpha_level);
+                    end
+                    
                     for iSigInterval = 1:length(inds_to_use)
                         line([start_intervals(inds_to_use(iSigInterval)) end_intervals(inds_to_use(iSigInterval))], [y_offset y_offset], 'color', plot_obj.the_colors{iResult}, 'LineWidth', 5)      
                     end      

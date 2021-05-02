@@ -6,10 +6,10 @@ function report_all_neurons()
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_11\odor1_WR\rat11_mpfc_14.10';
 %electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats\rat_10\odor1_WR\rat10_mpfc_12.10';
 
-electro_folder = 'C:\Users\GEORGEKOUR\Desktop\Electro_Rats';
+electro_folder = '/Users/gkour/Box/phd/Electro_Rats';
 
 %day_files = dir([electro_folder,'\*events_g.mat']); %look for all single units files in the stage
-day_files = dir([electro_folder,'\*\*\*\*events_g.mat']); %look for all single units files in the stage
+day_files = dir([electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
 
 day_files = day_files(end-6:end);
 
@@ -22,17 +22,17 @@ for j = 1:length(day_files)
     numFolds = 10;
     %f = figure('units','normalized','outerposition',[0 0 1 1]);
     % Draw the data per neuron
-    SS_files = dir([day_folder,'\*_SS_*.ntt']); %look for all single units files in the stage
+    SS_files = dir([day_folder,'/*_SS_*.ntt']); %look for all single units files in the stage
     
     num_neurons = length(SS_files);
     for i = 1:num_neurons
         
         total_neurons=total_neurons+1;
         neuron_filename = SS_files(i).name;
-        ss_file = [SS_files(i).folder,'\',neuron_filename]
+        ss_file = [SS_files(i).folder,'/',neuron_filename]
         
         %extract data to show neural activity during the day
-        idcs   = strfind(ss_file,'\');
+        idcs   = strfind(ss_file,'/');
         neuron_name = ss_file(idcs(end)+1:end-4);
         stage_folder_name = ss_file(1:idcs(end-1)-1);
         rat = ss_file(idcs(end-3)+1:idcs(end-2)-1);

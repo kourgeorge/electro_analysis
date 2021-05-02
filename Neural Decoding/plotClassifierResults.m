@@ -1,13 +1,15 @@
-function plotClassifierResults(decodingResultsFile, shuffledResultsFolder)
+function plotClassifierResults(decodingResultsFile, shuffledResultsFolder, txt)
 %PLOTCLASSIFIERRESULTS Plots the classifier decoding results. 
 
 decoding_results = load(decodingResultsFile);
 numSplits = decoding_results.DECODING_RESULTS.DS_PARAMETERS.num_cv_splits;
 used_sites = decoding_results.DECODING_RESULTS.DS_PARAMETERS.sites_to_use';
-
+modelName = decoding_results.DECODING_RESULTS.TRAINED_MODELS(1).name;
+event = decoding_results.DECODING_RESULTS.event;
+label = decoding_results.DECODING_RESULTS.label;
+stage = decoding_results.DECODING_RESULTS.stage;
 
 figure;
-%result_names{1} = fullfile(rastersDir,[event,'_',toDecode,'_Results']);
 plot_obj = plot_standard_results_object({decodingResultsFile}, '');
 
 %plot_obj.significant_event_times = [1000,4000,5000,5600,10600];
@@ -22,12 +24,11 @@ pval_dir{1} = shuffledResultsFolder;
 plot_obj.p_values = pval_dir;
 plot_obj.collapse_all_times_when_estimating_pvals = 1;
 plot_obj.p_value_alpha_level = 0.05;
+plot_obj.two_sided_pvalue = true;
 plot_obj.plot_results;
 
-% grid off
-% title([event, ' ', toDecode, ' Num Splits: ', num2str(numSplits), ...
-%     ' Num Cells: ', num2str(length(used_sites)), ' Clasifier: MaxCorrelation']);
-% legend off;
-
-end
+grid off
+title(['Stage: ', stage, ' ', event, ' ', label, ' Num Splits: ', num2str(numSplits), ...
+    ' #Cell: ', num2str(length(used_sites)), ' Class.: ', modelName, ' ', txt]);
+legend off;
 

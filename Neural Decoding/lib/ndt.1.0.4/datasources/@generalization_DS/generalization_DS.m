@@ -318,10 +318,10 @@ methods
             
             % remap labels (only using old 'test' data because I want each CV split to be independent)
             remapped_YTr_all = NaN .* ones(size(YTr_all));  % only getting labels (and data) from test set b/c want each CV split to contain unique data
-            remapped_YTe_all = NaN .* ones(size(YTe_al));
+            remapped_YTe_all = NaN .* ones(size(YTe_all));
 
             for iGroup = 1:length(the_training_label_numbers)
-                remapped_YTr_all(ismember(YTr_all_cv, the_training_label_numbers{iGroup})) = iGroup;
+                remapped_YTr_all(ismember(YTr_all, the_training_label_numbers{iGroup})) = iGroup;
                 remapped_YTe_all(ismember(YTe_all, the_test_label_numbers{iGroup})) = iGroup;
             end
             

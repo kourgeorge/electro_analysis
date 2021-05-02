@@ -140,7 +140,7 @@ classdef libsvm_CL
                error('Number of columns in YTr, and XTr must be the same (i.e., there must be one and exactly one label for each data point)') 
             end
 
-            cl.labels = unique(YTr);
+            cl.labels = unique(YTr, 'stable');
 
             
             % create the libsvm arguments for the kernel
@@ -169,8 +169,8 @@ classdef libsvm_CL
             
             if strcmp(cl.multiclass_classificaion_scheme, 'all_pairs')
                
-                cl.model = svmtrain2(YTr, double(XTr'), paramstring);  % renamed the libsvm function svmtrain2 because the Matlab bioinformatics toolbox now has a funciton named svmtrain
-                %cl.model = svmtrain(YTr, double(XTr'), paramstring);  
+                %cl.model = svmtrain2(YTr, double(XTr'), paramstring);  % renamed the libsvm function svmtrain2 because the Matlab bioinformatics toolbox now has a funciton named svmtrain
+                cl.model = svmtrain(YTr, double(XTr'), paramstring);  
 
                 
             elseif strcmp(cl.multiclass_classificaion_scheme, 'one_vs_all')
@@ -182,8 +182,8 @@ classdef libsvm_CL
                    curr_labels = zeros(size(YTr));
                    curr_labels(1:length(find(YTr == cl.labels(iClass)))) = 1;
                    the_weight = length(find(YTr ~= cl.labels(iClass)))./length(find(YTr == cl.labels(iClass)));
-                   cl.model{iClass} = svmtrain2(curr_labels, double(reformatted_test_data'), paramstring); 
-                   %cl.model{iClass} = svmtrain(curr_labels, double(reformatted_test_data'), paramstring); 
+                   %cl.model{iClass} = svmtrain2(curr_labels, double(reformatted_test_data'), paramstring); 
+                   cl.model{iClass} = svmtrain(curr_labels, double(reformatted_test_data'), paramstring); 
                        
                end
             end

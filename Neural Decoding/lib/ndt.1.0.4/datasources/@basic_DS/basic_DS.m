@@ -658,7 +658,8 @@ methods
             % convert the_resample_data into a training and splits 
             for iTimePeriod = 1:length(time_periods_to_get_data_from)
         
-                curr_data = the_resample_data(:, :, time_periods_to_get_data_from{iTimePeriod});            
+                curr_data = the_resample_data(:, :, time_periods_to_get_data_from{iTimePeriod});  
+
                 the_resample_data_time = reshape(curr_data, [size(curr_data, 1) size(curr_data, 2) * size(curr_data, 3)]);
 
                 
@@ -718,7 +719,20 @@ methods
             %    [XTr_all_time_cv XTe_all_time_cv] = turn_all_simultaneous_data_into_pseudo_populations(XTr_all_time_cv, YTr_all, XTe_all_time_cv, YTe_all, simul_to_pseudo_feature_to_siteID_mapping)
             % end
   
-            
+%                 for bin = 1:length(time_periods_to_get_data_from)
+%                        for  rep=1:length(XTr_all_time_cv{bin})
+%                           
+%                             [coeff,scoreTrain,~,~,~,mu] = pca(XTr_all_time_cv{bin}{rep}', 'Economy',false);
+%                             XTr_all_time_cv{bin}{rep} = scoreTrain(:,1:2)';
+%                             
+%                             XTe_all_time_cv{bin}{rep} = (XTe_all_time_cv{bin}{rep}'-mu)*coeff(:,1:2);
+%                             XTe_all_time_cv{bin}{rep} = XTe_all_time_cv{bin}{rep}';
+%                        end
+%                 end
+%                     
+                
+                
+                
         end   % end get_data
         
         
