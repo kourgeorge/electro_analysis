@@ -8,10 +8,9 @@ if nargin<1
     rep_factor=1;
 end
 
-electro_folder = '/Users/gkour/Box/phd/Electro_Rats';
-saveFolder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_augmented';
+config = get_config();
 
-day_files = dir([electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
+day_files = dir([config.electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
 
 for j = 1:length(day_files)
     day_folder = day_files(j).folder;
@@ -104,8 +103,8 @@ for j = 1:length(day_files)
             raster_site_info.basestd = blstd;
             raster_site_info.cut_info = cut_info.(eventName);
             raster_site_info.binsize = binsize;
-            saveFile = fullfile(saveFolder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
-            softmkdir(fullfile(saveFolder,eventName));
+            saveFile = fullfile(config.saveFolder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
+            softmkdir(fullfile(config.saveFolder,eventName));
             save(saveFile,'raster_data','raster_labels','raster_site_info');
         end
     end
