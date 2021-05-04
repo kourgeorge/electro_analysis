@@ -2,6 +2,7 @@ function prob = bernouli_runs_probability(p, n, r)
 %Calculates the probability of at least one run with m cosecutive successes
 %in n bernouli trials with sucess probability p.
 %   Following the paper: 
+
 z_n = beta (n,r,p)-p^r*beta (n-r,r,p);
 prob=1-z_n;
 end

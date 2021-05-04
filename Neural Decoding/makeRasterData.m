@@ -19,11 +19,17 @@ Labels.ArmType = 2 - (behaveStruct.selected_arms == 1 | behaveStruct.selected_ar
 Labels.NPRewarded = behaveStruct.selected_np==behaveStruct.rewarded_arm1 | ...
     behaveStruct.selected_np==behaveStruct.rewarded_arm2;
 Labels.CorrectArm = [behaveStruct.rewarded_arm1, behaveStruct.rewarded_arm1];
+N = numel(Labels.TrialNum);
 
-for trial=1:numel(Labels.TrialNum)
+Labels.Test = zeros(N,1);
+Labels.Test(randsample(N,round(0.2*N)))= 1;
+
+
+for trial=1:N
     cond = '';
+    cond2 = '';
     if (Labels.ArmType(trial)==1 && Labels.Chosen(trial)==1) || ...
-            (Labels.ArmType(trial)==2 && Labels.Chosen(trial)==3)
+            (Labels.ArmType(trial)==2 && Labels.Chosen(trial)==4)
         cond=[cond,'right_'];
         direction = 1;
     else
@@ -43,12 +49,25 @@ for trial=1:numel(Labels.TrialNum)
         cond=[cond,'water'];
     end
     
-   Labels.Combination(trial) = {cond}; 
+    % for each condition, try to map the trials to train and test equally
+    % or according to some ratio parameter.
+    
+    if Labels.Test(trial)==1
+        cond2=[cond,'_test'];
+    else
+        cond2=[cond,'_train'];
+    end
+    
+   Labels.Combination(trial) = {cond};
+   Labels.Combination2(trial) = {cond2}; 
    
 end
 %Fix the dimensions of Combination and Direction.
 Labels.Combination = Labels.Combination';
+Labels.Combination2 = Labels.Combination2';
 Labels.Direction = Labels.Direction';
+
+%Labels.Combination = Labels.Combination(randperm(length(Labels.Combination)));
 
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
