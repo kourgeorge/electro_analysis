@@ -42,7 +42,7 @@ binned_data_file_name = create_binned_data_from_raster_data(event_raster_dir, sa
 l = load(binned_data_file_name);
 trialsLabels = l.binned_labels.(label);
 
-enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, numSplits);
+enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, 1);
 
 %%% Build the Data Source                           
 if generalization
@@ -50,7 +50,7 @@ if generalization
     ds.use_unique_data_in_each_CV_split=use_unique_data_in_each_CV_split;
     
     % When the number split is small add more samples to test
-    ds.num_times_to_repeat_each_label_per_cv_split=5;
+    %ds.num_times_to_repeat_each_label_per_cv_split=5;
 else
     ds = basic_DS(binned_data_file_name, label, numSplits);
 end

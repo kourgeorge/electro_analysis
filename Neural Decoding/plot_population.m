@@ -3,7 +3,22 @@ function plot_population(ds, bins)
 %   Detailed explanation goes here
 %addpath('Users/gkour/drive/PhD/events_analysis/Neural Decoding/lib/drtoolbox')
 
-[all_XTr, all_YTr, all_XTe, all_YTe] = ds.get_data;
+
+% default for plots
+set(0,'DefaultFigurePosition', [25 550 500 400]);
+set(0,'DefaultAxesFontSize', 12);
+set(0,'DefaultAxesFontName', 'Helvetica');
+set(0,'DefaultAxesFontWeight','bold');
+set(0,'DefaultAxesLineWidth',2);
+set(0,'DefaultLineLineWidth',2);
+set(0,'DefaultLineMarkerSize',8);
+% Turn grid lines on by default
+% set(0,'defaultAxesXGrid', 'on')
+% set(0,'defaultAxesYGrid', 'on')
+% set(0,'defaultAxesZGrid', 'on')
+
+
+[all_XTr, all_YTr, all_XTe, all_YTe] = ds.get_data_MC;
 
 for bin=bins
     
@@ -21,6 +36,9 @@ for bin=bins
 
 %        dim=get_dimensionality(XTr)
 %        dim2=get_dimensionality(XTe)
+
+        extract_geometry(XTr);
+        
         
         YX = [[YTr;YTe],[XTr;XTe]];
         %YX( :, ~any(YX,1) ) = [];
@@ -61,13 +79,17 @@ for bin=bins
         ylim([min(x_dm(:,2)), max(x_dm(:,2))])
         h.DisplayName = 'Train SVM';
         
+
+        
+        
         SVM2 =libsvm_CL;
         SVM2.kernel = 'linear';
         SVM2 = SVM2.train(x_e', YTe);
         h = plot_svm_boundry(SVM2, 0.8*min(x_dm(:,1)),0.8*max(x_dm(:,1)), 'c--');
         ylim([min(x_dm(:,2)), max(x_dm(:,2))])
         h.DisplayName = 'Test SVM';
-         
+
+       
         
 %         mdl = fitcsvm(x_t,YTr,'KernelFunction', 'linear');
 %         y_hat_svm_m = predict(mdl,x_e);
@@ -81,9 +103,21 @@ for bin=bins
         acc_MC = mean(y_hat_mc==YTe);
         acc_SVM = mean(y_hat_svm==YTe);
 
-        hold off
+        
         title(['Population size: ', num2str(population_size), '; N=', num2str(num_vec), ...
             ' ; bin', num2str(bin),' ; MC/SVM:', num2str(acc_MC), '/', num2str(acc_SVM), ' ', ])
+        
+                
+        legend('Train, label1','Train, label2','Test, label1','Test, label2','M label1', 'M labels2', 'Train boundary', 'Test boundary')
+        hold off
+        
+        %figure;     
+        y_pred_tr_te=SVM.test(x_e');
+        C = confusionmat(YTe,y_pred_tr_te);
+        
+        %figure;
+        y_pred_te_tr=SVM2.test(x_e');
+        C = confusionmat(YTe,y_pred_te_tr);
 
     end
 end
@@ -114,4 +148,11 @@ function dim = get_dimensionality(x)
 
 dim = find(cumsum(explained)>95,1);
 
+end
+
+
+function geometry(X,y)
+    mat = cov(X);
+    [V,D] = eig(mat)
+    
 end
