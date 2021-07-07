@@ -410,7 +410,7 @@ classdef standard_resample_CV
 
 
                 % get the data from the datasource
-                [all_XTr all_YTr all_XTe all_YTe] = datasource.get_data;  
+                [all_XTr, all_YTr, all_XTe, all_YTe] = datasource.get_data_MC;  
 
 
                 % pre-allocating memory for saving stdev.all_single_CV_vals_combined

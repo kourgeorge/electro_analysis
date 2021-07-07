@@ -163,7 +163,7 @@ methods
     
     
     
-    function  [XTr_all_time_cv YTr_all XTe_all_time_cv YTe_all] = get_data(ds)
+    function  [XTr_all_time_cv YTr_all XTe_all_time_cv YTe_all] = get_data_MC(ds)
     %function  [XTr_all_time_cv YTr_all XTe_all_time_cv YTe_all ADDITIONAL_DATASOURCE_INFO] = get_data(ds)
         
 
@@ -299,7 +299,8 @@ methods
                 
         
         %[XTr_all_time_cv YTr_all XTe_all_time_cv YTe_all] = get_data@basic_DS(ds);  % old version where this object was a subclass of basic_DS
-         [XTr_all_time_cv YTr_all XTe_all_time_cv YTe_all] = ds.the_basic_DS.get_data;  % this might be much slower than inheriting from basic_DS :(
+        ds.the_basic_DS.from_generalization = 1; 
+        [XTr_all_time_cv YTr_all XTe_all_time_cv YTe_all] = ds.the_basic_DS.get_data_MC();  % this might be much slower than inheriting from basic_DS :(
         
          
         if ds.use_unique_data_in_each_CV_split == 1
