@@ -1,12 +1,8 @@
-function createRasterFiles(rep_factor, filerLabel, filterValues)
+function createRasterFiles(filerLabel, filterValues)
 %CREATERASTERFILES Given the single unit data and the behavioural data
 % folder, this functions scan all the files to extract raster files and save the to the disk
 % with the relevant name and in the relevant folder which represent the event.
 % 
-
-if nargin<1
-    rep_factor=1;
-end
 
 config = get_config();
 
@@ -48,13 +44,13 @@ for j = 1:length(day_files)
 		% Correction of the ITI - make it a second before.
         % behave_struct.event_times(:,1)=behave_struct.event_times(:,1)-1;
 
-        binsize = 100;
-        cut_info.ITI = [-0.2,0.6];
-        cut_info.NP = [-0.2,0.6];
-        cut_info.Ain = [-0.2,0.6];
-        cut_info.Bin = [-0.2,0.6];
-        cut_info.Aout = [-0.2,0.6];
-        cut_info.All = [-0.2,0.6];
+        binsize = 50;
+        cut_info.ITI = [-0.4,0.7];
+        cut_info.NP = [-0.4,0.7];
+        cut_info.Ain = [-0.4,0.7];
+        cut_info.Bin = [-0.4,0.7];
+        cut_info.Aout = [-0.4,0.7];
+        cut_info.All = [-0.4,0.7];
 
         [nspikes ,blmn, blstd, Labels, ITIRaster, AinRaster,AoutRaster, BinRaster, NPRaster, AllRaster] = ...
             makeRasterData(behave_struct, st, binsize, cut_info);
@@ -67,16 +63,16 @@ for j = 1:length(day_files)
           Labels.CorrectArm(:,2) = [];
         end
         
-         dataCelllArr = [{'ITI'}, {repmat(ITIRaster,rep_factor,1)};
-                {'NP'}, {repmat(NPRaster,rep_factor,1)};
-                {'Ain'}, {repmat(AinRaster,rep_factor,1)};
-                {'Aout'}, {repmat(AoutRaster,rep_factor,1)};
-                {'Bin'}, {repmat(BinRaster,rep_factor,1)}
-                {'All'}, {repmat(AllRaster,rep_factor,1)}
+         dataCelllArr = [{'ITI'}, {ITIRaster};
+                {'NP'}, {NPRaster};
+                {'Ain'}, {AinRaster};
+                {'Aout'}, {AoutRaster};
+                {'Bin'}, {BinRaster}
+                {'All'}, {AllRaster}
                 ];
            
             for field = fieldnames(Labels)'
-                Labels.(field{:}) = repmat(Labels.(field{:}),rep_factor,1);
+                Labels.(field{:}) = Labels.(field{:});
            end
             
         if nargin>1
@@ -103,8 +99,8 @@ for j = 1:length(day_files)
             raster_site_info.basestd = blstd;
             raster_site_info.cut_info = cut_info.(eventName);
             raster_site_info.binsize = binsize;
-            saveFile = fullfile(config.saveFolder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
-            softmkdir(fullfile(config.saveFolder,eventName));
+            saveFile = fullfile(config.rasters_folder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
+            softmkdir(fullfile(config.rasters_folder,eventName));
             save(saveFile,'raster_data','raster_labels','raster_site_info');
         end
     end

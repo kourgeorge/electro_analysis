@@ -21,9 +21,6 @@ Labels.NPRewarded = behaveStruct.selected_np==behaveStruct.rewarded_arm1 | ...
 Labels.CorrectArm = [behaveStruct.rewarded_arm1, behaveStruct.rewarded_arm1];
 N = numel(Labels.TrialNum);
 
-Labels.Test = zeros(N,1);
-Labels.Test(randsample(N,round(0.2*N)))= 1;
-
 
 for trial=1:N
     cond = '';
@@ -47,16 +44,7 @@ for trial=1:N
         cond=[cond,'food'];
     else
         cond=[cond,'water'];
-    end
-    
-    % for each condition, try to map the trials to train and test equally
-    % or according to some ratio parameter.
-    
-    if Labels.Test(trial)==1
-        cond2=[cond,'_test'];
-    else
-        cond2=[cond,'_train'];
-    end
+    end    
     
    Labels.Combination(trial) = {cond};
    Labels.Combination2(trial) = {cond2}; 

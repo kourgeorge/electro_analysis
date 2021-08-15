@@ -1,12 +1,5 @@
-function [decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, stage, train_label_values, test_label_values)
+function [decoding_results_path, shuffle_dir_name] = runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, stage, train_label_values, test_label_values)
 
-%runClassifierPVal('/Users/gkour/Box/phd/Electro_Rats/Rasters_100_simple','Ain','Rewarded',150,50,20)
-%runClassifierPVal('/Users/gkour/Box/phd/Electro_Rats/Rasters_100_augmented','Ain','combination',150,50,20, the_training_label_names, the_test_label_names)
-generalization = true;
-
-if nargin < 8
-    generalization = false;
-end
 
 if nargin < 7
     stage = [];
@@ -17,6 +10,7 @@ rng('shuffle','twister');
 % create a feature proprocessor and a classifier
 the_feature_preprocessors{1} = zscore_normalize_FP;
 %the_classifier = max_correlation_coefficient_CL;
+
 the_classifier = libsvm_CL;
 %the_classifier.multiclass_classificaion_scheme = 'one_vs_all';
 %the_classifier.multiclass_classificaion_scheme = 'all_pairs';  %uncomment for svm
@@ -25,37 +19,14 @@ the_classifier.kernel = 'linear';  %uncomment for svm
 %the_classifier.kernel = 'rbf';
 % the_classifier.poly_degree = 2;
 
-use_unique_data_in_each_CV_split = 1;
 %%% Create the Binned-data
 
-
-if ~isempty(stage)
-    event_raster_dir = fullfile(rastersDir,event,['*',stage,'*']);
-    save_prefix_name = fullfile(rastersDir,[stage,'_',event,'_Binned']);
+if nargin > 8
+    ds = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize, train_label_values, test_label_values);
 else
-    event_raster_dir = fullfile(rastersDir,event);
-    save_prefix_name = fullfile(rastersDir,[event,'_Binned']);
+    ds = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize);
 end
 
-binned_data_file_name = create_binned_data_from_raster_data(event_raster_dir, save_prefix_name, binSize, stepSize);%, start_time, end_time);
-
-l = load(binned_data_file_name);
-trialsLabels = l.binned_labels.(label);
-
-enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, 1);
-
-%%% Build the Data Source                           
-if generalization
-    ds = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);
-    ds.use_unique_data_in_each_CV_split=use_unique_data_in_each_CV_split;
-    
-    % When the number split is small add more samples to test
-    %ds.num_times_to_repeat_each_label_per_cv_split=5;
-else
-    ds = basic_DS(binned_data_file_name, label, numSplits);
-end
-
-ds.sites_to_use = enoughCellIndx;
 
 %%% Build and run the cross validation
 the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
@@ -74,19 +45,15 @@ for shuff_num = 1:5
     
     disp('running reshuffle decoding');
     disp(['Shuffle number ',num2str(shuff_num )]);
-    %%% Build the Data Source                           
-    if generalization
-        ds_shuff = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);
-        ds_shuff.use_unique_data_in_each_CV_split=use_unique_data_in_each_CV_split;
+    if nargin > 8
+        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize, train_label_values, test_label_values);
     else
-        ds_shuff = basic_DS(binned_data_file_name, label, numSplits);
+        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize);
     end
-
-    ds_shuff.sites_to_use = enoughCellIndx;
-    ds_shuff.randomly_shuffle_labels_before_running = 1;
     
     the_cross_validator = standard_resample_CV(ds_shuff, the_classifier, the_feature_preprocessors);
     the_cross_validator.num_resample_runs = 10;
+    
     % suppress displays
     the_cross_validator.display_progress.zero_one_loss = 0;
     the_cross_validator.display_progress.resample_run_time = 0;

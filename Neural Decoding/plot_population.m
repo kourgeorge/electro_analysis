@@ -3,7 +3,6 @@ function plot_population(ds, bins)
 %   Detailed explanation goes here
 %addpath('Users/gkour/drive/PhD/events_analysis/Neural Decoding/lib/drtoolbox')
 
-
 % default for plots
 set(0,'DefaultFigurePosition', [25 550 500 400]);
 set(0,'DefaultAxesFontSize', 12);
@@ -37,7 +36,7 @@ for bin=bins
 %        dim=get_dimensionality(XTr)
 %        dim2=get_dimensionality(XTe)
 
-        extract_geometry(XTr);
+%        extract_geometry(XTr);
         
         
         YX = [[YTr;YTe],[XTr;XTe]];
