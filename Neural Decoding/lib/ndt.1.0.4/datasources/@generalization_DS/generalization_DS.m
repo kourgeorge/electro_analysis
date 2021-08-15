@@ -128,6 +128,15 @@ end
 methods 
 
     
+    function ds = reshuffle_labels(ds)
+        %Added by george - may not properly and thus may create non-correct
+        %(not sure why.)
+        %null distribution. It is better to create a new datasource anew
+        %with shuffled labels.
+        ds.the_basic_DS = ds.the_basic_DS.reshuffle_labels();
+        
+     end
+        
     function ds = generalization_DS(binned_data_name, specific_binned_label_name, num_cv_splits, the_training_label_names, the_test_label_names, load_data_as_spike_counts)
  
        if nargin < 6

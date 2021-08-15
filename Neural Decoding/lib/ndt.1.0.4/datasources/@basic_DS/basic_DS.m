@@ -218,6 +218,28 @@ methods
         %end
     
     
+        function ds = reshuffle_labels(ds)
+            if ds.initialized ==1
+            % added in NDT version 1.0.2 so that for simultaneously recorded populations the labels in all sites are shuffled the same way (previous version returned an error when shuffling labels on simultaneously recorded populations)
+            if ds.create_simultaneously_recorded_populations > 0
+                
+                shuffled_labels = ds.the_labels{1}(randperm(length(ds.the_labels{1})));  % all sites should have the same labels, so will shuffle the labels for the first site only and will use this order for all sites
+                for iSite = 1:length(ds.the_labels)
+                    ds.the_labels{iSite} =  shuffled_labels;
+                end
+                
+                % for non-simultaneously recorded datasets, shuffle each channel separately (same as NDT version 1.0.0)
+            else
+                for iSite = 1:length(ds.the_labels)                 % will shuffle the labels from all sites, not just from those specified in sites_to_use
+                    ds.the_labels{iSite} =  ds.the_labels{iSite}(randperm(length(ds.the_labels{iSite})));
+                end
+            end
+            else
+                error('The dataset should be initialized before reshuffleing of the labels')
+            end
+            
+        end
+        
         % the constructor
         function ds = basic_DS(binned_data_name, specific_binned_label_name, num_cv_splits, load_data_as_spike_counts)
             
@@ -261,7 +283,6 @@ methods
         end
         
         
- 
         
         % This method allows one to set exact prespecified sites to get data from 
         %  rather than randomly selecting a set of sites from the larger population (it should rarely be used)
@@ -1071,13 +1092,13 @@ methods
              
                             
                % pre-allocate memory. 
-                the_resample_data = NaN .* ones(length(unique(label_names_to_use)) * ds.num_cv_splits * ds.num_times_to_repeat_each_label_per_cv_split, length(curr_resample_sites_to_use), size(ds.the_data{1}, 2)); 
-                the_resample_test = NaN .* ones(length(unique(label_names_to_use)) * 1 * ds.num_times_to_repeat_each_label_per_cv_split, length(curr_resample_sites_to_use), size(ds.the_data{1}, 2)); 
+                the_resample_data = NaN .* ones(length(unique(label_names_to_use)) * ds.num_times_to_repeat_each_label_per_cv_split, length(curr_resample_sites_to_use), size(ds.the_data{1}, 2)); 
+                the_resample_test = NaN .* ones(length(unique(label_names_to_use)) * ds.num_times_to_repeat_each_label_per_cv_split, length(curr_resample_sites_to_use), size(ds.the_data{1}, 2)); 
 
                 
                % pre-allocate memory
-               all_data_point_labels = NaN .* ones(length(unique(label_names_to_use)) * ds.num_cv_splits * ds.num_times_to_repeat_each_label_per_cv_split, 1);           
-               all_test_point_labels = NaN .* ones(length(unique(label_names_to_use)) * 1 * ds.num_times_to_repeat_each_label_per_cv_split, 1); 
+               all_data_point_labels = NaN .* ones(length(unique(label_names_to_use)) * ds.num_times_to_repeat_each_label_per_cv_split, 1);           
+               all_test_point_labels = NaN .* ones(length(unique(label_names_to_use)) * ds.num_times_to_repeat_each_label_per_cv_split, 1); 
                start_boostrap_ind = 1; 
                start_boostrap_ind_test = 1;
                
@@ -1099,29 +1120,34 @@ methods
                         else
                             curr_trials_to_use = 1:length(ds.the_labels{iNeuron});
                         end
+                        
+                        % Need to make sure that there at least
+                        % num_times_to_repeat_each_label_per_cv_split+1 repetitions, one for train and all other for for test
+                        
+                         if length(curr_trials_to_use) <  ds.num_times_to_repeat_each_label_per_cv_split+1
+                              error(['Requestion data from more trials of a given condition than has been recorded.'  ...
+                                  'The minimal number of repetitions required is ds.num_times_to_repeat_each_label_per_cv_split+1'...
+                                  'One is for training (which can be augmented and the other ds.num_times_to_repeat_each_label_per_cv_split is for the test set)' ]);  
+                            return;
+                         end
+                             
                         curr_trials_to_use = curr_trials_to_use(randperm(length(curr_trials_to_use)));
-                        curr_trials_for_test = curr_trials_to_use(1);
+                        curr_trials_for_test = curr_trials_to_use(1:ds.num_times_to_repeat_each_label_per_cv_split);
                         
                         if ds.from_generalization~=1
-                            curr_trials_to_use = curr_trials_to_use(2:end);
+                            curr_trials_to_use = curr_trials_to_use(ds.num_times_to_repeat_each_label_per_cv_split+1:end);
                         end
                         
                         
-                        % make sure the cell has 3 repetition of each label.
+                     
                         % The augmentation step.
-                        curr_trials_to_use = repmat(curr_trials_to_use,ds.num_cv_splits,1); % repeat each unique sample num_resamples times
+                        
+                        augmented_trials = repmat(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split,1);
+                        augmented_trials = augmented_trials(randperm(length(augmented_trials)));
+                        curr_trials_to_use = curr_trials_to_use(1:min(ds.num_times_to_repeat_each_label_per_cv_split, length(curr_trials_to_use)));
+                        curr_trials_to_use = [curr_trials_to_use;augmented_trials(1:ds.num_times_to_repeat_each_label_per_cv_split-length(curr_trials_to_use))]; % repeat each unique sample num_resamples times
                         curr_trials_to_use = curr_trials_to_use(randperm(length(curr_trials_to_use)));
-
-                        if length(curr_trials_to_use) < (ds.num_cv_splits  * ds.num_times_to_repeat_each_label_per_cv_split)    
-                            error(['Requestion data from more trials of a given condition than has been recorded.  This is due to ' ...
-                                '(ds.num_cv_splits * ds.num_times_to_repeat_each_label_per_cv_split) being greater than the number of times a given condition ' ...
-                                'is present in the data (for at least one site). Make sure that only sites that have enough repetitions of each condition are used ' ...
-                                '(this can be done by setting ds.site_to_use = find_sites_with_at_least_k_repeats_of_each_label(the_labels_to_use, num_cv_splits) )']);  
-                            return;
-                        else
-                            curr_trials_to_use = curr_trials_to_use(1:(ds.num_cv_splits  * ds.num_times_to_repeat_each_label_per_cv_split));
-                        end
-
+                        
 
                         % put everything into the correct number of CV splits
                         for iRepeats = 1:length(find(curr_resample_sites_to_use == iNeuron))                    

@@ -22,9 +22,9 @@ the_classifier.kernel = 'linear';  %uncomment for svm
 %%% Create the Binned-data
 
 if nargin > 8
-    ds = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize, train_label_values, test_label_values);
+    ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
 else
-    ds = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize);
+    ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 end
 
 
@@ -46,9 +46,9 @@ for shuff_num = 1:5
     disp('running reshuffle decoding');
     disp(['Shuffle number ',num2str(shuff_num )]);
     if nargin > 8
-        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize, train_label_values, test_label_values);
+        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
     else
-        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, binSize, stepSize);
+        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
     end
     
     the_cross_validator = standard_resample_CV(ds_shuff, the_classifier, the_feature_preprocessors);
