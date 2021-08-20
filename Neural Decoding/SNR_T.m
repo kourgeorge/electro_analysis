@@ -1,20 +1,35 @@
 function [snr,error_T] = SNR_T(geomA, geomB, geomC)
 %SNR_T Summary of this function goes here
 %   Detailed explanation goes here
-delta_BC = (geomC.centroid-geomB.centroid)';
-delta_AC = (geomC.centroid-geomA.centroid)';
-delta_BA = (geomB.centroid-geomA.centroid)';
+delta_BC = (geomC.centroid-geomB.centroid);
+delta_AC = (geomC.centroid-geomA.centroid);
+delta_BA = (geomB.centroid-geomA.centroid);
 
-signal = norm(delta_BC)^2 - norm(delta_AC)^2;
+signal = (norm(delta_BC)^2 - norm(delta_AC)^2)/(sum(geomA.Ri .^ 2)/geomA.N);
 
-bias = geomB.R2-geomA.R2;
+bias = sum(geomB.Ri .^ 2) / sum(geomA.Ri .^ 2) - 1;
 
-noise_B_along_BC = (norm(geomB.U*delta_BC))^2;
-noise_A_along_AC = (norm(geomA.U*delta_AC))^2;
-noise_C_along_AB = (norm(geomC.U*delta_BA))^2;
+%(norm((signal_direction*geomA.U) .* geomA.Ri'))^2
+noise_B_along_BC = (norm((delta_BC/norm(delta_BC)*geomB.U).*geomB.Ri'))^2/ sum(geomA.Ri .^ 2);
+noise_A_along_AC = (norm((delta_AC/norm(delta_AC)*geomA.U).*geomA.Ri'))^2/ sum(geomA.Ri .^ 2);
+noise_C_along_AB = (norm((delta_BA/norm(delta_BA)*geomC.U).*geomC.Ri'))^2/ sum(geomA.Ri .^ 2);
 
-snr = @(m) 0.5*(signal+bias/m)/sqrt(noise_B_along_BC/m + noise_A_along_AC/m + noise_C_along_AB);
+if isnan(noise_A_along_AC)
+    noise_A_along_AC = 0;
+end
+
+num_rows = size(geomC.U,1);
+Uc = geomC.U .* repmat(geomC.Ri', num_rows,1);
+Ub = geomB.U .* repmat(geomB.Ri', num_rows,1);
+Ua = geomA.U .* repmat(geomA.Ri', num_rows,1);
+
+noise_noise_cb = norm(Uc'*Ub ,'fro')^2/sum(geomA.Ri .^ 2)^2;
+noise_noise_ca = norm(Uc'*Ua ,'fro')^2/sum(geomA.Ri .^ 2)^2;
+
+
+snr = @(m) 0.5*(signal+bias/m)/sqrt(noise_B_along_BC/m + noise_A_along_AC/m + noise_C_along_AB +noise_noise_cb/m + noise_noise_ca/m);
 error_T = @(m) 1-normcdf(snr(m));
 
 end
+
 
