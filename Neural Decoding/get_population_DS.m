@@ -25,18 +25,18 @@ trialsLabels = l.binned_labels.(label);
 
 %%% Build the Data Source                           
 if generalization
-    ds = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);
-    ds.use_unique_data_in_each_CV_split=use_unique_data_in_each_CV_split;
-    
+    ds = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);   
     % When the number split is small add more samples to test
-    ds.num_times_to_repeat_each_label_per_cv_split=num_times_to_repeat_each_label_per_cv_split;
+    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, 1);
+    ds.sites_to_use = enoughCellIndx;
 else
     ds = basic_DS(binned_data_file_name, label, numSplits);
+    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split+1);
+    ds.sites_to_use = enoughCellIndx;
 end
 
 ds.num_times_to_repeat_each_label_per_cv_split = num_times_to_repeat_each_label_per_cv_split;
-enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split+1);
-ds.sites_to_use = enoughCellIndx;
+
 
 end
 
