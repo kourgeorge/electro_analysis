@@ -1,9 +1,9 @@
-function test_snr()
+function test_snr_T()
 addpath('/Users/gkour/drive/PhD/events_analysis/Neural Decoding')
 
 close all
-test_basic_transfer()
-test_compare_leaning_transfer()
+%test_basic_transfer()
+%test_compare_leaning_transfer()
 test_SNR_T_reduces_to_SNR()
 
 end
