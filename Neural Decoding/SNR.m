@@ -4,6 +4,9 @@ function [snr, error_a] = SNR(geomA, geomB)
 x_BA = (geomA.centroid-geomB.centroid);
 
 signal_direction = x_BA/norm(x_BA);
+signal = norm(x_BA)^2/(sum(geomA.Ri.^2)/geomA.N);
+
+
 bias = sum(geomB.Ri .^ 2) / sum(geomA.Ri .^ 2) - 1;
 
 costheta_a = geomA.U*signal_direction';
@@ -15,9 +18,8 @@ csb= sum(costheta_b.^2 .* geomB.Ri.^2) / sum(geomA.Ri.^2);
 signal_noise_overlapA = (norm((signal_direction*geomA.U) .* geomA.Ri'))^2 / sum(geomA.Ri.^2);
 signal_noise_overlapB = (norm((signal_direction*geomB.U) .* geomB.Ri'))^2 / sum(geomA.Ri.^2);
 
-css = @(m) signal_noise_overlapA+signal_noise_overlapB/m;
+css = @(m) (signal_noise_overlapA+signal_noise_overlapB/m)*signal;
 
-signal = norm(x_BA)^2/(sum(geomA.Ri.^2)/geomA.N);
 
 dim = geomA.D ^ -1;
 
