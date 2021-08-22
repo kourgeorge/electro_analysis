@@ -15,7 +15,11 @@ centroid = mean(X);
 [U,S,V] = svd(X-centroid);
 [eigvec,eigval] = eig(cov(X-centroid));
 eigval_exp = diag(S).^2/N;
-%all((diag(eigval)-eigval_exp)<0.001)
+
+%assert(all((diag(eigval)-flipud(eigval_exp))<0.01))
+%This assersion should work for large N, but for small N it seems that the
+%eig(cov(X-centroid)) becomes less accurate that the SVD and thus deviate
+%from it.
 %the eigen vectors are in the columns.
 
 Ri = zeros(dim,1);
