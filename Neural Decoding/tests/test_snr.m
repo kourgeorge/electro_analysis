@@ -2,17 +2,17 @@ function test_snr()
 addpath('/Users/gkour/drive/PhD/events_analysis/Neural Decoding')
 close all
 
-% test_theory_empirical_results_given_geometry(5)
-% test_theory_empirical_results_estimated_geometry(5)
-% test_distant_geometries_orthogonal_vs_parallel()
+test_theory_empirical_results_given_geometry(5)
+test_theory_empirical_results_estimated_geometry(3)
+test_distant_geometries_orthogonal_vs_parallel()
 test_overlapping_geometries()
-% test_biased_geometries()
+test_biased_geometries()
 
 end
 
 
 function test_theory_empirical_results_given_geometry(m)
-repetitions = 200;
+repetitions = 2000;
 P = 1000;
 
 % define the covariance matrices
@@ -164,7 +164,7 @@ function test_distant_geometries_orthogonal_vs_parallel()
 end
 
 
-function test_overlapping_geometries()
+function test_identical_geometries()
     
     cov = [1, 0; 0, 4];
     samples_m1 = mvnrnd([0 ,0],cov,200);
@@ -185,6 +185,29 @@ function test_overlapping_geometries()
     
     % assert that the error equals to 0.5 even for very large m.
     assert(abs(error_a(100)-0.5)<0.01)
+end
+
+function test_overlapping_geometries()
+    
+    cov = [1, 0; 0, 4];
+    samples_m1 = mvnrnd([0 ,0],cov,2000);
+    samples_m2 = mvnrnd([1 ,0],cov,2000);
+    
+    figure;
+    hold on;
+    scatter(samples_m1(:,1),samples_m1(:,2))
+    scatter(samples_m2(:,1),samples_m2(:,2))
+    hold off;
+    
+    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
+    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2);
+
+
+    [snr,error_a] = SNR(geom1, geom2);
+    arrayfun(error_a, 1:20)
+    
+    % assert that the error >  0.5 even for very large m.
+    assert(error_a(10000)>0.3)
 end
 
 function test_biased_geometries()
@@ -208,6 +231,17 @@ function test_biased_geometries()
     
 end
 
+
+function test_eq_si34()
+
+    cov = [1, 0; 0, 4];
+    centroid1 = [0,4];
+    centroid2 = [0,0];
+    Ri_c = flipud(sqrt(diag(cov)*P));
+    geom1.U = [0,1;1,0]; 
+    
+    
+end
 
 %HELPER FUNCIONS
 

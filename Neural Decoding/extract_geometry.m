@@ -2,19 +2,24 @@ function [centroid, D, V, Ri, N] = extract_geometry(X)
 %EXTRACT_GEOMETRY Summary of this function goes here
 %   Detailed explanation goes here
 
-[N, dim] = size(X); 
+[N, dim] = size(X);
 
 centroid = mean(X);
 
-% [V_cov,lambda,U_cov] = svd(cov(X-centroid));
-% [V_data,s,U_data] = svd(X-centroid);
-% lambda = diag(lambda);
-% s = diag(s);
+[V_cov,lambda,U_cov] = svd(cov(X-centroid));
+[V_data,s,U_data] = svd(X-centroid);
+lambda = diag(lambda);
+s = diag(s);
 % lambda_exp = s.^2/N 
 
 [U,S,V] = svd(X-centroid);
 [eigvec,eigval] = eig(cov(X-centroid));
 eigval_exp = diag(S).^2/N;
+
+
+%test
+C = 1/N * X'*X -  centroid*centroid';
+[myU,myS,myV] = svd(C);
 
 %assert(all((diag(eigval)-flipud(eigval_exp))<0.01))
 %This assersion should work for large N, but for small N it seems that the

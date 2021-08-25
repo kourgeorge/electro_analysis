@@ -18,7 +18,7 @@ if isnan(noise_A_along_AC)
     noise_A_along_AC = 0;
 end
 
-css = @(m) (noise_B_along_BC/m + noise_A_along_AC/m + noise_C_along_AB)* signal;
+css = @(m) (sum(geomA.Ri .^ 2)/geomA.N)^-1*(noise_B_along_BC*norm(delta_BC)^2/m + noise_A_along_AC*norm(delta_AC)^2/m+ noise_C_along_AB * norm(delta_BA)^2);
 
 num_rows = size(geomC.U,1);
 Uc = geomC.U .* repmat(geomC.Ri', num_rows,1);
