@@ -84,11 +84,12 @@ end
 function test_compare_leaning_transfer()
 
     cov = [4, 0; 0, 1];
+    P=2000;
     
-    samples_m1 = mvnrnd([0 ,5],cov,200);
-    samples_m2 = mvnrnd([10 ,5],cov,200);
-    samples_m2_leaning = mvnrnd([10 ,5],[4,2;2,4],200);
-    samples_m3 = mvnrnd([3 ,0],cov,200);
+    samples_m1 = mvnrnd([0 ,5],cov,P);
+    samples_m2 = mvnrnd([10 ,5],cov,P);
+    samples_m2_leaning = mvnrnd([10 ,5],[4,2;2,4],P);
+    samples_m3 = mvnrnd([3 ,0],cov,P);
 
     
     figure;
@@ -134,10 +135,10 @@ function test_SNR_T_reduces_to_SNR_a_b_equal()
     [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2); 
     
     [~,error_snr] = SNR(geom1, geom2);
-    snr_error_res = arrayfun(error_snr, 1:200)
+    snr_error_res = arrayfun(error_snr, 1:10)
     
     [~,error_snrT] = SNR_T(geom1, geom2, geom1);
-    snrT_error_res = arrayfun(error_snrT, 1:200)
+    snrT_error_res = arrayfun(error_snrT, 1:10)
     
     assert(all(abs(snr_error_res-snrT_error_res)<0.0001))
     

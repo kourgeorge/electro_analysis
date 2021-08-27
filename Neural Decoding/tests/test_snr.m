@@ -37,9 +37,9 @@ P = 1000;
     %assume geometry is given.
     geom1.N = P;
     geom1.centroid = centroid1;
-    geom1.Ri = flipud(sqrt(diag(cov)*P));
+    [geom1.U,geom1.Ri] = eig(cov);
+    geom1.Ri = sqrt(diag(geom1.Ri));
     geom1.D = sum(geom1.Ri.^2)^2 / sum(geom1.Ri.^4);
-    geom1.U = [0,1;1,0]; 
     
     geom2 = geom1;
     geom2.centroid = centroid2;
@@ -131,6 +131,7 @@ function test_distant_geometries_orthogonal_vs_parallel()
     %%% Test that overlapping geometry has high error than non-overlapping.
     %%% Test 3 configuration with gradual overlapping.
     
+    P=1000;
     
     cov1(:,:,1) = [1, 0; 0, 4];
     cov1(:,:,2) = [1, 0; 0, 4];
@@ -140,8 +141,8 @@ function test_distant_geometries_orthogonal_vs_parallel()
     cov2(:,:,2) = [4, 0; 0, 1];
     
     for i=1:3
-        samples_m1 = mvnrnd([0 ,0],cov1(:,:,i),200);
-        samples_m2 = mvnrnd([4 ,0],cov2(:,:,i),200);
+        samples_m1 = mvnrnd([0 ,0],cov1(:,:,i),P);
+        samples_m2 = mvnrnd([4 ,0],cov2(:,:,i),P);
 
         figure;
         hold on;

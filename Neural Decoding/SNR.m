@@ -2,9 +2,8 @@ function [snr, error_a] = SNR(geomA, geomB)
 %SNR Summary of this function goes here
 %   Detailed explanation goes here
 x_BA = (geomA.centroid-geomB.centroid);
-
 signal_direction = x_BA/norm(x_BA);
-signal = norm(x_BA)^2/(sum(geomA.Ri.^2)/geomA.N);
+signal = norm(x_BA)^2/(sum(geomA.Ri.^2));
 
 bias = sum(geomB.Ri .^ 2) / sum(geomA.Ri .^ 2) - 1;
 
