@@ -7,9 +7,6 @@ numSplits = 20;
 transfer = 'ArmType';
 target = 'Rewarded';
 
-%num_times_to_repeat_each_label_per_cv_split = 10;
-
-
 % == An example of how to run decoding analysis with transfer learning ==
 [train_label_values, test_label_values] = partition_label_values(transfer, target);
 [decoding_results_path, shuffle_dir_name] = runClassifierPVal(config.rasters_folder, event, 'Combination', binSize, stepSize, numSplits, ...
@@ -32,7 +29,7 @@ plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Tran.: ',transf
 %ds = get_population_DS(config.rasters_folder, event, [], 'Combination', 1,num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
 %plot_population(ds, 8)
 
-
+num_times_to_repeat_each_label_per_cv_split = 10;
 timebin = 15;
 ds = get_population_DS(config.rasters_folder, event, ['WR'], 'Combination', 1, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
 %ds = get_population_DS(config.rasters_folder, event, [], target, 2,num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
