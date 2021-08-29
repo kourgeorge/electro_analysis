@@ -1,4 +1,6 @@
 function ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize,  stepSize, train_label_values, test_label_values)
+%GET_POPULATION_DS Summary of this function goes here
+%   Detailed explanation goes here
 
 generalization = true;
 
@@ -6,10 +8,7 @@ if nargin < 10
     generalization = false;
 end
 
-use_unique_data_in_each_CV_split = 1;
 
-%GET_POPULATION_DS Summary of this function goes here
-%   Detailed explanation goes here
 if ~isempty(stage)
     event_raster_dir = fullfile(rastersDir,event,['*',stage,'*']);
     save_prefix_name = fullfile(rastersDir,[stage,'_',event,'_Binned']);
