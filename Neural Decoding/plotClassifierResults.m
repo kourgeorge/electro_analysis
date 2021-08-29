@@ -28,7 +28,8 @@ plot_obj.two_sided_pvalue = true;
 plot_obj.plot_results;
 
 grid off
-title(['Stage: ', stage, ' ', event, ' ', label, ' Num Splits: ', num2str(numSplits), ...
-    ' #Cell: ', num2str(length(used_sites)), ' Class.: ', modelName, ' ', txt]);
+title(txt)
+subtitle(['Stage: ', stage, ' ', event, ' ', label, ' Num Splits: ', num2str(numSplits), ...
+    ' #Cell: ', num2str(length(used_sites)), ' Class.: ', modelName]);
 legend off;
 
