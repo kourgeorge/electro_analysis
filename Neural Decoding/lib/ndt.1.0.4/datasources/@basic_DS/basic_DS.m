@@ -1121,32 +1121,31 @@ methods
                             curr_trials_to_use = 1:length(ds.the_labels{iNeuron});
                         end
                         
-                        % Need to make sure that there at least
-                        % num_times_to_repeat_each_label_per_cv_split+1 repetitions, one for train and all other for for test
-                        
-                         if length(curr_trials_to_use) <  ds.num_times_to_repeat_each_label_per_cv_split+1
-                              error(['Requestion data from more trials of a given condition than has been recorded.'  ...
-                                  'The minimal number of repetitions required is ds.num_times_to_repeat_each_label_per_cv_split+1'...
-                                  'One is for training (which can be augmented and the other ds.num_times_to_repeat_each_label_per_cv_split is for the test set)' ]);  
-                            return;
-                         end
-                             
-                        curr_trials_to_use = curr_trials_to_use(randperm(length(curr_trials_to_use)));
-                        curr_trials_for_test = curr_trials_to_use(1:ds.num_times_to_repeat_each_label_per_cv_split);
+
                         
                         if ds.from_generalization~=1
+                            % Need to make sure that there at least
+                            % num_times_to_repeat_each_label_per_cv_split+1 repetitions, one for train and all other for for test
+                            
+                            if length(curr_trials_to_use) <  ds.num_times_to_repeat_each_label_per_cv_split+1
+                                error(['Requestion data from more trials of a given condition than has been recorded.'  ...
+                                    'The minimal number of repetitions required is ds.num_times_to_repeat_each_label_per_cv_split+1'...
+                                    'One is for training (which can be augmented and the other ds.num_times_to_repeat_each_label_per_cv_split is for the test set)' ]);
+                                return;
+                            end
+                            
+                            
+                            curr_trials_to_use = curr_trials_to_use(randperm(length(curr_trials_to_use)));
+                            curr_trials_for_test = curr_trials_to_use(1:ds.num_times_to_repeat_each_label_per_cv_split);
                             curr_trials_to_use = curr_trials_to_use(ds.num_times_to_repeat_each_label_per_cv_split+1:end);
+                            
+                            % The augmentation step.
+                            curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split);
+                        else
+                            % The augmentation step.
+                            curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split);
+                            curr_trials_for_test = curr_trials_to_use;
                         end
-                        
-                        
-                     
-                        % The augmentation step.
-                        
-                        augmented_trials = repmat(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split,1);
-                        augmented_trials = augmented_trials(randperm(length(augmented_trials)));
-                        curr_trials_to_use = curr_trials_to_use(1:min(ds.num_times_to_repeat_each_label_per_cv_split, length(curr_trials_to_use)));
-                        curr_trials_to_use = [curr_trials_to_use;augmented_trials(1:ds.num_times_to_repeat_each_label_per_cv_split-length(curr_trials_to_use))]; % repeat each unique sample num_resamples times
-                        curr_trials_to_use = curr_trials_to_use(randperm(length(curr_trials_to_use)));
                         
 
                         % put everything into the correct number of CV splits
@@ -1174,11 +1173,24 @@ methods
         
    end  % end methods
    
-    
-   
-   
+   methods (Static)
+       function augmented_list = augment_trials(trials_list, target_number)
+           if target_number < length(trials_list)
+            augmented_list =  trials_list(randperm(length(trials_list)));
+            augmented_list=augmented_list(1:target_number);
+            return
+           end
+           augmented_trials = repmat(trials_list, target_number,1);
+           augmented_trials = augmented_trials(randperm(length(augmented_trials)));
+           trials_list = trials_list(1:min(target_number, length(trials_list)));
+           trials_list = [trials_list;augmented_trials(1:target_number-length(trials_list))]; % repeat each unique sample num_resamples times
+           augmented_list = trials_list(randperm(length(trials_list)));
+           
+       end
+   end
    
 end % end class
+
 
 
 
