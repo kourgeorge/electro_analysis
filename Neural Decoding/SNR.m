@@ -1,4 +1,4 @@
-function [snr, error_a] = SNR(geomA, geomB)
+function [snr, error_a, signal, bias, dim,signal_noise_overlapA, signal_noise_overlapB, noise_noise ] = SNR(geomA, geomB)
 %SNR Summary of this function goes here
 %   Detailed explanation goes here
 x_BA = (geomA.centroid-geomB.centroid);

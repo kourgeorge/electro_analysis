@@ -1,4 +1,4 @@
-function [snr,error_T] = SNR_T(geomA, geomB, geomC)
+function [snr,error_T, signal, bias, noise_B_along_BC, noise_A_along_AC, noise_C_along_AB, noise_noise_cb, noise_noise_ca] = SNR_T(geomA, geomB, geomC)
 %SNR_T Summary of this function goes here
 %   Detailed explanation goes here
 delta_BC = (geomC.centroid-geomB.centroid);
