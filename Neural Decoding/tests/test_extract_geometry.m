@@ -2,7 +2,7 @@ function test_extract_geometry()
 %TEST_EXTRACT_GEOMETRY Summary of this function goes here
 %   Detailed explanation goes here
 close all
-%test_exact_lambda_estimated_Ri()
+test_exact_lambda_estimated_Ri()
 test_estimated_lambda_estimated_Ri()
 end
 

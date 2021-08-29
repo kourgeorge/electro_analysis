@@ -1,5 +1,4 @@
 function test_snr_T()
-addpath('/Users/gkour/drive/PhD/events_analysis/Neural Decoding')
 
 close all
 test_basic_transfer()

@@ -1,5 +1,4 @@
 function test_snr()
-addpath('/Users/gkour/drive/PhD/events_analysis/Neural Decoding')
 close all
 
 test_theory_empirical_results_given_geometry(5)
