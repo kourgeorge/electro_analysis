@@ -1,4 +1,7 @@
 config = get_config();
+rasters_allocentric = fullfile(config.rasters_folder,'Rasters_allocentric');
+raster_egoentric = fullfile(config.rasters_folder,'Rasters_egocentric');
+
 event = 'ITI';
 binSize = 150;
 stepSize = 50;
@@ -9,7 +12,7 @@ target = 'Rewarded';
 
 % == An example of how to run decoding analysis with transfer learning ==
 [train_label_values, test_label_values] = partition_label_values(transfer, target);
-[decoding_results_path, shuffle_dir_name] = runClassifierPVal(config.rasters_folder, event, 'Combination', binSize, stepSize, numSplits, ...
+[decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters_allocentric, event, 'Combination', binSize, stepSize, numSplits, ...
   [],train_label_values,test_label_values);
 plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Tran.: ',transfer, ' Tar.: ', target])
 
@@ -31,7 +34,7 @@ plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Tran.: ',transf
 
 num_times_to_repeat_each_label_per_cv_split = 10;
 timebin = 15;
-ds = get_population_DS(config.rasters_folder, event, ['WR'], 'Combination', 1, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
+ds = get_population_DS(rasters_allocentric, event, ['WR'], 'Combination', 1, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
 %ds = get_population_DS(config.rasters_folder, event, [], target, 2,num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 plot_population(ds, timebin)
 
