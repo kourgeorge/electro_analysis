@@ -20,7 +20,7 @@ the_classifier.kernel = 'linear';  %uncomment for svm
 % the_classifier.poly_degree = 2;
 
 %%% Create the Binned-data
-
+num_times_to_repeat_each_label_per_cv_split = 5;
 if nargin > 8
     ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
 else
@@ -50,6 +50,8 @@ for shuff_num = 1:5
     else
         ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
     end
+    
+    ds_shuff.randomly_shuffle_labels_before_running=1;
     
     the_cross_validator = standard_resample_CV(ds_shuff, the_classifier, the_feature_preprocessors);
     the_cross_validator.num_resample_runs = 10;
