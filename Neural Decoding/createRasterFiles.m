@@ -5,6 +5,7 @@ function createRasterFiles(filerLabel, filterValues)
 % 
 
 config = get_config();
+save_folder_name = 'Rasters_allocentric';
 
 day_files = dir([config.electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
 
@@ -99,8 +100,8 @@ for j = 1:length(day_files)
             raster_site_info.basestd = blstd;
             raster_site_info.cut_info = cut_info.(eventName);
             raster_site_info.binsize = binsize;
-            saveFile = fullfile(config.rasters_folder,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
-            softmkdir(fullfile(config.rasters_folder,eventName));
+            saveFile = fullfile(save_folder_name,eventName,[stage,'_',day,'_',neuron_name,'.mat']);
+            softmkdir(fullfile(save_folder_name,eventName));
             save(saveFile,'raster_data','raster_labels','raster_site_info');
         end
     end
