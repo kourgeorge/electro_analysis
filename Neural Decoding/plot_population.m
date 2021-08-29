@@ -26,10 +26,10 @@ for bin=bins
         %XTr = all_XTr{bin}{rep}';
         %XTe = all_XTe{bin}{rep}';
         
-        XTr = [all_XTr{bin}{1}';all_XTr{bin}{2}'];
-        XTe = [all_XTe{bin}{1}';all_XTe{bin}{2}'];
-        YTr = [all_YTr;all_YTr];
-        YTe = [all_YTe;all_YTe]; 
+        XTr = all_XTr{bin}{1}';
+        XTe = all_XTe{bin}{1}';
+        YTr = all_YTr;
+        YTe = all_YTe; 
         
         [num_vec, population_size] = size(XTr); 
 
@@ -60,7 +60,7 @@ for bin=bins
         figure;
         gscatter(x_t(:,1),x_t(:,2),YTr, 'br','oo')
         hold on 
-        gscatter(x_e(:,1),x_e(:,2),YTe,'br','xx')
+        gscatter(x_e(:,1),x_e(:,2),YTe, 'br','xx')
         
         %%%%%%%MC%%%%%%%
         MC = max_correlation_coefficient_CL;
@@ -110,13 +110,17 @@ for bin=bins
         legend('Train, label1','Train, label2','Test, label1','Test, label2','M label1', 'M labels2', 'Train boundary', 'Test boundary')
         hold off
         
-        %figure;     
+        figure;     
         y_pred_tr_te=SVM.test(x_e');
         C = confusionmat(YTe,y_pred_tr_te);
+        heatmap(C)
+        title('confusion of test data on train SVM')
         
-        %figure;
-        y_pred_te_tr=SVM2.test(x_e');
-        C = confusionmat(YTe,y_pred_te_tr);
+        figure;
+        y_pred_te_tr=SVM2.test(x_t');
+        C = confusionmat(YTr,y_pred_te_tr);
+        heatmap(C)
+        title('confusion of train data on test SVM')
 
     end
 end
