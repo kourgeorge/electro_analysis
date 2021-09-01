@@ -1,4 +1,4 @@
-function [snr,error_T, signal, bias, noise_B_along_BC, noise_A_along_AC, noise_C_along_AB, noise_noise_cb, noise_noise_ca] = SNR_T(geomA, geomB, geomC)
+function [snr,error_T, signal, bias_v, noise_B_along_BC_v, noise_A_along_AC_v, noise_C_along_AB_v, noise_noise_cb, noise_noise_ca] = SNR_T(geomA, geomB, geomC)
 %SNR_T Summary of this function goes here
 %   Detailed explanation goes here
 delta_BC = (geomC.centroid-geomB.centroid);
@@ -8,11 +8,16 @@ delta_BA = (geomB.centroid-geomA.centroid);
 signal = (norm(delta_BC)^2 - norm(delta_AC)^2);
 
 bias = (sum(geomB.Ri .^ 2) - sum(geomA.Ri .^ 2));
+bias_v = sum(geomB.Ri .^ 2)/sum(geomA.Ri .^ 2);
 
-%(norm((signal_direction*geomA.U) .* geomA.Ri'))^2
+
 noise_B_along_BC = (norm((delta_BC*geomB.U).*geomB.Ri'))^2;
 noise_A_along_AC = (norm((delta_AC*geomA.U).*geomA.Ri'))^2;
 noise_C_along_AB = (norm((delta_BA*geomC.U).*geomC.Ri'))^2;
+
+noise_B_along_BC_v = (norm((delta_BC/norm(delta_BC)*geomB.U).*geomB.Ri'))^2;
+noise_A_along_AC_v = (norm((delta_AC/norm(delta_AC)*geomA.U).*geomA.Ri'))^2;
+noise_C_along_AB_v = (norm((delta_BA/norm(delta_BA)*geomC.U).*geomC.Ri'))^2;
 
 if isnan(noise_A_along_AC)
     noise_A_along_AC = 0;
