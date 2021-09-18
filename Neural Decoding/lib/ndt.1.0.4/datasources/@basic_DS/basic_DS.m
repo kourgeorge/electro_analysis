@@ -212,11 +212,7 @@ end
 
 
 methods
-
-    
-        %function ds = basic_DS
-        %end
-    
+  
     
         function ds = reshuffle_labels(ds)
             if ds.initialized ==1
@@ -1088,6 +1084,9 @@ methods
         
         
         function [the_resample_data, the_resample_test, all_data_point_labels, all_test_point_labels] = pseudo_population_sample(ds, curr_resample_sites_to_use, label_names_to_use)
+            %%%Returns a psudo population for train and test for all
+            %%%timebins to be used as a singly fold in the cross
+            %%%validation.
             
              
                             
@@ -1114,13 +1113,7 @@ methods
                     cNeuron = 1;    
                     for iNeuron = unique(curr_resample_sites_to_use)  
 
-                        % choose random trials to use for each label type
-                        if ~ds.randomly_shuffle_labels_before_running 
-                            curr_trials_to_use = find(ds.the_labels{iNeuron} == iLabel);  %find(ds.the_labels{iNeuron} == iLabel);
-                        else
-                            curr_trials_to_use = 1:length(ds.the_labels{iNeuron});
-                        end
-                        
+                        curr_trials_to_use = find(ds.the_labels{iNeuron} == iLabel);
 
                         
                         if ds.from_generalization~=1
