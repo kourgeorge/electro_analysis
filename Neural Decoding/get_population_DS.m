@@ -1,6 +1,8 @@
 function ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize,  stepSize, train_label_values, test_label_values)
 %GET_POPULATION_DS Summary of this function goes here
-%   Detailed explanation goes here
+%   numSplits: the number of cv folds in each timebin.
+%   num_times_to_repeat_each_label_per_cv_split: how many times each label
+%   should appear in each cv fold.
 
 generalization = true;
 
@@ -25,11 +27,11 @@ trialsLabels = l.binned_labels.(label);
 %%% Build the Data Source                           
 if generalization
     ds = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);   
-    % When the number split is small add more samples to test
     enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, 1);
     ds.sites_to_use = enoughCellIndx;
 else
     ds = basic_DS(binned_data_file_name, label, numSplits);
+    %enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split*numSplits);
     enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split+1);
     ds.sites_to_use = enoughCellIndx;
 end
