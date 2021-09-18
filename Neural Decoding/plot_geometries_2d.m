@@ -10,15 +10,15 @@ hold on;
 h1=plot_gaussian_ellipsoid(geom1.centroid,cov(X1)); 
 h2=plot_gaussian_ellipsoid(geom2.centroid,cov(X2));
 h3= plot_gaussian_ellipsoid(geom3.centroid,cov(X3));
-%h4= plot_gaussian_ellipsoid(geom4.centroid,cov(X4_red));
+h4= plot_gaussian_ellipsoid(geom4.centroid,cov(X4));
 
 set(h1,'color','#0072BD');
 set(h2,'color','#A2142F');
 
 set(h3,'color','#0072BD');
 set(h3,'LineStyle','-.');
-%set(h4,'color','#A2142F');
-%set(h4,'LineStyle','--');
+set(h4,'color','#A2142F');
+set(h4,'LineStyle','-.');
 
 
 signal = [geom1.centroid;geom3.centroid;geom2.centroid];
