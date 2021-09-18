@@ -52,8 +52,8 @@ for bin=bins
         %%%%%%%MC%%%%%%%
         MC = max_correlation_coefficient_CL;
         MC = MC.train(XTr_reduced', YTr);
-        scatter(MC.templates(1,1), MC.templates(2,1),'r', 'filled');
-        scatter(MC.templates(1,2), MC.templates(2,2),'b', 'filled'); 
+        scatter(MC.templates(1,2), MC.templates(2,2),'r', 'filled');
+        scatter(MC.templates(1,1), MC.templates(2,1),'b', 'filled'); 
         
         %%%%%%%SVM%%%%%%% 
         %%% Plot training hyperplane%%%
@@ -89,14 +89,16 @@ for bin=bins
         %%% Plot confusion matrix %%%%
         figure;
         subplot(2,2,1)
-        y_pred_tr_te=SVM.test(XTe_reduced');
-        C = confusionmat(YTe,y_pred_tr_te);
+        SVM = train_svm(XTr_reduced', YTr);
+        y_pred=SVM.test(XTe_reduced');
+        C = confusionmat(YTe,y_pred);
         heatmap(C)
         title('confusion of test data (reduced) on train SVM')
         
         subplot(2,2,2)
-        y_pred_te_tr=SVM2.test(XTr_reduced');
-        C = confusionmat(YTr,y_pred_te_tr);
+        SVM = train_svm(XTe_reduced', YTe);
+        y_pred=SVM.test(XTr_reduced');
+        C = confusionmat(YTr,y_pred);
         heatmap(C)
         title('confusion of train data (reduced) on test SVM')
         
@@ -110,7 +112,7 @@ for bin=bins
         subplot(2,2,4)
         SVM = train_svm(XTe',YTe);
         y_pred=SVM.test(XTr');
-        C = confusionmat(YTe,y_pred);
+        C = confusionmat(YTr,y_pred);
         heatmap(C)
         title('confusion of train data on test SVM')
 
