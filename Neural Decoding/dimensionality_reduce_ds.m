@@ -23,15 +23,15 @@ all_XTe_reduced = [];
 for timebin=1:timebins
     for split = 1:splits
         XTr_reduced_timebin = [];
-        for fold=1:size(all_XTr{timebin}{1},2)
-            sample = all_XTr{timebin}{1}(:,fold)';
+        for i=1:size(all_XTr{timebin}{1},2)
+            sample = all_XTr{timebin}{1}(:,i)';
             XTr_reduced_timebin = [XTr_reduced_timebin; out_of_sample(sample, mapping)];
         end
         all_XTr_reduced{timebin,split} = {XTr_reduced_timebin'};
         
         XTe_reduced_timebin = [];
-        for fold=1:size(all_XTe{timebin}{1},2)
-            sample = all_XTe{timebin}{1}(:,fold)';
+        for i=1:size(all_XTe{timebin}{1},2)
+            sample = all_XTe{timebin}{1}(:,i)';
             XTe_reduced_timebin = [XTe_reduced_timebin; out_of_sample(sample, mapping)];
         end
         all_XTe_reduced{timebin,split} = {XTe_reduced_timebin'};
