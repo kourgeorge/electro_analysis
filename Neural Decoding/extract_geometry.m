@@ -1,4 +1,4 @@
-function [centroid, D, V, Ri, N] = extract_geometry(X)
+function geom = extract_geometry(X)
 %EXTRACT_GEOMETRY Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -34,4 +34,11 @@ Ri(1:length(diag(S))) = diag(S)/sqrt(N);
 
 
 D = sum(Ri.^2)^2 / sum(Ri.^4);
+
+geom.centroid=centroid;
+geom.D=D;
+geom.U = V;
+geom.Ri = Ri;
+geom.N=N;
+
 end

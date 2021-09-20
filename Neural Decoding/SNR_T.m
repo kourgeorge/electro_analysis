@@ -1,4 +1,4 @@
-function [snr,error_T, signal, bias_v, noise_B_along_BC_v, noise_A_along_AC_v, noise_C_along_AB_v, noise_noise_cb, noise_noise_ca] = SNR_T(geomA, geomB, geomC)
+function snrObj = SNR_T(geomA, geomB, geomC)
 %SNR_T Summary of this function goes here
 %   Detailed explanation goes here
 delta_BC = (geomC.centroid-geomB.centroid);
@@ -37,6 +37,16 @@ noise_noise_ca = norm(Uc'*Ua ,'fro')^2;
 
 snr = @(m) 0.5*(signal+bias/m)/sqrt(css(m) + noise_noise_ca/m +noise_noise_cb/m);
 error_T = @(m) 1-normcdf(snr(m));
+
+snrObj.snr = snr;
+snrObj.error = error_T;
+snrObj.signal = signal;
+snrObj.bias_v = bias_v;
+snrObj.noise_B_along_BC_v = noise_B_along_BC_v;
+snrObj.noise_A_along_AC_v = noise_A_along_AC_v;
+snrObj.noise_C_along_AB_v = noise_C_along_AB_v;
+snrObj.noise_noise_cb = noise_noise_cb;
+snrObj.noise_noise_ca = noise_noise_ca;
 
 end
 

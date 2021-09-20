@@ -22,7 +22,7 @@ for rep=1:repetitions
     
     samples_m1 = mvnrnd(centroid,cov,P);
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
+    geom1 = extract_geometry(samples_m1);
     
     lambda = eig(cov);
     Ri = sqrt(lambda);
@@ -48,7 +48,7 @@ for rep=1:repetitions
     
     X = mvnrnd(centroid,cov1,P);
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(X);
+    geom1 = extract_geometry(X);
     
     lambda = eig(cov(X-centroid));
     Ri = sqrt(lambda);

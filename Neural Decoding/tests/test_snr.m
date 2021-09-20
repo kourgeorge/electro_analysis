@@ -43,8 +43,8 @@ P = 1000;
     geom2 = geom1;
     geom2.centroid = centroid2;
     
-    [~,eps] = SNR(geom1, geom2);
-    err_theory = eps(m)
+    snr = SNR(geom1, geom2);
+    err_theory = snr.error(m);
      
 % perform emprical estimation
     
@@ -94,12 +94,12 @@ P = 1000;
         
 % estimate the theory error rate for given m
 
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2);
+    geom1 = extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2);
     
     
-    [~,eps] = SNR(geom1, geom2);
-    err_theory = eps(m)
+    snr = SNR(geom1, geom2);
+    err_theory = snr.error(m)
      
 % perform emprical estimation
     
@@ -152,12 +152,12 @@ function test_distant_geometries_orthogonal_vs_parallel()
 
 
 
-        [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-        [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2);
+        geom1= extract_geometry(samples_m1);
+        geom2 = extract_geometry(samples_m2);
 
 
-        [snr,error_a] = SNR(geom1, geom2);
-        err(i,:) = arrayfun(error_a, 1:20);
+        snr = SNR(geom1, geom2);
+        err(i,:) = arrayfun(snr.error, 1:20);
         
     end
     assert (all(err(1,:)<err(2,:))& all(err(2,:)<err(3,:)))
@@ -176,15 +176,15 @@ function test_identical_geometries()
     scatter(samples_m2(:,1),samples_m2(:,2))
     hold off;
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2);
+    geom1= extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2);
 
 
-    [snr,error_a] = SNR(geom1, geom2);
-    arrayfun(error_a, 1:20)
+    snr = SNR(geom1, geom2);
+    arrayfun(snr.error, 1:20)
     
     % assert that the error equals to 0.5 even for very large m.
-    assert(abs(error_a(100)-0.5)<0.01)
+    assert(abs(snr.error(100)-0.5)<0.01)
 end
 
 function test_overlapping_geometries()
@@ -199,15 +199,15 @@ function test_overlapping_geometries()
     scatter(samples_m2(:,1),samples_m2(:,2))
     hold off;
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2);
+    geom1= extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2);
 
 
-    [snr,error_a] = SNR(geom1, geom2);
-    arrayfun(error_a, 1:20)
+    snr = SNR(geom1, geom2);
+    arrayfun(snr.error, 1:20)
     
     % assert that the error >  0.5 even for very large m.
-    assert(error_a(10000)>0.3)
+    assert(snr.error(10000)>0.3)
 end
 
 function test_biased_geometries()
@@ -217,15 +217,15 @@ function test_biased_geometries()
     samples_m1 = mvnrnd([0 ,0],cov,200);
     samples_m2 = mvnrnd([4 ,0],2*cov,200);
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2);
+    geom1 = extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2);
 
 
-    [snr,eps] = SNR(geom1, geom2);
-    err_a=arrayfun(eps, 1:20);
+    snr = SNR(geom1, geom2);
+    err_a=arrayfun(snr.error, 1:20);
     
-    [snr,eps] = SNR(geom2, geom1);
-    err_b=arrayfun(eps, 1:20);
+    snr = SNR(geom2, geom1);
+    err_b=arrayfun(snr.error, 1:20);
     
     assert(all(err_a<err_b))
     

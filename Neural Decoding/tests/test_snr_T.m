@@ -27,16 +27,16 @@ function test_basic_transfer()
     axis equal;
     hold off;
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2); 
-    [geom3.centroid, geom3.D, geom3.U, geom3.Ri, geom3.N] = extract_geometry(samples_m3);
+    geom1 = extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2); 
+    geom3 = extract_geometry(samples_m3);
     
     
-    [snr,error_c] = SNR_T(geom1, geom2, geom3);
-    arrayfun(snr, 1:20)
-    arrayfun(error_c, 1:20)
+    snr_t = SNR_T(geom1, geom2, geom3);
+    arrayfun(snr_t.snr, 1:20)
+    arrayfun(snr_t.error, 1:20)
     
-    assert (error_c(1)<0.05)
+    assert (snr_t.error(1)<0.05)
     
             
 end
@@ -74,8 +74,8 @@ function test_c_in_middle()
     geom3.centroid = centroid3;
     
     
-    [snr,error_c] = SNR_T(geom1, geom2, geom3);
-    assert(abs(error_c(100)-0.5)<0.001)
+    snr= SNR_T(geom1, geom2, geom3);
+    assert(abs(snr.error(100)-0.5)<0.001)
     
             
 end
@@ -99,16 +99,16 @@ function test_compare_leaning_transfer()
     axis equal;
     hold off;
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2);
-    [geom2_l.centroid, geom2_l.D, geom2_l.U, geom2_l.Ri, geom2_l.N] = extract_geometry(samples_m2_leaning);
-    [geom3.centroid, geom3.D, geom3.U, geom3.Ri, geom3.N] = extract_geometry(samples_m3);
+    geom1= extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2);
+    geom2_l = extract_geometry(samples_m2_leaning);
+    geom3 = extract_geometry(samples_m3);
     
     
-    [~,error_c] = SNR_T(geom1, geom2, geom3);
-    a = arrayfun(error_c, 1:20);
-    [~,error_c] = SNR_T(geom1, geom2_l, geom3);
-    b = arrayfun(error_c, 1:20);
+    snr = SNR_T(geom1, geom2, geom3);
+    a = arrayfun(snr.error, 1:20);
+    snr = SNR_T(geom1, geom2_l, geom3);
+    b = arrayfun(snr.error, 1:20);
     
     assert(all(a<b))
     
@@ -130,14 +130,14 @@ function test_SNR_T_reduces_to_SNR_a_b_equal()
     hold off;
     
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2); 
+    geom1 = extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2); 
     
-    [~,error_snr] = SNR(geom1, geom2);
-    snr_error_res = arrayfun(error_snr, 1:10)
+    snr = SNR(geom1, geom2);
+    snr_error_res = arrayfun(snr.error, 1:10)
     
-    [~,error_snrT] = SNR_T(geom1, geom2, geom1);
-    snrT_error_res = arrayfun(error_snrT, 1:10)
+    snrT = SNR_T(geom1, geom2, geom1);
+    snrT_error_res = arrayfun(snrT.error, 1:10)
     
     assert(all(abs(snr_error_res-snrT_error_res)<0.0001))
     
@@ -158,14 +158,14 @@ function test_SNR_T_reduces_to_SNR()
     hold off;
     
     
-    [geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(samples_m1);
-    [geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(samples_m2); 
+    geom1 = extract_geometry(samples_m1);
+    geom2 = extract_geometry(samples_m2); 
     
-    [~,error_snr] = SNR(geom1, geom2);
-    snr_error_res = arrayfun(error_snr, 1:10)
+    snr = SNR(geom1, geom2);
+    snr_error_res = arrayfun(snr.error, 1:10)
     
-    [~,error_snrT] = SNR_T(geom1, geom2, geom1);
-    snrT_error_res = arrayfun(error_snrT, 1:10)
+    snrT = SNR_T(geom1, geom2, geom1);
+    snrT_error_res = arrayfun(snrT.error, 1:10)
     
     assert(all(abs(snr_error_res-snrT_error_res)<0.0001))
     
