@@ -1,35 +1,39 @@
-function [decoding_results_path, shuffle_dir_name] = runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, stage, train_label_values, test_label_values)
+function [decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, stage, train_label_values, test_label_values)
 
 
 if nargin < 7
     stage = [];
 end
 
-rng('shuffle','twister');
+%rng('shuffle','twister');
 
 % create a feature proprocessor and a classifier
 the_feature_preprocessors{1} = zscore_normalize_FP;
-%the_classifier = max_correlation_coefficient_CL;
+the_classifier = max_correlation_coefficient_CL;
 
-the_classifier = libsvm_CL;
+%the_classifier = libsvm_CL;
 %the_classifier.multiclass_classificaion_scheme = 'one_vs_all';
 %the_classifier.multiclass_classificaion_scheme = 'all_pairs';  %uncomment for svm
 %the_classifier.kernel = 'polynomial';
-the_classifier.kernel = 'linear';  %uncomment for svm
+%the_classifier.kernel = 'linear';  %uncomment for svm
 %the_classifier.kernel = 'rbf';
 % the_classifier.poly_degree = 2;
 
 %%% Create the Binned-data
-num_times_to_repeat_each_label_per_cv_split = 5;
+
 if nargin > 8
+    num_times_to_repeat_each_label_per_cv_split = 4;
     ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
 else
+    num_times_to_repeat_each_label_per_cv_split = 8;
     ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 end
 
 
 %%% Build and run the cross validation
-the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
+%the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
+the_cross_validator = standard_resample_CV(ds, the_classifier);
+%the_cross_validator.num_resample_runs = 10;
 the_cross_validator.test_only_at_training_times = 1; % train and test on same time slot
 DECODING_RESULTS = the_cross_validator.run_cv_decoding;
 DECODING_RESULTS.event = event; 
@@ -53,7 +57,8 @@ for shuff_num = 1:5
     
     ds_shuff.randomly_shuffle_labels_before_running=1;
     
-    the_cross_validator = standard_resample_CV(ds_shuff, the_classifier, the_feature_preprocessors);
+    %the_cross_validator = standard_resample_CV(ds_shuff, the_classifier, the_feature_preprocessors);
+    the_cross_validator = standard_resample_CV(ds_shuff, the_classifier);
     the_cross_validator.num_resample_runs = 10;
     
     % suppress displays
