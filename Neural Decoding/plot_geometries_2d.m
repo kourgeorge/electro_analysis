@@ -1,10 +1,10 @@
 function plot_geometries_2d(X1,X2,X3,X4)
     
 
-[geom1.centroid, geom1.D, geom1.U, geom1.Ri, geom1.N] = extract_geometry(X1);
-[geom2.centroid, geom2.D, geom2.U, geom2.Ri, geom2.N] = extract_geometry(X2);
-[geom3.centroid, geom3.D, geom3.U, geom3.Ri, geom3.N] = extract_geometry(X3);
-[geom4.centroid, geom4.D, geom4.U, geom4.Ri, geom4.N] = extract_geometry(X4);
+geom1 = extract_geometry(X1);
+geom2 = extract_geometry(X2);
+geom3 = extract_geometry(X3);
+geom4 = extract_geometry(X4);
 
 hold on;
 h1=plot_gaussian_ellipsoid(geom1.centroid,cov(X1)); 
