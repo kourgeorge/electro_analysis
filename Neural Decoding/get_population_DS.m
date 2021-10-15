@@ -32,7 +32,7 @@ if generalization
 else
     ds = basic_DS(binned_data_file_name, label, numSplits);
     %enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split*numSplits);
-    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split+1);
+    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split*2);
     ds.sites_to_use = enoughCellIndx;
 end
 
