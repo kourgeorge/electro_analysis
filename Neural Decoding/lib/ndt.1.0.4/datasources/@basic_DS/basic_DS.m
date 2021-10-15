@@ -1168,10 +1168,10 @@ methods
    
    methods (Static)
        function augmented_list = augment_trials(trials_list, target_number)
-           if target_number < length(trials_list)
-            augmented_list =  trials_list(randperm(length(trials_list)));
-            augmented_list=augmented_list(1:target_number);
-            return
+           if target_number <= length(trials_list)
+               augmented_list = trials_list(randperm(length(trials_list)));
+               augmented_list = augmented_list(1:target_number);
+               return
            end
            augmented_trials = repmat(trials_list, target_number,1);
            augmented_trials = augmented_trials(randperm(length(augmented_trials)));
