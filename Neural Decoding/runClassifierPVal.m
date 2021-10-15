@@ -5,7 +5,7 @@ if nargin < 7
     stage = [];
 end
 
-%rng('shuffle','twister');
+rng('shuffle','twister');
 
 % create a feature proprocessor and a classifier
 the_feature_preprocessors{1} = zscore_normalize_FP;
@@ -31,8 +31,7 @@ end
 
 
 %%% Build and run the cross validation
-%the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
-the_cross_validator = standard_resample_CV(ds, the_classifier);
+the_cross_validator = standard_resample_CV(ds, the_classifier, the_feature_preprocessors);
 %the_cross_validator.num_resample_runs = 10;
 the_cross_validator.test_only_at_training_times = 1; % train and test on same time slot
 DECODING_RESULTS = the_cross_validator.run_cv_decoding;
@@ -57,8 +56,7 @@ for shuff_num = 1:5
     
     ds_shuff.randomly_shuffle_labels_before_running=1;
     
-    %the_cross_validator = standard_resample_CV(ds_shuff, the_classifier, the_feature_preprocessors);
-    the_cross_validator = standard_resample_CV(ds_shuff, the_classifier);
+    the_cross_validator = standard_resample_CV(ds_shuff, the_classifier, the_feature_preprocessors);
     the_cross_validator.num_resample_runs = 10;
     
     % suppress displays
