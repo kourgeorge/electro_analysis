@@ -187,6 +187,7 @@ properties
 
     from_generalization = 0 % this obkect is part of the generalization_ds and thus there is no need to maintain a segregation between train and test.
     
+    label = -1;
                                    
            
 end
@@ -1120,10 +1121,10 @@ methods
                             % Need to make sure that there at least
                             % num_times_to_repeat_each_label_per_cv_split+1 repetitions, one for train and all other for for test
                             
-                            if length(curr_trials_to_use) <  ds.num_times_to_repeat_each_label_per_cv_split+1
+                            if length(curr_trials_to_use) <  ds.num_times_to_repeat_each_label_per_cv_split*2
                                 error(['Requestion data from more trials of a given condition than has been recorded.'  ...
-                                    'The minimal number of repetitions required is ds.num_times_to_repeat_each_label_per_cv_split+1'...
-                                    'One is for training (which can be augmented and the other ds.num_times_to_repeat_each_label_per_cv_split is for the test set)' ]);
+                                    'The minimal number of repetitions required is ds.num_times_to_repeat_each_label_per_cv_split*2 '...
+                                    'Enough samples to be be used for train and test.)' ]);
                                 return;
                             end
                             
@@ -1133,7 +1134,7 @@ methods
                             curr_trials_to_use = curr_trials_to_use(ds.num_times_to_repeat_each_label_per_cv_split+1:end);
                             
                             % The augmentation step.
-                            curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split);
+                            curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split*(ds.num_cv_splits-1));
                         else
                             % The augmentation step.
                             curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split);
