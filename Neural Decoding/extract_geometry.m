@@ -13,8 +13,8 @@ centroid = mean(X);
 % lambda_exp = s.^2/N 
 
 [~,S,V] = svd(X-centroid);
-[eigvec,eigval] = eig(cov(X-centroid));
-eigval_exp = diag(S).^2/N;
+%[eigvec,eigval] = eig(cov(X-centroid));
+%eigval_exp = diag(S).^2/N;
 
 
 %test
