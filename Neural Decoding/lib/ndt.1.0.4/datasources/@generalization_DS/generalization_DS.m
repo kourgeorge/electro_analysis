@@ -109,7 +109,8 @@ properties
                                         
     % randomly shuffles the labels prior to the get_data method being called - which is useful for creating one point in a null distribution to check if decoding results are above what is expected by change.
     randomly_shuffle_labels_before_running = 0;                                                        
-                                                         
+    
+    label = -1;
                                   
 end
 
