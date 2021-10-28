@@ -2,6 +2,12 @@ function [X_aug,Y_aug] = augment_pseudo_population(X, Y, factor)
 %AUGMENT_PSEUDO_POPULATION Summary of this function goes here
 %   Detailed explanation goes here
 
+if factor==0
+    X_aug=X;
+    Y_aug=Y;
+    return
+end
+
 all_labels = unique(Y)';
 
 X_aug = [];
