@@ -1,6 +1,6 @@
-function [all_XTr_reduced, all_XTe_reduced] = dimensionality_reduce_ds(ds)
+function [all_XTr_reduced, all_XTe_reduced] = dimensionality_reduce_ds(all_XTr, all_XTe)
 
-[all_XTr, all_YTr, all_XTe, all_YTe] = ds.get_data_MC;
+
 timebins = length(all_XTr);
 splits = length(all_XTr{1});
 

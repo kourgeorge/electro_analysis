@@ -21,21 +21,19 @@ Labels.NPRewarded = behaveStruct.selected_np==behaveStruct.rewarded_arm1 | ...
 Labels.CorrectArm = [behaveStruct.rewarded_arm1, behaveStruct.rewarded_arm1];
 N = numel(Labels.TrialNum);
 
+Labels.Direction = 2-(Labels.Chosen==2 | Labels.Chosen==4);
+Labels.AllocentericDirection = 2-(Labels.Chosen==2 | Labels.Chosen==3);  
+
+relevant_direction=Labels.AllocentericDirection;
 
 for trial=1:N
-    cond = '';
-    cond2 = '';
-    if (Labels.ArmType(trial)==1 && Labels.Chosen(trial)==1) || ...
-            (Labels.ArmType(trial)==2 && Labels.Chosen(trial)==4)
+    cond = '';  
+    if relevant_direction(trial)==1 
         cond=[cond,'right_'];
-        direction = 1;
     else
         cond=[cond,'left_'];
-        direction = 2;
     end
-    Labels.Direction(trial) = direction;
-    
-    if Labels.Rewarded(trial)
+    if Labels.Rewarded(trial) 
         cond=[cond,'R_'];
     else
         cond=[cond,'NR_'];
@@ -47,15 +45,11 @@ for trial=1:N
     end    
     
    Labels.Combination(trial) = {cond};
-   Labels.Combination2(trial) = {cond2}; 
    
 end
-%Fix the dimensions of Combination and Direction.
-Labels.Combination = Labels.Combination';
-Labels.Combination2 = Labels.Combination2';
-Labels.Direction = Labels.Direction';
 
-%Labels.Combination = Labels.Combination(randperm(length(Labels.Combination)));
+Labels.Combination = Labels.Combination'; %Fix the dimensions of Combination.
+
 
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
