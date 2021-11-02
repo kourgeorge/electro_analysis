@@ -73,8 +73,11 @@ numSplits = 10;
 %plotClassifierResults(decoding_results_path, shuffle_dir_name,[])
 decoding_results = load(decoding_results_path);
 
-num_times_to_repeat_each_label_per_cv_split = 10;
-numSplits = 2;
+%TODOL check the verage radius of water vs. food (on the decoder data) to explain why is the recall of
+% water is much higher than the recall of food.
+
+num_times_to_repeat_each_label_per_cv_split = 4;
+%numSplits = 2;
 
 ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 %[all_XTr, all_YTr_aug, all_XTe_aug, all_YTe_aug] = ds.get_data_MC;
@@ -83,10 +86,49 @@ plot_theoretical_decoding(ds, decoding_results)
 title('Fig 2e (2) - for supplementary information, a figure with the whole timeline of the cut, showing correspondence Between theoretical and empirical SNRT')
 
 
-%% Fig 2f confusion matrix of something? Help me think here…
+
+%% Fig 2f Neural geometry of ArmType at ITI
 event = 'ITI';
 target = 'ArmType';
+timebin = 8;
 
-ds = get_population_DS(rasters, event, [], target, 2, 10, binSize, stepSize);
-%[all_XTr, all_YTr, all_XTe, all_YTe] = augment_ds(ds, 10);
-plot_population(ds, 8)
+config = get_config();
+rasters = fullfile(config.rasters_folder,'all'); 
+
+binSize = 150;
+stepSize = 50;
+numSplits = 2;
+
+num_times_to_repeat_each_label_per_cv_split = 10;
+
+ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+
+[all_XTr_aug, all_YTr, all_XTe_aug, all_YTe] = augment_ds(ds, 5);
+
+labels = unique(all_YTr);
+X1 = all_XTr_aug{timebin}{1}(:,all_YTr==labels(1))';
+X2 = all_XTr_aug{timebin}{1}(:,all_YTr==labels(2))';
+X3 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(1))';
+X4 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(2))';
+
+geom1 = extract_geometry([X1;X3]);
+geom2 = extract_geometry([X2;X4]);
+snr = SNR(geom1,geom2);
+
+X_dr = DirectectedDR([X1;X2;X3;X4], geom1.centroid-geom2.centroid, 2);
+
+n = size(X1,1);
+
+X1_red = X_dr(1:n,:);
+X2_red = X_dr(n+1:2*n,:);
+X3_red = X_dr(2*n+1:3*n,:);
+X4_red = X_dr(3*n+1:4*n,:);
+
+m=length(all_YTr);
+
+figure;
+%plot_geometries_2d(X1_red, X3_red);
+plot_geometries_2d([X1_red;X3_red], [X2_red;X4_red]);
+
+title(['Fig 3f – Estimated geometries for interesting points (timebin=',num2str(timebin),')'])
+subtitle (['Num Cells: ', num2str(size(all_XTr_aug{1}{1},1)), '#TrainSize: ', num2str(length(all_YTr)), ' #TestSize: ', num2str(length(all_YTe)), '. Pred.Acc:', num2str(1-snr.error(m))])
