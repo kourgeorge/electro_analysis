@@ -27,12 +27,12 @@ trialsLabels = l.binned_labels.(label);
 %%% Build the Data Source                           
 if generalization
     ds = generalization_DS(binned_data_file_name, label , numSplits, train_label_values, test_label_values);   
-    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, 1);
+    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split);
     ds.sites_to_use = enoughCellIndx;
 else
     ds = basic_DS(binned_data_file_name, label, numSplits);
-    %enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split*numSplits);
-    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels,num_times_to_repeat_each_label_per_cv_split*2);
+    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split*2);
+    %enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels,num_times_to_repeat_each_label_per_cv_split*2);
     ds.sites_to_use = enoughCellIndx;
     
 end
