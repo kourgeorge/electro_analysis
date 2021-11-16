@@ -5,7 +5,8 @@ function createRasterFiles(filerLabel, filterValues)
 % 
 
 config = get_config();
-save_folder_name = 'Rasters_allocentric';
+save_folder_name = 'all';
+save_folder_name = fullfile(config.rasters_folder, save_folder_name);
 
 day_files = dir([config.electro_folder,'/*/*/*/*events_g.mat']); %look for all single units files in the stage
 
@@ -45,13 +46,13 @@ for j = 1:length(day_files)
 		% Correction of the ITI - make it a second before.
         % behave_struct.event_times(:,1)=behave_struct.event_times(:,1)-1;
 
-        binsize = 50;
-        cut_info.ITI = [-0.4,0.7];
-        cut_info.NP = [-0.4,0.7];
-        cut_info.Ain = [-0.4,0.7];
-        cut_info.Bin = [-0.4,0.7];
-        cut_info.Aout = [-0.4,0.7];
-        cut_info.All = [-0.4,0.7];
+        binsize = 150;
+        cut_info.ITI = [-0.2,0.6];
+        cut_info.NP = [-0.2,0.6];
+        cut_info.Ain = [-0.2,0.6];
+        cut_info.Bin = [-0.2,0.6];
+        cut_info.Aout = [-0.2,0.6];
+        cut_info.All = [-0.2,0.6];
 
         [nspikes ,blmn, blstd, Labels, ITIRaster, AinRaster,AoutRaster, BinRaster, NPRaster, AllRaster] = ...
             makeRasterData(behave_struct, st, binsize, cut_info);
