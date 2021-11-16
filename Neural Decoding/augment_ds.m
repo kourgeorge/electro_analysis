@@ -1,5 +1,5 @@
 function [all_XTr_aug, all_YTr_aug, all_XTe_aug, all_YTe_aug] = augment_ds(ds, factor)
-%AUGMENT_DS Summary of this function goes here
+%AUGMENT_DS TODO: rename this function and consider adding it to datasource.
 %   Detailed explanation goes here
 
 
