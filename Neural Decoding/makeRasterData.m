@@ -27,29 +27,54 @@ Labels.AllocentericDirection = 2-(Labels.Chosen==2 | Labels.Chosen==3);
 relevant_direction=Labels.AllocentericDirection;
 
 for trial=1:N
-    cond = '';  
+    cond = '';
+    condRA = '';
+    condDR = '';
+    condDA = '';
     if relevant_direction(trial)==1 
         cond=[cond,'right_'];
+        condDR = [condDR,'right_'];
+        condDA = [condDA,'right_'];
     else
         cond=[cond,'left_'];
+        condDR = [condDR,'left_'];
+        condDA = [condDA,'left_'];
     end
     if Labels.Rewarded(trial) 
         cond=[cond,'R_'];
+        condRA=[condRA,'R_'];
+        condDR = [condDR,'R'];
     else
         cond=[cond,'NR_'];
+        condRA=[condRA,'NR_'];
+        condDR = [condDR,'NR'];
     end
     if Labels.ArmType(trial)==1
         cond=[cond,'food'];
+        condRA=[condRA,'food'];
+        condDA = [condDA,'food'];
     else
         cond=[cond,'water'];
+        condRA=[condRA,'water'];
+        condDA = [condDA,'water'];
     end    
     
    Labels.Combination(trial) = {cond};
+   Labels.RewardedArmType(trial) = {condRA};
+   Labels.DirectionArmType(trial) = {condDA};
+   Labels.DirectionRewarded(trial) = {condDR};
    
 end
 
 Labels.Combination = Labels.Combination'; %Fix the dimensions of Combination.
+Labels.RewardedArmType = Labels.RewardedArmType';
+Labels.DirectionArmType = Labels.DirectionArmType';
+Labels.DirectionRewarded = Labels.DirectionRewarded';
 
+% Duplicate to support any order of labels
+Labels.ArmTypeRewarded = Labels.RewardedArmType;
+Labels.ArmTypeDirection = Labels.DirectionArmType;
+Labels.RewardedDirection = Labels.DirectionRewarded;
 
 blTimeBins = st(1):windowSize:st(end);
 ns = zeros(1,length(blTimeBins));
