@@ -66,25 +66,26 @@ rasters = fullfile(config.rasters_folder,'all');
 
 binSize = 150;
 stepSize = 50;
-numSplits = 10;
+numSplits = 2;
 
 
-[decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,[]);
+%[decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,[]);
 %plotClassifierResults(decoding_results_path, shuffle_dir_name,[])
-decoding_results = load(decoding_results_path);
+%decoding_results = load(decoding_results_path);
 
-%TODOL check the verage radius of water vs. food (on the decoder data) to explain why is the recall of
+%TODO: check the verage radius of water vs. food (on the decoder data) to explain why is the recall of
 % water is much higher than the recall of food.
 
-num_times_to_repeat_each_label_per_cv_split = 4;
+num_times_to_repeat_each_label_per_cv_split = 10;
 %numSplits = 2;
 
 ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 %[all_XTr, all_YTr_aug, all_XTe_aug, all_YTe_aug] = ds.get_data_MC;
 
-plot_theoretical_decoding(ds, decoding_results)
-title('Fig 2e (2) - for supplementary information, a figure with the whole timeline of the cut, showing correspondence Between theoretical and empirical SNRT')
-
+plot_theoretical_decoding(ds)
+title('Fig 2e (2) - for supplementary information, a figure with the whole timeline of the cut, showing correspondence Between theoretical and empirical SNR')
+legend('Theory Accuracy', ['Theory recall: Water'], ['Theory recall: Food'],'AutoUpdate','off');
+%ylim([0.75,0.85])
 
 
 %% Fig 2f Neural geometry of ArmType at ITI
@@ -103,7 +104,7 @@ num_times_to_repeat_each_label_per_cv_split = 10;
 
 ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 
-[all_XTr_aug, all_YTr, all_XTe_aug, all_YTe] = augment_ds(ds, 5);
+[all_XTr_aug, all_YTr, all_XTe_aug, all_YTe] = augment_ds(ds, 10);
 
 labels = unique(all_YTr);
 X1 = all_XTr_aug{timebin}{1}(:,all_YTr==labels(1))';
@@ -132,3 +133,5 @@ plot_geometries_2d([X1_red;X3_red], [X2_red;X4_red]);
 
 title(['Fig 3f – Estimated geometries for interesting points (timebin=',num2str(timebin),')'])
 subtitle (['Num Cells: ', num2str(size(all_XTr_aug{1}{1},1)), '#TrainSize: ', num2str(length(all_YTr)), ' #TestSize: ', num2str(length(all_YTe)), '. Pred.Acc:', num2str(1-snr.error(m))])
+
+legend('food', 'water')
