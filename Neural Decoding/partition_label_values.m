@@ -2,16 +2,16 @@ function [label_group1, label_group2] = partition_label_values(transfer_label, t
 %%% The transfer_label is the label we check generalization on and the
 %%% target_labelis the label we will decode.
 
-    values =  [0,0,0,{'left_NR_food'} 
-               0,0,1,{'left_NR_water'}
-               0,1,0,{'left_R_food'}
-               0,1,1,{'left_R_water'}
-               1,0,0,{'right_NR_food'}
-               1,0,1,{'right_NR_water'}
-               1,1,0,{'right_R_food'} 
-               1,1,1,{'right_R_water'}];
-           
-           
+values =  [0,0,0,{'left_NR_food'}
+    0,0,1,{'left_NR_water'}
+    0,1,0,{'left_R_food'}
+    0,1,1,{'left_R_water'}
+    1,0,0,{'right_NR_food'}
+    1,0,1,{'right_NR_water'}
+    1,1,0,{'right_R_food'}
+    1,1,1,{'right_R_water'}];
+
+
 switch(transfer_label)
     case 'Direction'
         train_ind = find(cell2mat(values(:,1))==1);
