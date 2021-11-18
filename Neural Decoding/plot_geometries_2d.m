@@ -10,23 +10,17 @@ set(0,'DefaultLineMarkerSize',8);
 
 geom1 = extract_geometry(X1);
 geom2 = extract_geometry(X2);
-geom3 = extract_geometry(X3);
-geom4 = extract_geometry(X4);
 
+std = 2.0;
+
+figure;
 hold on;
-h1=plot_gaussian_ellipsoid(geom1.centroid,cov(X1),2.0); 
-h2=plot_gaussian_ellipsoid(geom2.centroid,cov(X2),2.0);
-h3= plot_gaussian_ellipsoid(geom3.centroid,cov(X3),2.0);
-h4= plot_gaussian_ellipsoid(geom4.centroid,cov(X4),2.0);
+h1=plot_gaussian_ellipsoid(geom1.centroid,cov(X1),std); 
+h2=plot_gaussian_ellipsoid(geom2.centroid,cov(X2),std);
+
 
 set(h1,'color','#0072BD');
 set(h2,'color','#A2142F');
-
-
-set(h3,'color','#0072BD');
-set(h4,'color','#A2142F');
-set(h3,'LineStyle',':');
-set(h4,'LineStyle',':');
 
 
 %set(gca,'proj','perspective');  
@@ -34,15 +28,28 @@ set(h4,'LineStyle',':');
 
 scatter(X1(:,1),X1(:,2),'MarkerEdgeColor','#0072BD','Marker','o')
 scatter(X2(:,1),X2(:,2),'MarkerEdgeColor','#A2142F','Marker','o')
-scatter(X3(:,1),X3(:,2),'MarkerEdgeColor','#0072BD','Marker','x')
-scatter(X4(:,1),X4(:,2),'MarkerEdgeColor','#A2142F','Marker','x')
+
 
 
 axis equal; %axis tight;
 hold off;
-legend('A(Train)', 'B(Train)', 'A(Test)', 'B(Test)' ,'A(Train)', 'B(Train)', 'A(Test)', 'B(Test)', 'AutoUpdate','off')
+%legend('A(Train)', 'B(Train)', 'A(Test)', 'B(Test)' ,'A(Train)', 'B(Train)', 'A(Test)', 'B(Test)', 'AutoUpdate','off')
 
+if nargin>3
+geom3 = extract_geometry(X3);
+geom4 = extract_geometry(X4);
+h3= plot_gaussian_ellipsoid(geom3.centroid,cov(X3),std);
+h4= plot_gaussian_ellipsoid(geom4.centroid,cov(X4),std);
+set(h3,'color','#0072BD');
+set(h4,'color','#A2142F');
+set(h3,'LineStyle',':');
+set(h4,'LineStyle',':');
+scatter(X3(:,1),X3(:,2),'MarkerEdgeColor','#0072BD','Marker','x')
+scatter(X4(:,1),X4(:,2),'MarkerEdgeColor','#A2142F','Marker','x')
 signal = [geom1.centroid;geom3.centroid;geom2.centroid];
 line(signal(:,1),signal(:,2),'Color','#7E2F8E','LineStyle','-', 'Marker', 'o')
+end
+
+axis equal;
 
 end
