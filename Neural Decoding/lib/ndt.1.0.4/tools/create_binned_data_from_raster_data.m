@@ -108,7 +108,7 @@ function saved_binned_data_file_name = create_binned_data_from_raster_data(raste
 %  fix the directory name in case there it does not end with a slash
 last_char = raster_file_directory_name(end);
 if (strcmp(last_char, '/') + strcmp(last_char, '\') + strcmp(last_char, '*')) == 0
-    raster_file_directory_name = [raster_file_directory_name '/'];
+    raster_file_directory_name = [raster_file_directory_name filesep];
 end
 
 
