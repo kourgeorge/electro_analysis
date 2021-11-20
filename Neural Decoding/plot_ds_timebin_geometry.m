@@ -11,11 +11,13 @@ transfer_ds = isequal(class(ds),'generalization_DS');
 factor = 0;
 
 [all_XTr_aug, all_YTr, all_XTe_aug, all_YTe] = augment_ds(ds, factor);
+
 labels = unique(all_YTr);
 X1 = all_XTr_aug{timebin}{1}(:,all_YTr==labels(1))';
 X2 = all_XTr_aug{timebin}{1}(:,all_YTr==labels(2))';
 X3 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(1))';
 X4 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(2))';
+
 
 
 if transfer_ds || merge_train_test==false

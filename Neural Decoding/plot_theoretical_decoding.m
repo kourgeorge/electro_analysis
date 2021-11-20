@@ -4,11 +4,7 @@ function plot_theoretical_decoding(ds, decoding_results)
 
 aug_factor = 0;
 
-transfer = false;
-if ds.from_generalization
-    transfer=true;
-end
-    
+transfer = isequal(class(ds),'generalization_DS'); 
     
 for rep=1:50
     %[all_XTr, all_YTr, all_XTe, all_YTe] = augment_ds(ds, aug_factor); 
