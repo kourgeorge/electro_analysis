@@ -6,6 +6,8 @@ if nargin<3
     merge_train_test=false;
 end
 
+transfer_ds = isequal(class(ds),'generalization_DS');
+
 factor = 0;
 
 [all_XTr_aug, all_YTr, all_XTe_aug, all_YTe] = augment_ds(ds, factor);
@@ -16,27 +18,7 @@ X3 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(1))';
 X4 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(2))';
 
 
-if merge_train_test
-    % TODO: In this case we can collect all splits...
-    
-    X_train = [X1;X3];
-    X_test = [X2;X4];
-    geom1 = extract_geometry(X_train);
-    geom2 = extract_geometry(X_test);
-    X_dr = DirectectedDR([X_train;X_test], geom1.centroid-geom2.centroid, 2);
-    n = size(X_train,1);
-    plot_geometries_2d(X_dr(1:n,:), X_dr(n+1:end,:));
-    
-    subtitle (['Label:',ds.label ,' Num Cells: ', num2str(size(all_XTr_aug{1}{1},1)), ...
-        ' LabelRep: ', num2str(size(X_train,1)), '. Timebin:', num2str(timebin)])
-    
-    legend('X1 samples', 'X2 samples', 'X1 manifold', 'X2 manifold');
-    
-    geom3 = NaN;
-    geom4 = NaN;
-    
-else
-    
+if transfer_ds || merge_train_test==false
     geom1 = extract_geometry(X1);
     geom2 = extract_geometry(X2);
     geom3 = extract_geometry(X3);
@@ -57,13 +39,36 @@ else
     subtitle (['Label:',ds.label ,' Num Cells: ', num2str(size(all_XTr_aug{1}{1},1)), ...
         ' TrainSize: ', num2str(length(all_YTr)), ' TestSize: ', num2str(length(all_YTe)), '. Timebin:', num2str(timebin)])
    
-    if ds.from_generalization
+    if transfer_ds
         legend(ds.the_training_label_names{1}{1}, ds.the_training_label_names{2}{1},... 
             ds.the_training_label_names{1}{1}, ds.the_training_label_names{2}{1},...
             ds.the_test_label_names{1}{1}, ds.the_test_label_names{2}{1}, ...
             ds.the_test_label_names{1}{1}, ds.the_test_label_names{2}{1}, 'Interpreter', 'none');
     else
-        legend(num2str(labels(1)), num2str(labels(2)) , 'Interpreter', 'none');
+        legend(['Train: ',num2str(labels(1))], ['Train: ', num2str(labels(2))], '', '', ...
+        ['Test: ',num2str(labels(1))], ['Test: ', num2str(labels(2))] , 'Interpreter', 'none');
     end
+    
+else
+    % In case of non-transfer... without showing the train and test in
+    % different manifolds
+    
+    % TODO: In this case we can collect all splits...
+    
+    X_train = [X1;X3];
+    X_test = [X2;X4];
+    geom1 = extract_geometry(X_train);
+    geom2 = extract_geometry(X_test);
+    X_dr = DirectectedDR([X_train;X_test], geom1.centroid-geom2.centroid, 2);
+    n = size(X_train,1);
+    plot_geometries_2d(X_dr(1:n,:), X_dr(n+1:end,:));
+    
+    subtitle (['Label:',ds.label ,' Num Cells: ', num2str(size(all_XTr_aug{1}{1},1)), ...
+        ' LabelRep: ', num2str(size(X_train,1)), '. Timebin:', num2str(timebin)])
+    
+    legend(['Train: ',num2str(labels(1))], ['Train: ', num2str(labels(2))], 'Interpreter', 'none');
+    
+    geom3 = NaN;
+    geom4 = NaN;
 end
 
