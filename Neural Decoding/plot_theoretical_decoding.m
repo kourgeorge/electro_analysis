@@ -42,7 +42,7 @@ end
 if transfer
     acc=acc_T;
 end
-%acc=acc_T;
+acc=acc_T;
 
 theoretical_acc_mat = mean(acc,2);
 snr_A_rep = acc(:,:,1);
@@ -61,6 +61,9 @@ h(3).Color = '#A2142F';
 if transfer
     legend('Theory Accuracy', ['Theory recall: ', ds.the_test_label_names{labels(1)}{1}], ['Theory recall: ', ds.the_test_label_names{labels(2)}{1}],'AutoUpdate','off', 'Interpreter', 'none');
     set(gca,'ColorOrderIndex',1)
+else
+    legend('Theory Accuracy', ['Theory recall: ',ds.label,'(', num2str(labels(1)),')'], ['Theory recall: ',ds.label,'(', num2str(labels(2)),')'],'AutoUpdate','off', 'Interpreter', 'none');
+    set(gca,'ColorOrderIndex',1)
 end
 
 shadedErrorBar(1:timebins,mean([snr_A_rep,snr_B_rep]'), sem([snr_A_rep,snr_B_rep]'),{'color',h(1).Color},0.5)
@@ -68,6 +71,7 @@ shadedErrorBar(1:timebins,mean(snr_A_rep'), sem(snr_A_rep'),{'color',h(2).Color}
 shadedErrorBar(1:timebins,mean(snr_B_rep'), sem(snr_B_rep'),{'color',h(3).Color},0.5)
 
 
+% In case of showing the emprirical results.
 if transfer && nargin>1
     confusion_matrix= decoding_results.DECODING_RESULTS.ZERO_ONE_LOSS_RESULTS.confusion_matrix_results.confusion_matrix;
     empirical_acc_mat = [confusion_matrix(1,1,:)./sum((confusion_matrix(:,1,:))),...
