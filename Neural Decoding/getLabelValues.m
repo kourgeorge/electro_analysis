@@ -15,6 +15,10 @@ switch label
         allPossibilities = [0 1];
     case 'NPRewarded'
         allPossibilities = [0 1];
+    case 'Direction'
+        allPossibilities = [1 2];
+    case 'AllocentericDirection'
+        allPossibilities = [1 2];
     case 'ArmType'
         allPossibilities = [1 2];
     case 'combination'
