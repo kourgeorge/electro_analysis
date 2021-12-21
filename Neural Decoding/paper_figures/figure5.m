@@ -21,7 +21,7 @@ combinations = getLabelsCombinations( filter_labels );
 %filter_values = {{[1],[0]}, {[1],[1]}, {[2],[0]}, {[2],[1]}, {[3],[0]}, {[3],[1]}, {[4],[0]}, {[4],[1]}};
 
 all_conditions_vectors = [];
-for comb =combinations
+for comb = combinations
     all_cells_condition_mean = [];
     for cell_raster_file = raster_cells_data'
         cell_data = load(fullfile(cell_raster_file.folder,cell_raster_file.name));
@@ -30,6 +30,7 @@ for comb =combinations
         if isempty(relevant_trials)
             binned_raster = nan(1,5);
         else
+            
             binned_raster = create_binned_raster_from_raster(cell_data.raster_data(relevant_trials,:), bin_size);
         end
         all_cells_condition_mean=[all_cells_condition_mean, nanmean(binned_raster(:,timebin))];
@@ -37,14 +38,26 @@ for comb =combinations
     all_conditions_vectors = [all_conditions_vectors;all_cells_condition_mean];
 end
 
-all_conditions_vectors(isnan(all_conditions_vectors))=0;
-all_conditions_vectors = zscore(all_conditions_vectors);
-RSA_mat = pdist2(all_conditions_vectors,all_conditions_vectors, 'correlation');
+%all_conditions_vectors(isnan(all_conditions_vectors))=0;
+%all_conditions_vectors = zscore(all_conditions_vectors);
+%RSA_mat = pdist2(all_conditions_vectors,all_conditions_vectors, 'correlation');
+RSA_mat = corrcoef(all_conditions_vectors','rows','pairwise');
 figure;
-colormap(flipud(hot))
-imagesc(RSA_mat)
+colormap(bluewhitered)
+imagesc(-RSA_mat)
 colorbar
-clim([0.4,1.4])
+clim([-1,1])
+armtype = [{'food'}, {'water'}];
+direction = [{'left'},{'right'}];
+labels = [];
+
+for comb=combinations 
+    labels = [labels; {[armtype{comb(1)},' ' ,direction{comb(2)}]}];
+end
+xticks([1,2,3,4]);
+xticklabels(labels)
+yticks([1,2,3,4]);
+yticklabels(labels)
 
 function relevant_trials = filter_trials(cell_data, filter_labels, filter_values)
 if isempty(filter_labels)
@@ -63,9 +76,11 @@ end
 function binned_raster = create_binned_raster_from_raster(raster, binsize)
 actual_bins =  floor(size(raster,2)/binsize);
 
+norm_raster = zscore(raster, 0, 'all');
+
 binned_raster = [];
-for row=1:size(raster,1)
-    [binned_raster_row,~] = histcounts(find(raster(row,:)),actual_bins);
+for row=1:size(norm_raster,1)
+    [binned_raster_row,~] = histcounts(find(norm_raster(row,:)),actual_bins);
     binned_raster = [binned_raster;binned_raster_row];
 end
 
