@@ -1,4 +1,4 @@
-function ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize,  stepSize, train_label_values, test_label_values)
+function ds = get_population_DS(rastersDir, event, stage, label, label_names_to_use ,numSplits, num_times_to_repeat_each_label_per_cv_split, binSize,  stepSize, train_label_values, test_label_values)
 %GET_POPULATION_DS Summary of this function goes here
 %   numSplits: the number of cv folds in each timebin.
 %   num_times_to_repeat_each_label_per_cv_split: how many times each label
@@ -31,9 +31,9 @@ if generalization
     ds.sites_to_use = enoughCellIndx;
 else
     ds = basic_DS(binned_data_file_name, label, numSplits);
-    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split*numSplits);
+    enoughCellIndx = find_sites_with_k_label_repetitions(trialsLabels, num_times_to_repeat_each_label_per_cv_split*2, label_names_to_use);
     ds.sites_to_use = enoughCellIndx;
-    
+    ds.label_names_to_use= label_names_to_use;
 end
 
 ds.num_times_to_repeat_each_label_per_cv_split = num_times_to_repeat_each_label_per_cv_split;

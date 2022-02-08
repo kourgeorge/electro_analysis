@@ -2,7 +2,7 @@ addpath '/Users/gkour/drive/PhD/events_analysis/Neural Decoding';
 clearvars;
 close all;
 
-%% Figure 2c - 2c  classification accuracy along the time of the ITI response to goal type (arm type) (stimulus time marked)
+%% Figure 3a  classification accuracy along the time of the ITI response to goal type (arm type) (stimulus time marked)
 %%%	use the best looking of the following:
 %%%	- separately on WR and FR stages
 %%%	- only on WR stages
@@ -17,16 +17,16 @@ binSize = 150;
 stepSize = 50;
 numSplits = 10;
 
-[decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,[]);
-plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Fig 2c - classification accuracy along the time of the ',event,' response to goal type.'])
+%[decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,[]);
+%plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Fig 3a - classification accuracy along the time of the ',event,' response to goal type.'])
 
 [decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,['WR']);
-plotClassifierResults(decoding_results_path, shuffle_dir_name,['Fig 2c (1) - classification accuracy along the time of the ',event,' response to goal type: WR Stages'])
+plotClassifierResults(decoding_results_path, shuffle_dir_name,['Fig 3a (1) - classification accuracy along the time of the ',event,' response to goal type: WR Stages'])
 
 [decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,['FR']);
-plotClassifierResults(decoding_results_path, shuffle_dir_name,['Fig 2c (2) - classification accuracy along the time of the ',event,'  response to goal type: FR Stages'])
+plotClassifierResults(decoding_results_path, shuffle_dir_name,['Fig 3a (2) - classification accuracy along the time of the ',event,'  response to goal type: FR Stages'])
 
-%% Fig 2d - maximum classification accuracy in each stage
+%% Fig 3b - maximum classification accuracy in each stage
 all_stage_names = {'odor1_WR1','odor2_WR1','odor2_XFR','odor3_WR2','spatial_WR2'};
 maximal_goal_decoding_accuracy_all_stages = [];
 num_cell = [];
@@ -52,9 +52,9 @@ labels = string(num_cell);
 text(xtips,ytips,labels,'HorizontalAlignment','center',...
     'VerticalAlignment','bottom')
 
-title('2d - maximum classification accuracy of goal type in each stage at around ITI. Num cells above bars.')
+title('3b - maximum classification accuracy of goal type in each stage at around ITI. Num cells above bars.')
 
-%% Fig 2e - theoretical maximum classification accuracy according to Sompolinsky’s SNR, or according to SNRT with the test, 
+%% Fig 2e - Suplementary! theoretical maximum classification accuracy according to Sompolinsky’s SNR, or according to SNRT with the test, 
 %for each such day or stage (if possible, then day would be much better), separating food and water and both.
 
 event = 'ITI';
@@ -79,10 +79,10 @@ numSplits = 2;
 num_times_to_repeat_each_label_per_cv_split = 10;
 %numSplits = 2;
 
-ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+ds = get_population_DS(rasters, event, [], target, [],numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 %[all_XTr, all_YTr_aug, all_XTe_aug, all_YTe_aug] = ds.get_data_MC;
 
-plot_theoretical_decoding(ds)
+plot_theoretical_decoding(ds, 100)
 title('Fig 2e (2) - for supplementary information, a figure with the whole timeline of the cut, showing correspondence Between theoretical and empirical SNR')
 legend('Theory Accuracy', ['Theory recall: Water'], ['Theory recall: Food'],'AutoUpdate','off');
 %ylim([0.75,0.85])
@@ -91,7 +91,7 @@ legend('Theory Accuracy', ['Theory recall: Water'], ['Theory recall: Food'],'Aut
 %% Fig 2f Neural geometry of ArmType at ITI
 event = 'ITI';
 target = 'ArmType';
-timebin = 8;
+timebin = 4;
 
 config = get_config();
 rasters = fullfile(config.rasters_folder,'all'); 
@@ -102,15 +102,16 @@ numSplits = 2;
 
 num_times_to_repeat_each_label_per_cv_split = 10;
 
-ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+ds = get_population_DS(rasters, event, ['FR'], target, [], numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 
-[all_XTr_aug, all_YTr, all_XTe_aug, all_YTe] = augment_ds(ds, 10);
+[all_XTr, all_YTr, all_XTe, all_YTe] = augment_ds(ds, 10);
+%[all_XTr, all_YTr, all_XTe, all_YTe] = ds.get_data_MC;
 
 labels = unique(all_YTr);
-X1 = all_XTr_aug{timebin}{1}(:,all_YTr==labels(1))';
-X2 = all_XTr_aug{timebin}{1}(:,all_YTr==labels(2))';
-X3 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(1))';
-X4 = all_XTe_aug{timebin}{1}(:,all_YTe==labels(2))';
+X1 = all_XTr{timebin}{1}(:,all_YTr==labels(1))';
+X2 = all_XTr{timebin}{1}(:,all_YTr==labels(2))';
+X3 = all_XTe{timebin}{1}(:,all_YTe==labels(1))';
+X4 = all_XTe{timebin}{1}(:,all_YTe==labels(2))';
 
 geom1 = extract_geometry([X1;X3]);
 geom2 = extract_geometry([X2;X4]);
@@ -132,6 +133,6 @@ figure;
 plot_geometries_2d([X1_red;X3_red], [X2_red;X4_red]);
 
 title(['Fig 3f – Estimated geometries for interesting points (timebin=',num2str(timebin),')'])
-subtitle (['Num Cells: ', num2str(size(all_XTr_aug{1}{1},1)), '#TrainSize: ', num2str(length(all_YTr)), ' #TestSize: ', num2str(length(all_YTe)), '. Pred.Acc:', num2str(1-snr.error(m))])
+subtitle (['Num Cells: ', num2str(size(all_XTr{1}{1},1)), '#TrainSize: ', num2str(length(all_YTr)), ' #TestSize: ', num2str(length(all_YTe)), '. Pred.Acc:', num2str(1-snr.error(m))])
 
 legend('food', 'water')

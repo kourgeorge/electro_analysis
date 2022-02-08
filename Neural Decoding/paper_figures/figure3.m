@@ -9,7 +9,7 @@ close all;
 config = get_config();
 rasters = fullfile(config.rasters_folder,'all'); 
 
-event = 'ITI';
+event = 'Bin';
 binSize = 150;
 stepSize = 50;
 numSplits = 8;
@@ -20,7 +20,7 @@ target = 'Rewarded';
 % [decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,[]);
 % plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Fig 3a - classification accuracy for ‘Rewarded’ during ITI'])
 
-[decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,['WR']);
+[decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,['WR2']);
 plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Fig 3a(1) - classification accuracy for ‘Rewarded’ during ITI in WR stages'])
 % 
 % [decoding_results_path, shuffle_dir_name] = runClassifierPVal(rasters, event, target, binSize, stepSize, numSplits,['FR']);
@@ -44,7 +44,7 @@ target = 'Rewarded';
 num_times_to_repeat_each_label_per_cv_split = 20;
 
 
-ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+ds = get_population_DS(rasters, event, [], target, [],numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 
 %[geom1, geom2, geom3, geom4] = plot_ds_timebin_geometry(ds, 4, false);
 % snr_A = SNR(geom1, geom2);
@@ -56,7 +56,7 @@ ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repea
 % mean([snr_tA.error(100),snr_tB.error(100)])
 
 
-plot_theoretical_decoding(ds)
+plot_theoretical_decoding(ds,100)
 
 suptitle ('Fig 3b - theoretical classification accuracy for ‘Rewarded’ during ITI')
 
@@ -70,6 +70,15 @@ rasters_food = fullfile(config.rasters_folder,'food');
 rasters_water = fullfile(config.rasters_folder,'water');
 
 numSplits = 10;
+
+
+%trying out to do filering using the same infrastructure
+rasters_all = fullfile(config.rasters_folder,'all');
+transfer = 'ArmType';
+target = 'Rewarded';
+[decoding_results_path, shuffle_dir_name, ds_food] = runClassifierPVal(rasters_all, event, [transfer,target], binSize, stepSize, numSplits,[]);
+plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Fig 3c - classification accuracy for Rewarded in food arms'])
+    
 
 [decoding_results_path, shuffle_dir_name, ds_food] = runClassifierPVal(rasters_food, event, target, binSize, stepSize, numSplits,[]);
 plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Fig 3c - classification accuracy for Rewarded in food arms'])
@@ -89,17 +98,15 @@ timebin = 10;
 binSize = 150;
 stepSize = 50;
 
-rasters_food = fullfile(config.rasters_folder,'food');
-rasters_water = fullfile(config.rasters_folder,'water');
 rasters = fullfile(config.rasters_folder,'all');
 
 numSplits = 2;
 num_times_to_repeat_each_label_per_cv_split = 8;
 
 
-ds = get_population_DS(rasters, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
-ds_food = get_population_DS(rasters_food, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
-ds_water = get_population_DS(rasters_water, event, [], target, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+ds = get_population_DS(rasters, event, [], target, [], numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+ds_food = get_population_DS(rasters, event, [], 'RewardedArmType', [{'R_food'},{'NR_food'}], numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+ds_water = get_population_DS(rasters, event, [], 'RewardedArmType', [{'R_water'},{'NR_water'}], numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 % 
 % [geom1, geom2, ~, ~] = plot_ds_timebin_geometry(ds, timebin, false);
 % snr_a = SNR(geom1, geom2);
@@ -136,7 +143,7 @@ transfer = 'ArmType';
 target = 'Rewarded';
 
 [train_label_values,test_label_values] = get_transfer_label_values(transfer,target);
-[decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rasters, event, [transfer,target], binSize, stepSize, numSplits, ...
+[decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rasters, event, [transfer,target], [] ,binSize, stepSize, numSplits, ...
   [],train_label_values,test_label_values);
 plotClassifierResults(decoding_results_path, shuffle_dir_name, ['Tran.: ',transfer, ' Tar.: ', target])
 suptitle('Fig 3d – transfer classification accuracy')
@@ -166,10 +173,10 @@ num_times_to_repeat_each_label_per_cv_split = 8;
 
 rasters = fullfile(config.rasters_folder, 'all'); 
 
-%[train_label_values, test_label_values] = partition_label_values(transfer, target);
+
 [train_label_values,test_label_values] = get_transfer_label_values(transfer,target);
 
-ds = get_population_DS(rasters, event, [], [transfer,target], numSplits, num_times_to_repeat_each_label_per_cv_split, ...
+ds = get_population_DS(rasters, event, [], [transfer,target], [],numSplits, num_times_to_repeat_each_label_per_cv_split, ...
     binSize, stepSize, train_label_values, test_label_values);
 
 [geom1, geom2, geom3, geom4]=plot_ds_timebin_geometry(ds, timebin);
@@ -199,7 +206,7 @@ numSplits = 10;
 %decoding_results = load(decoding_results_path);
 
 
-ds = get_population_DS(rasters, event, [], [transfer,target], numSplits, num_times_to_repeat_each_label_per_cv_split, ...
+ds = get_population_DS(rasters, event, [], [transfer,target], [], numSplits, num_times_to_repeat_each_label_per_cv_split, ...
     binSize, stepSize, train_label_values, test_label_values);
 
 

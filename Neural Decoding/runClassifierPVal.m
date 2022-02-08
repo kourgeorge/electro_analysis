@@ -1,32 +1,39 @@
-function [decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rastersDir, event, label, binSize, stepSize, numSplits, stage, train_label_values, test_label_values)
+function [decoding_results_path, shuffle_dir_name, ds] = runClassifierPVal(rastersDir, event, label, label_names_to_use, binSize, stepSize, numSplits, stage, train_label_values, test_label_values)
 
 
-if nargin < 7
-    stage = [];
+transfer = false;
+
+if nargin > 8
+    transfer = true;
 end
-
 rng('shuffle','twister');
 
 % create a feature proprocessor and a classifier
 the_feature_preprocessors{1} = zscore_normalize_FP;
-the_classifier = max_correlation_coefficient_CL;
+% the_feature_preprocessors{2} = select_pvalue_significant_features_FP;
+% the_feature_preprocessors{2}.pvalue_threshold = 0.1;
 
-%the_classifier = libsvm_CL;
+%the_feature_preprocessors{2} = select_or_exclude_top_k_features_FP;
+%the_feature_preprocessors{2}.num_features_to_use = 30;
+
+%the_feature_preprocessors={};
+%the_classifier = max_correlation_coefficient_CL;
+the_classifier = libsvm_CL;
 %the_classifier.multiclass_classificaion_scheme = 'one_vs_all';
 %the_classifier.multiclass_classificaion_scheme = 'all_pairs';  %uncomment for svm
 %the_classifier.kernel = 'polynomial';
-%the_classifier.kernel = 'linear';  %uncomment for svm
+the_classifier.kernel = 'linear';  %uncomment for svm
 %the_classifier.kernel = 'rbf';
 % the_classifier.poly_degree = 2;
 
 %%% Create the Binned-data
 
-if nargin > 8
-    num_times_to_repeat_each_label_per_cv_split = 4;
-    ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
+if transfer
+    num_times_to_repeat_each_label_per_cv_split = 5;
+    ds = get_population_DS(rastersDir, event, stage, label, label_names_to_use, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
 else
-    num_times_to_repeat_each_label_per_cv_split = 8;
-    ds = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+    num_times_to_repeat_each_label_per_cv_split = 2;
+    ds = get_population_DS(rastersDir, event, stage, label, label_names_to_use, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
 end
 
 
@@ -48,10 +55,10 @@ for shuff_num = 1:5
     
     disp('running reshuffle decoding');
     disp(['Shuffle number ',num2str(shuff_num )]);
-    if nargin > 8
-        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
+    if transfer
+        ds_shuff = get_population_DS(rastersDir, event, stage, label,label_names_to_use,numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize, train_label_values, test_label_values);
     else
-        ds_shuff = get_population_DS(rastersDir, event, stage, label, numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
+        ds_shuff = get_population_DS(rastersDir, event, stage, label,label_names_to_use,numSplits, num_times_to_repeat_each_label_per_cv_split, binSize, stepSize);
     end
     
     ds_shuff.randomly_shuffle_labels_before_running=1;
