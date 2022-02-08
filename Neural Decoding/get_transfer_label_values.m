@@ -17,7 +17,7 @@ elseif strcmp(transfer,'ArmType') && strcmp(target,'Direction')
     
 elseif strcmp(transfer,'Direction') && strcmp(target,'ArmType')
     train_label_values = [{{'left_food'}},{{'left_water'}}];
-    test_label_values = [{{'left_food'}},{{'left_water'}}];
+    test_label_values = [{{'right_food'}},{{'right_water'}}];
     
 elseif strcmp(transfer,'Rewarded') && strcmp(target,'Direction')
     train_label_values = [{{'left_R'}},{{'right_R'}}];
