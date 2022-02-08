@@ -1134,7 +1134,8 @@ methods
                             curr_trials_to_use = curr_trials_to_use(ds.num_times_to_repeat_each_label_per_cv_split+1:end);
                             
                             % The augmentation step.
-                            curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split*(ds.num_cv_splits-1));
+                            %curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split*(ds.num_cv_splits-1));
+                            curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, (ds.num_cv_splits-1)*ds.num_times_to_repeat_each_label_per_cv_split);
                         else
                             % The augmentation step.
                             curr_trials_to_use = basic_DS.augment_trials(curr_trials_to_use, ds.num_times_to_repeat_each_label_per_cv_split);
@@ -1146,6 +1147,8 @@ methods
                         for iRepeats = 1:length(find(curr_resample_sites_to_use == iNeuron))                    
                             the_resample_data(start_boostrap_ind:(start_boostrap_ind + length(curr_trials_to_use) - 1), cNeuron, :) = ds.the_data{iNeuron}(curr_trials_to_use, :);
                             the_resample_test(start_boostrap_ind_test:(start_boostrap_ind_test + length(curr_trials_for_test) - 1), cNeuron, :) = ds.the_data{iNeuron}(curr_trials_for_test, :);
+                            %the_resample_data(start_boostrap_ind:(start_boostrap_ind + length(curr_trials_to_use) - 1), cNeuron, :) = repmat(curr_trials_to_use,1,size(ds.the_data{1}, 2));
+                            %the_resample_test(start_boostrap_ind_test:(start_boostrap_ind_test + length(curr_trials_for_test) - 1), cNeuron, :) = repmat(curr_trials_for_test, 1, size(ds.the_data{1}, 2));
                             cNeuron = cNeuron + 1;
                             
                         end
@@ -1171,9 +1174,14 @@ methods
        function augmented_list = augment_trials(trials_list, target_number)
            if target_number <= length(trials_list)
                augmented_list = trials_list(randperm(length(trials_list)));
+               %augmented_list = augmented_list(1:target_number);
                augmented_list = augmented_list(1:target_number);
+               
                return
            end
+%            GMModel = fitgmdist(trials_list,2);
+%            r = normrnd(GMModel.mu,GMModel.sigma);
+           
            augmented_trials = repmat(trials_list, target_number,1);
            augmented_trials = augmented_trials(randperm(length(augmented_trials)));
            trials_list = trials_list(1:min(target_number, length(trials_list)));
