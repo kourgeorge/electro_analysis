@@ -78,7 +78,7 @@ function [inds_of_sites_with_at_least_k_repeats min_num_repeats_all_sites num_re
 ignore_case_of_strings = 0;  % could make this an input argument, but not going to bother for now
 
 
-if nargin < 3
+if nargin < 3 || isempty(label_names_to_use)
     label_names_to_use = [];
     %label_names_to_use = {};  % switched this to make the code compatible with Octavem but problematic because now won't work with numbers as stimulus labels...
     for iSite = 1:length(the_labels)
