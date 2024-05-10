@@ -1,16 +1,19 @@
 function [stats, agg_results] = CellsSelectivityStats(event, labels, stage, rat)
 %%% Presents cells selectivity information. For each Cell it finds the
 %%% responsiveness and selectivity type given the event and labels.
-global PROJECTS_DIR
+config = get_config()
 
 % raster_folder = '/Users/gkour/Box/phd/Electro_Rats/Rasters_test';
-raster_folder = fullfile(PROJECTS_DIR, 'plusMazeMotivationExpt','Rasters');
+%raster_folder = fullfile(PROJECTS_DIR, 'plusMazeMotivationExpt','Rasters');
+raster_folder = fullfile(config.rasters_folder, 'all')
 
 % event = 'ITI';
 % labels = [{'ArmType'},{'NPRewarded'}];
 show_cell_plot = false;
-baseline_range_bins = [-7,-1];
-target_range_bins = [0,12];
+% TODO 24.4.24: changed baseline and target ranges to adapt to the small cut. May need to change back and have longer cuts 
+
+baseline_range_bins = [-2,-1];
+target_range_bins = [0,3];
 %baseline_range_bins = [-19,-13];
 %target_range_bins = [-12,0];
 alpha = 0.05;

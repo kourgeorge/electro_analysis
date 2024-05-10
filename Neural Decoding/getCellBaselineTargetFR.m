@@ -18,7 +18,7 @@ for v=1:length(combinations)
     
     bin_size = event_cell_data.raster_site_info.binsize;
     binned_xaxis = event_cell_data.raster_site_info.cut_info(1)*1000/bin_size:event_cell_data.raster_site_info.cut_info(2)*1000/bin_size;
-    event_bin = find(binned_xaxis==0);
+    event_bin = find(binned_xaxis>=0, 1);
     baseline_range = event_bin+baseline_range_bins(1):event_bin+baseline_range_bins(2);
     target_range = event_bin+target_range_bins(1):event_bin+target_range_bins(2);
     

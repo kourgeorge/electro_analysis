@@ -6,6 +6,8 @@ raster = cell_data.raster_data.Raster(relevant_trial,:);
 raster_binned = cell_data.raster_data.BinnedRaster(relevant_trial,:);
 %raster = raster(any(raster ~= 0,2),:);
 
+% raster_binned = raster*(1000/cell_data.raster_site_info.binsize);
+
 end
 
 function relevant_trials = filter_trials(cell_data, filter_labels, filter_values)
